@@ -1,12 +1,26 @@
 {
-   "name": "aio",
+   "name": "@maivubc/ujs",
+   "author": "Rainy",
    "version": "1.0.0",
    "main": "dist/index.js",
+   "types": "dist/index.d.ts",
+   "files": [
+      "dist"
+   ],
    "license": "MIT",
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/mvanvu/ujs.git"
+   },
+   "keywords": [
+      "umd-js",
+      "util-js"
+   ],
    "scripts": {
       "start": "webpack server",
       "build": "tsc && webpack build",
-      "test": "jest"
+      "test": "jest",
+      "npm-publish": "yarn publish --access=public"
    },
    "dependencies": {
       "buffer": "^6.0.3",
@@ -28,5 +42,13 @@
       "webpack": "^5.90.0",
       "webpack-cli": "^5.1.4",
       "webpack-dev-server": "^4.15.1"
+   },
+   "description": "UMD JS work on the both browser and NodeJs",
+   "bugs": {
+      "url": "https://github.com/mvanvu/ujs/issues"
+   },
+   "homepage": "https://github.com/mvanvu/ujs#readme",
+   "directories": {
+      "test": "test"
    }
 }
