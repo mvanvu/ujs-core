@@ -5,7 +5,7 @@ import { DateTime } from './datetime';
 import { Is } from './is';
 import * as crypto from 'crypto';
 
-export function clone<T>(src: any): T {
+export function clone<T extends any>(src: T): T {
    if (Is.flatValue(src)) {
       return <T>src;
    }
@@ -34,7 +34,7 @@ export function clone<T>(src: any): T {
       const val = typeof src.valueOf === 'function' ? src.valueOf() : undefined;
 
       if (val && Object(val) !== val) {
-         newInst = new src.constructor(val);
+         newInst = new (src.constructor as any)(val);
       }
    }
 
@@ -267,4 +267,62 @@ export function chunk<T extends any>(array: T[], size = 1): Array<T[]> {
    }
 
    return output;
+}
+
+export function repeat(char: string, level = 0) {
+   level = parseInt(level.toString());
+
+   if (level <= 0) {
+      return '';
+   }
+
+   while (--level > 0) {
+      char += `${char}`;
+   }
+
+   return char;
+}
+
+export function resetObject<T extends object>(obj: object, newData?: T): T | {} {
+   // Clean the object first
+   for (const k in obj) {
+      delete obj[k];
+   }
+
+   if (newData) {
+      Object.assign(obj, newData);
+   }
+
+   return obj;
+}
+
+export function sort(data: any[] | object, options?: { key?: string }) {
+   const k = options?.key;
+   const compare = (a: any, b: any) => (a < b ? -1 : a > b ? 1 : 0);
+
+   if (Array.isArray(data)) {
+      if (k) {
+         data.sort((a, b) => {
+            if (Is.object(a) && Is.object(b)) {
+               return compare(a[k], b[k]);
+            }
+
+            return compare(a, b);
+         });
+      } else {
+         data.sort(compare);
+      }
+   } else if (Is.object(data)) {
+      const keys = Object.keys(data);
+      const obj = {} as typeof data;
+      keys.sort();
+
+      for (const key of keys) {
+         obj[key] = clone(data[key]);
+      }
+
+      resetObject(data, obj);
+   }
+
+   return data;
 }

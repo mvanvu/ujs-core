@@ -1,13 +1,31 @@
-import { uuid, hash, clone, extendsObject, excludeProps, sum, truncate, union, first, last, chunk } from '../../src';
+import {
+   uuid,
+   hash,
+   clone,
+   extendsObject,
+   excludeProps,
+   sum,
+   truncate,
+   union,
+   first,
+   last,
+   chunk,
+   repeat,
+   resetObject,
+   sort,
+} from '../../src';
 
 it('Util Func', () => {
    // Hash
+   const rawStr = 'Hello World!';
    expect(uuid().length).toEqual(36);
-   expect(hash('', 'md5').length).toEqual(32);
+   expect(hash(rawStr, 'md5')).toEqual('ed076287532e86365e841e92bfc50d8c');
+   expect(hash(rawStr, 'sha1')).toEqual('2ef7bde608ce5404e97d5f042f95f89f1c232871');
+   expect(hash(rawStr, 'sha256')).toEqual('7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069');
 
    // Clone
    const foo = { bar: 123 };
-   const foo2 = clone<typeof foo>(foo);
+   const foo2 = clone(foo);
    foo2.bar = 456;
    expect(foo.bar).toEqual(123);
    expect(foo2.bar).toEqual(456);
@@ -45,4 +63,33 @@ it('Util Func', () => {
       ['c', 'd'],
    ]);
    expect(chunk(['a', 'b', 'c', 'd'], 3)).toEqual([['a', 'b', 'c'], ['d']]);
+
+   // Repeat
+   expect(repeat('-', 0.4)).toEqual('');
+   expect(repeat('-', -1)).toEqual('');
+   expect(repeat('-', 0)).toEqual('');
+   expect(repeat('-', 1)).toEqual('-');
+   expect(repeat('-', 2)).toEqual('--');
+   expect(repeat('==', 2)).toEqual('====');
+
+   // Reset object
+   resetObject(obj, { foo: 'bar' });
+   expect(foo).toHaveProperty('foo', 'bar');
+
+   // Sort
+   expect(sort(['March', 'Jan', 'Feb', 'Dec'])).toEqual(['Dec', 'Feb', 'Jan', 'March']);
+   expect(sort([1, 30, 4, 21, 100000])).toEqual([1, 4, 21, 30, 100000]);
+   expect(
+      sort(
+         [
+            { foo: 10, bar: 20 },
+            { foo: 5, bar: 10 },
+         ],
+         { key: 'foo' },
+      ),
+   ).toEqual([
+      { foo: 5, bar: 10 },
+      { foo: 10, bar: 20 },
+   ]);
+   expect(Object.keys(sort({ foo: 10, bar: 20 }))).toEqual(['bar', 'foo']);
 });

@@ -237,15 +237,23 @@ export class DateTime {
       }
    }
 
-   isGreater(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
+   gt(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
       return this.diff(datetime, unit) > 0;
    }
 
-   isLesser(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
+   gte(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
+      return this.diff(datetime, unit) >= 0;
+   }
+
+   lt(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
       return this.diff(datetime, unit) < 0;
    }
 
-   isEquals(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
+   lte(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
+      return this.diff(datetime, unit) <= 0;
+   }
+
+   eq(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
       return this.diff(datetime, unit) === 0;
    }
 
