@@ -326,3 +326,25 @@ export function sort(data: any[] | object, options?: { key?: string }) {
 
    return data;
 }
+
+export function diff(a: any, b: any) {
+   if (Array.isArray(a) && Array.isArray(b)) {
+      const output = [];
+
+      for (const v of a) {
+         if (!b.find((val) => Is.equals(val, v))) {
+            output.push(v);
+         }
+      }
+
+      for (const v of b) {
+         if (!a.find((val) => Is.equals(val, v))) {
+            output.push(v);
+         }
+      }
+
+      return output;
+   }
+
+   return Is.equals(a, b) ? [] : [a, b];
+}

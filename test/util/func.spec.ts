@@ -13,6 +13,7 @@ import {
    repeat,
    resetObject,
    sort,
+   diff,
 } from '../../src';
 
 it('Util Func', () => {
@@ -92,4 +93,12 @@ it('Util Func', () => {
       { foo: 10, bar: 20 },
    ]);
    expect(Object.keys(sort({ foo: 10, bar: 20 }))).toEqual(['bar', 'foo']);
+
+   // Diff
+   expect(diff([2, 1], [2, 3])).toEqual([1, 3]);
+   expect(diff([2, 1], [1, 2, 3])).toEqual([3]);
+   expect(diff([2, 1, 4, 5], [1, 2, 3])).toEqual([4, 5, 3]);
+   expect(diff(1, 2)).toEqual([1, 2]);
+   expect(diff(1, 1)).toEqual([]);
+   expect(diff({ foo: 1, bar: 2 }, { bar: 2, foo: 1 })).toEqual([]);
 });
