@@ -1,6 +1,4 @@
 import {
-   uuid,
-   hash,
    clone,
    extendsObject,
    excludeProps,
@@ -14,15 +12,17 @@ import {
    resetObject,
    sort,
    diff,
+   baseName,
+   dirName,
 } from '../../src';
 
 it('Util Func', () => {
-   // Hash
-   const rawStr = 'Hello World!';
-   expect(uuid().length).toEqual(36);
-   expect(hash(rawStr, 'md5')).toEqual('ed076287532e86365e841e92bfc50d8c');
-   expect(hash(rawStr, 'sha1')).toEqual('2ef7bde608ce5404e97d5f042f95f89f1c232871');
-   expect(hash(rawStr, 'sha256')).toEqual('7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069');
+   // // Hash
+   // const rawStr = 'Hello World!';
+   // expect(uuid().length).toEqual(36);
+   // expect(hash(rawStr, 'md5')).toEqual('ed076287532e86365e841e92bfc50d8c');
+   // expect(hash(rawStr, 'sha1')).toEqual('2ef7bde608ce5404e97d5f042f95f89f1c232871');
+   // expect(hash(rawStr, 'sha256')).toEqual('7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069');
 
    // Clone
    const foo = { bar: 123 };
@@ -101,4 +101,12 @@ it('Util Func', () => {
    expect(diff(1, 2)).toEqual([1, 2]);
    expect(diff(1, 1)).toEqual([]);
    expect(diff({ foo: 1, bar: 2 }, { bar: 2, foo: 1 })).toEqual([]);
+
+   // Base name
+   expect(baseName('/www/site/home.htm', '.htm')).toEqual('home');
+   expect(baseName('/some/path/')).toEqual('path');
+
+   // Dir name
+   expect(dirName('/etc/passwd')).toEqual('/etc');
+   expect(dirName('/some/path/to/')).toEqual('/some/path');
 });

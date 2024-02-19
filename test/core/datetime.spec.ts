@@ -10,8 +10,8 @@ it('Util Datetime', () => {
    clone.add(1, 'day');
    expect(clone.native.getDate() - 1 === date.getDate());
    expect(datetime.native.getDate() - 1 < date.getDate());
-   expect(clone.isGreater(date));
-   expect(datetime.isEquals(date));
+   expect(clone.gt(date));
+   expect(datetime.eq(date));
 
    // TZ
    datetime.setOffset(DateTime.parseOffset('+08:00'));

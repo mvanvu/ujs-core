@@ -1,4 +1,5 @@
 module.exports = {
+   testEnvironment: 'node',
    moduleFileExtensions: ['js', 'json', 'ts'],
    rootDir: 'test',
    testRegex: '.*\\.spec\\.(t|j)s$',

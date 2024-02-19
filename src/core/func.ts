@@ -3,10 +3,10 @@ import { configDefault } from '../config';
 import { Registry } from './registry';
 import { DateTime } from './datetime';
 import { Is } from './is';
-import * as crypto from 'crypto';
+// import * as crypto from 'crypto';
 
 export function clone<T extends any>(src: T): T {
-   if (Is.flatValue(src)) {
+   if (Is.flat(src)) {
       return <T>src;
    }
 
@@ -52,7 +52,7 @@ export function extendsObject<T extends Record<string, any>>(
          if (Is.object(target[key]) && Is.object(data)) {
             extendsObject(target[key], data);
          } else {
-            Object.assign(target, { [key]: Is.flatValue(data) ? data : clone(data) });
+            Object.assign(target, { [key]: Is.flat(data) ? data : clone(data) });
          }
       }
    }
@@ -144,58 +144,58 @@ export function debug(...args: any[]) {
    }
 }
 
-export function hash(str: string, type: 'md5' | 'sha1' | 'sha256' = 'sha256') {
-   return crypto.createHash(type).update(str).digest('hex');
-}
+// export function hash(str: string, type: 'md5' | 'sha1' | 'sha256' = 'sha256') {
+//    return crypto.createHash(type).update(str).digest('hex');
+// }
 
-export function uuid() {
-   let buf: Buffer | undefined,
-      bufIdx = 0;
-   const hexBytes = new Array(256);
+// export function uuid() {
+//    let buf: Buffer | undefined,
+//       bufIdx = 0;
+//    const hexBytes = new Array(256);
 
-   // Pre-calculate toString(16) for speed
-   for (let i = 0; i < 256; i++) {
-      hexBytes[i] = (i + 0x100).toString(16).substring(1);
-   }
+//    // Pre-calculate toString(16) for speed
+//    for (let i = 0; i < 256; i++) {
+//       hexBytes[i] = (i + 0x100).toString(16).substring(1);
+//    }
 
-   // Buffer random numbers for speed
-   // Reduce memory usage by decreasing this number (min 16)
-   // or improve speed by increasing this number (try 16384)
-   const BUFFER_SIZE = 4096;
+//    // Buffer random numbers for speed
+//    // Reduce memory usage by decreasing this number (min 16)
+//    // or improve speed by increasing this number (try 16384)
+//    const BUFFER_SIZE = 4096;
 
-   // Buffer some random bytes for speed
-   if (buf === void 0 || bufIdx + 16 > BUFFER_SIZE) {
-      bufIdx = 0;
-      buf = crypto.randomBytes(BUFFER_SIZE);
-   }
+//    // Buffer some random bytes for speed
+//    if (buf === void 0 || bufIdx + 16 > BUFFER_SIZE) {
+//       bufIdx = 0;
+//       buf = crypto.randomBytes(BUFFER_SIZE);
+//    }
 
-   const b = Array.prototype.slice.call(buf, bufIdx, (bufIdx += 16));
-   b[6] = (b[6] & 0x0f) | 0x40;
-   b[8] = (b[8] & 0x3f) | 0x80;
+//    const b = Array.prototype.slice.call(buf, bufIdx, (bufIdx += 16));
+//    b[6] = (b[6] & 0x0f) | 0x40;
+//    b[8] = (b[8] & 0x3f) | 0x80;
 
-   return (
-      hexBytes[b[0]] +
-      hexBytes[b[1]] +
-      hexBytes[b[2]] +
-      hexBytes[b[3]] +
-      '-' +
-      hexBytes[b[4]] +
-      hexBytes[b[5]] +
-      '-' +
-      hexBytes[b[6]] +
-      hexBytes[b[7]] +
-      '-' +
-      hexBytes[b[8]] +
-      hexBytes[b[9]] +
-      '-' +
-      hexBytes[b[10]] +
-      hexBytes[b[11]] +
-      hexBytes[b[12]] +
-      hexBytes[b[13]] +
-      hexBytes[b[14]] +
-      hexBytes[b[15]]
-   );
-}
+//    return (
+//       hexBytes[b[0]] +
+//       hexBytes[b[1]] +
+//       hexBytes[b[2]] +
+//       hexBytes[b[3]] +
+//       '-' +
+//       hexBytes[b[4]] +
+//       hexBytes[b[5]] +
+//       '-' +
+//       hexBytes[b[6]] +
+//       hexBytes[b[7]] +
+//       '-' +
+//       hexBytes[b[8]] +
+//       hexBytes[b[9]] +
+//       '-' +
+//       hexBytes[b[10]] +
+//       hexBytes[b[11]] +
+//       hexBytes[b[12]] +
+//       hexBytes[b[13]] +
+//       hexBytes[b[14]] +
+//       hexBytes[b[15]]
+//    );
+// }
 
 export function sum(source: number[] | Record<string, any>[], options?: { key?: string }) {
    const key = options?.key ?? '';
@@ -347,4 +347,25 @@ export function diff(a: any, b: any) {
    }
 
    return Is.equals(a, b) ? [] : [a, b];
+}
+
+export function baseName(path: string, suffix?: string) {
+   let b = path;
+   const lastChar = b.charAt(b.length - 1);
+
+   if (lastChar === '/' || lastChar === '\\') {
+      b = b.slice(0, -1);
+   }
+
+   b = b.replace(/^.*[/\\]/g, '');
+
+   if (typeof suffix === 'string' && b.substring(b.length - suffix.length) === suffix) {
+      b = b.substring(0, b.length - suffix.length);
+   }
+
+   return b;
+}
+
+export function dirName(path: string) {
+   return path.replace(/\\/g, '/').replace(/\/[^/]*\/?$/, '');
 }

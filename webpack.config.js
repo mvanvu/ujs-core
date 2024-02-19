@@ -1,10 +1,11 @@
 const path = require('path');
 
 module.exports = {
-   mode: 'development',
+   mode: 'production',
    entry: './src/index.ts',
-   devtool: 'source-map',
+   // devtool: 'inline-source-map',
    output: {
+      globalObject: 'this',
       filename: 'index.js',
       path: path.resolve(__dirname, 'dist'),
       library: {
@@ -12,6 +13,7 @@ module.exports = {
          type: 'umd',
          umdNamedDefine: true,
       },
+      pathinfo: false,
    },
    devServer: {
       static: {
@@ -21,16 +23,12 @@ module.exports = {
    },
    resolve: {
       extensions: ['.ts', '.js'],
-      fallback: {
-         crypto: require.resolve('crypto-browserify'),
-         stream: require.resolve('stream-browserify'),
-         buffer: require.resolve('buffer/'),
-      },
    },
    module: {
       rules: [
          {
             use: 'ts-loader',
+            include: path.resolve(__dirname, 'src'),
             exclude: /node_modules/,
          },
       ],

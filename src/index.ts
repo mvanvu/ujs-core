@@ -1,3 +1,3 @@
 export * from './config';
 export * from './type';
-export * from './util';
+export * from './core';

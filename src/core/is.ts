@@ -4,26 +4,12 @@ import { CommonType, ObjectCommonType } from '../type';
 type RulesOptions = { rules: ObjectCommonType; suitable?: boolean };
 
 export class Is {
-   static emptyObject(obj: any) {
-      return Is.object(obj) && !Object.keys(obj).length;
-   }
-
-   static date(d: any): DateTime | false {
-      const date = DateTime.create(d);
-
-      return date.valid ? date : false;
-   }
-
-   // eslint-disable-next-line @typescript-eslint/no-empty-function
-   static asyncFunc(fn: any) {
-      return fn instanceof (async () => {}).constructor;
-   }
-
    static typeOf(value: any, type: CommonType, each = false) {
       value = each ? (Array.isArray(value) ? value : [value]) : value;
 
       for (const val of each ? value : [value]) {
          const typeValue = typeof val;
+
          switch (type) {
             case 'string':
             case 'undefined':
@@ -107,6 +93,13 @@ export class Is {
 
             case 'regex':
                if (!(val instanceof RegExp)) {
+                  return false;
+               }
+
+               break;
+
+            case 'date':
+               if (!Is.date(val)) {
                   return false;
                }
 
@@ -247,7 +240,17 @@ export class Is {
       return a !== a && b !== b; // eslint-disable-line no-self-compare
    }
 
-   static flatValue(value: any) {
+   static emptyObject(obj: any) {
+      return Is.object(obj) && !Object.keys(obj).length;
+   }
+
+   static date(d: any): DateTime | false {
+      const date = DateTime.create(d);
+
+      return date.valid ? date : false;
+   }
+
+   static flat(value: any) {
       if ([null, undefined, NaN].includes(value)) {
          return true;
       }
@@ -303,7 +306,7 @@ export class Is {
       return value !== null && !Array.isArray(value) && typeof value === 'object';
    }
 
-   static validateObject(value: any, options?: RulesOptions) {
+   private static validateObject(value: any, options?: RulesOptions) {
       const suitable = options?.suitable ?? true;
       const validate = (v: any, rules?: any) => {
          if (!Is.object(v)) {
@@ -368,5 +371,86 @@ export class Is {
       }
 
       return true;
+   }
+
+   // eslint-disable-next-line @typescript-eslint/no-empty-function
+   static asyncFunc(value: any) {
+      return value instanceof (async () => {}).constructor;
+   }
+
+   static func(value: any, each = false) {
+      return Is.typeOf(value, 'function', each);
+   }
+
+   static number(value: any, each = false) {
+      return Is.typeOf(value, 'number', each);
+   }
+
+   static sNumber(value: any, each = false) {
+      return Is.typeOf(value, 'snumber', each);
+   }
+
+   static uNumber(value: any, each = false) {
+      return Is.typeOf(value, 'unumber', each);
+   }
+
+   static int(value: any, each = false) {
+      return Is.typeOf(value, 'int', each);
+   }
+
+   static sInt(value: any, each = false) {
+      return Is.typeOf(value, 'sint', each);
+   }
+
+   static uInt(value: any, each = false) {
+      return Is.typeOf(value, 'uint', each);
+   }
+
+   static bigInt(value: any, each = false) {
+      return Is.typeOf(value, 'bigint', each);
+   }
+
+   static sBigInt(value: any, each = false) {
+      return Is.typeOf(value, 'sbigint', each);
+   }
+
+   static uBigInt(value: any, each = false) {
+      return Is.typeOf(value, 'ubigint', each);
+   }
+
+   static boolean(value: any, each = false) {
+      return Is.typeOf(value, 'boolean', each);
+   }
+
+   static string(value: any, each = false) {
+      return Is.typeOf(value, 'string', each);
+   }
+
+   static null(value: any, each = false) {
+      return Is.typeOf(value, 'null', each);
+   }
+
+   static undefined(value: any, each = false) {
+      return Is.typeOf(value, 'undefined', each);
+   }
+
+   static nan(value: any, each = false) {
+      return Is.typeOf(value, 'NaN', each);
+   }
+
+   static symbol(value: any, each = false) {
+      return Is.typeOf(value, 'symbol', each);
+   }
+
+   static map(value: any, each = false) {
+      return Is.typeOf(value, 'map', each);
+   }
+
+   static set(value: any, each = false) {
+      return Is.typeOf(value, 'set', each);
+   }
+
+   static regex(value: any, each = false) {
+      return Is.typeOf(value, 'regex', each);
    }
 }

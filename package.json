@@ -17,21 +17,14 @@
       "util-js"
    ],
    "scripts": {
-      "start": "webpack server",
-      "build": "tsc && webpack build",
+      "serve": "webpack server",
+      "build": "webpack build",
       "test": "jest",
       "npm-publish": "yarn publish --access=public"
-   },
-   "dependencies": {
-      "buffer": "^6.0.3",
-      "crypto-browserify": "^3.12.0",
-      "sanitize-html": "^2.11.0",
-      "stream-browserify": "^3.0.0"
    },
    "devDependencies": {
       "@types/jest": "^29.5.12",
       "@types/node": "^20.11.16",
-      "@types/sanitize-html": "^2.9.5",
       "@types/webpack": "^5.28.5",
       "@types/webpack-dev-server": "^4.7.2",
       "jest": "^29.7.0",
@@ -39,9 +32,9 @@
       "ts-loader": "^9.5.1",
       "ts-node": "^10.9.2",
       "typescript": "^5.3.3",
-      "webpack": "^5.90.0",
+      "webpack": "^5.90.2",
       "webpack-cli": "^5.1.4",
-      "webpack-dev-server": "^4.15.1"
+      "webpack-dev-server": "^5.0.2"
    },
    "description": "UMD JS work on the both browser and NodeJs",
    "bugs": {

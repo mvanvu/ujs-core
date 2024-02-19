@@ -1,6 +1,5 @@
 'use strict';
 import { Is } from './is';
-import sanitize from 'sanitize-html';
 
 export class Transform {
    // Trim the string value
@@ -73,7 +72,7 @@ export class Transform {
    }
 
    // Convert to JSON
-   static toJson<T>(value: any, defaultJson?: any[] | Record<string, any>): T {
+   static toJsonObject<T = any[] | Record<string, any>>(value: any, defaultJson?: T): T {
       const type = typeof value;
 
       if (type === 'string' && (value[0] === '{' || value[0] === '[')) {
@@ -167,11 +166,6 @@ export class Transform {
       return [value];
    }
 
-   // Convert string to array which has no empty element
-   static stringToArray(value: any, splitChar = ',') {
-      return (typeof value === 'string' ? value : '').split(splitChar).filter((v) => !!v.trim());
-   }
-
    // Convert a string to a safe URL path
    static toPath(value: any) {
       return Transform.toString(value)
@@ -190,10 +184,6 @@ export class Transform {
          .trim()
          .replace(/[^a-z0-9]/gi, '')
          .toLowerCase();
-   }
-
-   static toSafeHTML(value: any, options?: sanitize.IOptions) {
-      return sanitize(Transform.toString(value), options);
    }
 
    static toNoneDiacritics(value: any) {
@@ -219,7 +209,7 @@ export class Transform {
          .replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
          .replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
          .replace(/Đ/g, 'D')
-         .replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, '') // Huyền sắc hỏi ngã nặng
+         .replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, '') // -> \/?~.
          .replace(/\u02C6|\u0306|\u031B/g, '');
 
       return Transform.toNoneDiacritics(value);
@@ -233,7 +223,7 @@ export class Transform {
    }
 
    static toSafeFileName(value: any): string {
-      let name = Transform.toNonAccentVietnamese(value);
+      let name = Transform.toASCIIString(Transform.toNonAccentVietnamese(value));
       let ext = '';
 
       if (name.includes('.')) {
@@ -246,21 +236,102 @@ export class Transform {
    }
 
    static toDefault(value: any, ...defValues: any[]) {
-      const noValues = [null, undefined, NaN];
+      const nothing = [null, undefined, NaN];
 
-      if (!noValues.includes(value)) {
+      if (!nothing.includes(value)) {
          return value;
       }
 
       for (let i = 0, n = defValues.length; i < n; i++) {
          const def = defValues[i];
 
-         if (!noValues.includes(def)) {
+         if (!nothing.includes(def)) {
             return def;
          }
       }
 
       return undefined;
+   }
+
+   static toStripTags(value: any, allowed?: string) {
+      // Making sure the allowed arg is a string containing only tags in lowercase (<a><b><c>)
+      allowed = (((allowed || '') + '').toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('');
+      const tags = /<\/?([a-z0-9]*)\b[^>]*>?/gi;
+      const commentsAndPhpTags = /<!--[\s\S]*?-->|<\?(?:php)?[\s\S]*?\?>/gi;
+      let after = Transform.toString(value);
+      // Removes the '<' char at the end of the string to replicate PHP's behaviour
+      after = after.substring(after.length - 1) === '<' ? after.substring(0, after.length - 1) : after;
+
+      // Recursively remove tags to ensure that the returned string doesn't contain forbidden tags after previous passes (e.g. '<<bait/>switch/>')
+      while (true) {
+         const before = after;
+         after = before.replace(commentsAndPhpTags, '').replace(tags, function ($0, $1) {
+            return allowed.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
+         });
+
+         // Return once no more tags are removed
+         if (before === after) {
+            return after;
+         }
+      }
+   }
+
+   static toSafeHtml(value: any, options?: { allowedTags?: string[]; allowedAttributes?: string[] }) {
+      // Allowed HTML tags and attributes
+      const allowedTags = Array.isArray(options?.allowedTags)
+         ? options.allowedTags
+         : [
+              'p',
+              'b',
+              'i',
+              'em',
+              'strong',
+              'a',
+              'ul',
+              'ol',
+              'li',
+              'br',
+              'hr',
+              'img',
+              'table',
+              'thead',
+              'tfoot',
+              'tr',
+              'td',
+              'th',
+              'div',
+              'span',
+              'h1',
+              'h2',
+              'h3',
+              'h4',
+              'h5',
+              'h6',
+           ];
+      const allowedAttributes = Array.isArray(options?.allowedAttributes) ? options.allowedAttributes : ['href', 'src'];
+
+      if (!allowedTags.length) {
+         return Transform.toStripTags(value);
+      }
+
+      // Filter the input string
+      return Transform.trim(value)
+         .replace(/<\/?([^\>]+)>/gi, (match, foundStr) => {
+            const tagName = foundStr.split(' ')[0];
+
+            return allowedTags.includes(tagName)
+               ? match
+                    .replace(/([a-z0-9_-]+)\s*=\s*["']([^"']+)["']/gi, (match) => {
+                       const attr = match.split('=')[0]?.trim();
+
+                       return allowedAttributes.includes(attr) ? match.trim() : '';
+                    })
+                    .trim()
+                    .replace(/<\s+/g, '<')
+                    .replace(/\s+>/g, '>')
+               : '';
+         })
+         .replace(/\s+/gi, ' ');
    }
 
    // Clean up value with a list of transform

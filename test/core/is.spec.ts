@@ -16,18 +16,18 @@ it('Util Is', () => {
    expect(Is.asyncFunc(async () => {})).toBeTruthy();
 
    // Typeof
-   expect(Is.typeOf(123, 'int')).toBeTruthy();
-   expect(Is.typeOf(-1, 'sint')).toBeFalsy();
-   expect(Is.typeOf(123.4, 'uint')).toBeFalsy();
-   expect(Is.typeOf(-123, 'number')).toBeTruthy();
-   expect(Is.typeOf(-123, 'snumber')).toBeFalsy();
-   expect(Is.typeOf(-123.456, 'unumber')).toBeTruthy();
-   expect(Is.typeOf(undefined, 'undefined')).toBeTruthy();
-   expect(Is.typeOf(null, 'null')).toBeTruthy();
-   expect(Is.typeOf(null, 'object')).toBeFalsy();
-   expect(Is.typeOf({}, 'object')).toBeTruthy();
-   expect(Is.typeOf([], 'object')).toBeFalsy();
-   expect(Is.typeOf([], 'array')).toBeTruthy();
+   expect(Is.int(123)).toBeTruthy();
+   expect(Is.sInt(-1)).toBeFalsy();
+   expect(Is.uInt(123.4)).toBeFalsy();
+   expect(Is.number(-123)).toBeTruthy();
+   expect(Is.sNumber(-123)).toBeFalsy();
+   expect(Is.uNumber(-123.456)).toBeTruthy();
+   expect(Is.undefined(undefined)).toBeTruthy();
+   expect(Is.null(null)).toBeTruthy();
+   expect(Is.object(null)).toBeFalsy();
+   expect(Is.object({})).toBeTruthy();
+   expect(Is.object([])).toBeFalsy();
+   expect(Is.array([])).toBeTruthy();
 
    // Equals
    expect(Is.equals(123, '123')).toBeFalsy();
@@ -42,19 +42,19 @@ it('Util Is', () => {
    expect(Is.equals(date, DateTime.create(date))).toBeTruthy();
 
    // Flat value
-   expect(Is.flatValue(123)).toBeTruthy();
-   expect(Is.flatValue(-123)).toBeTruthy();
-   expect(Is.flatValue(null)).toBeTruthy();
-   expect(Is.flatValue(void 0)).toBeTruthy();
-   expect(Is.flatValue('')).toBeTruthy();
-   expect(Is.flatValue(true)).toBeTruthy();
-   expect(Is.flatValue(false)).toBeTruthy();
-   expect(Is.flatValue(NaN)).toBeTruthy();
-   expect(Is.flatValue([])).toBeFalsy();
-   expect(Is.flatValue({})).toBeFalsy();
-   expect(Is.flatValue(() => {})).toBeFalsy();
-   expect(Is.flatValue(new Set())).toBeFalsy();
-   expect(Is.flatValue(new Map())).toBeFalsy();
+   expect(Is.flat(123)).toBeTruthy();
+   expect(Is.flat(-123)).toBeTruthy();
+   expect(Is.flat(null)).toBeTruthy();
+   expect(Is.flat(void 0)).toBeTruthy();
+   expect(Is.flat('')).toBeTruthy();
+   expect(Is.flat(true)).toBeTruthy();
+   expect(Is.flat(false)).toBeTruthy();
+   expect(Is.flat(NaN)).toBeTruthy();
+   expect(Is.flat([])).toBeFalsy();
+   expect(Is.flat({})).toBeFalsy();
+   expect(Is.flat(() => {})).toBeFalsy();
+   expect(Is.flat(new Set())).toBeFalsy();
+   expect(Is.flat(new Map())).toBeFalsy();
 
    // Empty
    expect(Is.empty(0)).toBeTruthy();

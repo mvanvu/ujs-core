@@ -23,4 +23,17 @@ it('Util Transform', () => {
    expect(Transform.toDefault(null, 1)).toEqual(1);
    expect(Transform.toDefault(NaN, 2)).toEqual(2);
    expect(Transform.toDefault(false)).toEqual(false);
+
+   // Strip tags
+   expect(Transform.toStripTags('1 <br/> 1', '<br><br/>')).toEqual('1 <br/> 1');
+   expect(Transform.toStripTags('<i>hello</i> <<foo>script>world<</foo>/script>')).toEqual('hello world');
+   expect(Transform.toStripTags(4)).toEqual('4');
+
+   // Safe HTML
+   expect(Transform.toSafeHtml('<a href="/path/to/url" >Click me</a>')).toEqual('<a href="/path/to/url">Click me</a>');
+   expect(Transform.toSafeHtml('<div><p>Hello, <b>World</b>!</p><script>alert("XSS");</script></div>')).toEqual(
+      '<div><p>Hello, <b>World</b>!</p>alert("XSS");</div>',
+   );
+   expect(Transform.toSafeHtml(' <iframe> ')).toEqual('');
+   expect(Transform.toSafeHtml('<h1>Heading</h1>')).toEqual('<h1>Heading</h1>');
 });

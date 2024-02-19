@@ -19,7 +19,8 @@ export type CommonType =
    | 'regex'
    | 'set'
    | 'map'
-   | 'NaN';
+   | 'NaN'
+   | 'date';
 
 export interface ObjectCommonType {
    [key: string]: CommonType | ObjectCommonType;
