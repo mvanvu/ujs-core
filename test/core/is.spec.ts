@@ -1,6 +1,6 @@
 import { Is, DateTime } from '../../src';
 
-it('Util Is', () => {
+it('Core Is', () => {
    // Empty object
    expect(Is.emptyObject({ foo: 'bar' })).toBeFalsy();
    expect(Is.emptyObject({})).toBeTruthy();

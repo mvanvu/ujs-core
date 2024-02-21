@@ -251,19 +251,7 @@ export class Is {
    }
 
    static flat(value: any) {
-      if ([null, undefined, NaN].includes(value)) {
-         return true;
-      }
-
-      const flatTypes: CommonType[] = ['string', 'boolean', 'number', 'bigint', 'ubigint', 'int', 'uint', 'number', 'unumber'];
-
-      for (const flatType of flatTypes) {
-         if (Is.typeOf(value, flatType)) {
-            return true;
-         }
-      }
-
-      return false;
+      return (typeof value !== 'object' && typeof value !== 'function') || value === null;
    }
 
    static empty(value: any) {
@@ -452,5 +440,19 @@ export class Is {
 
    static regex(value: any, each = false) {
       return Is.typeOf(value, 'regex', each);
+   }
+
+   static nodeJs() {
+      return (
+         typeof global !== 'undefined' &&
+         global &&
+         typeof global.process !== 'undefined' &&
+         typeof global.process.versions !== 'undefined' &&
+         typeof global.process.versions.node !== 'undefined'
+      );
+   }
+
+   static nullOrUndefined(value: any) {
+      return value === undefined || value === null;
    }
 }

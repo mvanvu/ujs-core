@@ -43,5 +43,8 @@
    "homepage": "https://github.com/mvanvu/ujs#readme",
    "directories": {
       "test": "test"
+   },
+   "engines": {
+      "node": ">=18.0.0"
    }
 }
