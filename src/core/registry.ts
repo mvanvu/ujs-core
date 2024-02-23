@@ -1,7 +1,7 @@
 'use strict';
+import { Is } from './is';
 import { Transform } from './transform';
 import { clone } from './func';
-export type RegistryParamType = string | Registry | Record<string, any> | any[];
 export type RegistryDataType = Record<string, any> | any[];
 export class RegistryDataError extends Error {}
 
@@ -9,55 +9,44 @@ export class Registry {
    private cached: Record<string, any> = {};
    private data: RegistryDataType;
 
-   constructor(data?: RegistryParamType) {
-      this.parse(data);
+   constructor(data?: any, validate?: boolean) {
+      this.parse(data, validate);
    }
 
-   static from(data?: RegistryParamType | Registry) {
+   static from(data?: any) {
       return new Registry(data);
    }
 
-   merge(data?: RegistryParamType | Registry) {
-      const obj = Registry.from(data).clone().valueOf();
-      const deepMerge = (path: string, value: any) => {
-         if (value !== null && typeof value === 'object') {
-            if (Array.isArray(value)) {
-               for (let i = 0, n = value.length; i < n; i++) {
-                  deepMerge(`${path}.${i}`, value[i]);
-               }
-            } else {
-               for (const p in value) {
-                  deepMerge(`${path}.${p}`, value[p]);
-               }
+   merge(data: any) {
+      const deepMerge = (data: any, path?: string) => {
+         if (Is.array(data)) {
+            for (let i = 0, n = data.length; i < n; i++) {
+               deepMerge(data[i], `${path ? `${path}.` : ''}${i}`);
+            }
+         } else if (Is.object(data)) {
+            for (const p in data) {
+               deepMerge(data[p], `${path ? `${path}.` : ''}${p}`);
             }
          } else {
-            this.set(path, value);
+            this.set(path, data);
          }
       };
 
-      for (const path in obj) {
-         deepMerge(path, obj[path]);
-      }
+      deepMerge(Registry.from(data).valueOf());
 
       return this;
    }
 
-   parse(data?: any) {
-      if (data instanceof Registry) {
-         this.data = data.clone().data;
-
-         return this;
-      }
-
+   parse(data?: any, validate?: boolean) {
       if (data === undefined) {
          data = {};
-      } else if (typeof data === 'string' && ['{', '['].includes(data[0])) {
+      } else if (Is.string(data) && ['{', '['].includes(data[0])) {
          try {
             data = JSON.parse(data);
          } catch {
             throw new RegistryDataError('Invalid JSON string data');
          }
-      } else if (typeof data === 'object' && data !== null) {
+      } else if (Is.object(data) || Is.array(data)) {
          // Renew data to ignore the Object reference
          data = clone(data);
       }
@@ -70,6 +59,10 @@ export class Registry {
          );
       }
 
+      if (validate === true) {
+         this.validate();
+      }
+
       return this;
    }
 
@@ -79,7 +72,7 @@ export class Registry {
             for (const datum of data) {
                deepCheck(datum);
             }
-         } else if (typeof data === 'object' && data !== null) {
+         } else if (Is.object(data)) {
             if (Object.prototype.toString.call(data) !== '[object Object]') {
                throw new RegistryDataError(
                   'The object element data must be an Object<key, value> pair, not from any Class/Function constructor',
@@ -89,7 +82,7 @@ export class Registry {
             for (const k in data) {
                deepCheck(data[k]);
             }
-         } else if (typeof data === 'function') {
+         } else if (Is.func(data)) {
             throw new RegistryDataError('The object element data must be not a function');
          }
       };
@@ -114,7 +107,7 @@ export class Registry {
    }
 
    get<T>(path: string, defaultValue?: any, filter?: string | string[]): T {
-      const isDeep = (value: any) => (typeof value === 'object' && value !== null) || Array.isArray(value);
+      const isDeep = (value: any) => Is.object(value) || Array.isArray(value);
 
       if (this.cached[path] === undefined) {
          if (path.indexOf('.') === -1) {
@@ -215,13 +208,13 @@ export class Registry {
    }
 
    has(path: string) {
-      return this.get(path) !== undefined;
+      return !Is.undefined(this.get(path));
    }
 
    is(path: string, compareValue?: any) {
       const value = this.get(path);
 
-      if (compareValue === undefined) {
+      if (Is.undefined(compareValue)) {
          return Transform.toBoolean(value);
       }
 
@@ -238,13 +231,15 @@ export class Registry {
    }
 
    isPathArray(path?: string) {
-      return Array.isArray(path ? this.get(path) : this.data);
+      return Is.array(path ? this.get(path) : this.data);
    }
 
    isPathObject(path?: string) {
-      const value = path ? this.get(path) : this.data;
+      return Is.object(path ? this.get(path) : this.data);
+   }
 
-      return value !== null && typeof value === 'object' && !Array.isArray(value);
+   isPathFlat(path: string) {
+      return Is.flat(this.get(path));
    }
 
    remove(path: string) {

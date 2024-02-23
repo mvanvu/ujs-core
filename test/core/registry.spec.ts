@@ -22,8 +22,9 @@ it('Util Registry', () => {
    expect(registry.get('foo2')).toEqual(456);
    expect(registry.get('bar.foo1')).toEqual('bar1');
    expect(registry.get('bar.foo3')).toEqual('bar3');
-   registry.merge({ bar: 456 });
+   registry.merge({ bar: 456, fn: () => 1 });
    expect(registry.get('bar')).toEqual(456);
+   expect(registry.isValidData()).toBeFalsy();
 
    // Array registry
    registry.parse([1, 'foo', 2, 'bar', { foo: 'bar' }]);

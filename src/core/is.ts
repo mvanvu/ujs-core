@@ -294,6 +294,10 @@ export class Is {
       return value !== null && !Array.isArray(value) && typeof value === 'object';
    }
 
+   static objectOrArray(value: any) {
+      return Is.object(value) || Is.array(value);
+   }
+
    private static validateObject(value: any, options?: RulesOptions) {
       const suitable = options?.suitable ?? true;
       const validate = (v: any, rules?: any) => {
@@ -363,7 +367,7 @@ export class Is {
 
    // eslint-disable-next-line @typescript-eslint/no-empty-function
    static asyncFunc(value: any) {
-      return value instanceof (async () => {}).constructor;
+      return value instanceof Promise || value instanceof (async () => {}).constructor;
    }
 
    static func(value: any, each = false) {

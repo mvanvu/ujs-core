@@ -7,6 +7,8 @@ it('Core Func', () => {
    foo2.bar = 456;
    expect(foo.bar).toEqual(123);
    expect(foo2.bar).toEqual(456);
+   const fn = () => 1;
+   expect(clone(fn)).toEqual(fn);
 
    // Reset object
    expect(resetObject({ foo: 1, bar: 2 }, { foo: 'bar' })).toHaveProperty('foo', 'bar');
@@ -29,7 +31,8 @@ it('Core Func', () => {
    expect(Object.keys(sort({ foo: 10, bar: 20 }))).toEqual(['bar', 'foo']);
 
    // Base name
-   expect(baseName('/www/site/home.htm', '.htm')).toEqual('home');
+   expect(baseName('/www/site/home.html')).toEqual('home.html');
+   expect(baseName('/www/site/home.html', '.html')).toEqual('home');
    expect(baseName('/some/path/')).toEqual('path');
 
    // Dir name

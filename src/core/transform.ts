@@ -1,4 +1,5 @@
 'use strict';
+import { CommonType } from '../type';
 import { Is } from './is';
 
 export class Transform {
@@ -75,17 +76,17 @@ export class Transform {
    static toJsonObject<T = any[] | Record<string, any>>(value: any, defaultJson?: T): T {
       const type = typeof value;
 
-      if (type === 'string' && (value[0] === '{' || value[0] === '[')) {
+      if (type === 'string' && ['{', '['].includes(value[0])) {
          try {
             return JSON.parse(value);
          } catch {}
       }
 
-      if (type === 'object' && value) {
+      if (type === 'object' && value !== null) {
          return value;
       }
 
-      return <T>(defaultJson || {});
+      return defaultJson || <T>{};
    }
 
    // Convert to boolean
@@ -368,25 +369,13 @@ export class Transform {
       return value;
    }
 
-   static cleanIfType(
-      value: any,
-      typeTransform: string | string[],
-      type: 'string' | 'boolean' | 'array' | 'object' | 'undefined' | 'null',
-   ) {
-      switch (type) {
-         case 'string':
-         case 'boolean':
-         case 'undefined':
-            return typeof value === type ? Transform.clean(value, typeTransform) : value;
-
-         case 'array':
-            return Array.isArray(value) ? Transform.clean(value, typeTransform) : value;
-
-         case 'object':
-            return typeof value === type && !Array.isArray(value) && value ? Transform.clean(value, typeTransform) : value;
-
-         case 'null':
-            return value === null ? Transform.clean(value, typeTransform) : value;
+   static cleanIfType(value: any, typeTransform: string | string[], typeValue: CommonType | CommonType[]) {
+      for (const type of Is.array(typeValue) ? <CommonType[]>typeValue : [<CommonType>typeValue]) {
+         if (Is.typeOf(value, type)) {
+            return Transform.clean(value, typeTransform);
+         }
       }
+
+      return value;
    }
 }

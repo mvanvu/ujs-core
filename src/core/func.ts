@@ -3,11 +3,11 @@ import { Registry } from './registry';
 import { DateTime } from './datetime';
 import { Is } from './is';
 
-export function clone<T extends any>(src: T): T {
+export function clone<T>(src: T): T {
    let newInst: any = src;
 
    if (Is.flat(newInst)) {
-      return <T>newInst;
+      return newInst;
    }
 
    if (src instanceof DateTime || src instanceof Registry) {
@@ -36,19 +36,11 @@ export function clone<T extends any>(src: T): T {
       }
    }
 
-   return <T>newInst;
+   return newInst;
 }
 
-export async function callback<T extends Promise<T>>(fn: any, params: any[] = [], inst?: any) {
-   if (fn instanceof Promise) {
-      return <T>await fn;
-   }
-
-   if (typeof fn === 'function') {
-      return Is.asyncFunc(fn) ? <T>await fn.apply(inst, params) : <T>fn.apply(inst, params);
-   }
-
-   return <T>fn;
+export async function callback<T>(fn: any, params: any[] = [], inst?: any): Promise<T> {
+   return Is.asyncFunc(fn) ? await fn.apply(inst, params) : Is.func(fn) ? fn.apply(inst, params) : fn;
 }
 
 export function resetObject<T extends object>(obj: object, newData?: T): T | {} {
