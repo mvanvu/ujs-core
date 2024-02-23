@@ -42,7 +42,7 @@ export class Registry {
       return this;
    }
 
-   parse(data?: RegistryParamType) {
+   parse(data?: any) {
       if (data instanceof Registry) {
          this.data = data.clone().data;
 
@@ -62,13 +62,13 @@ export class Registry {
          data = clone(data);
       }
 
-      if (!data || typeof data !== 'object') {
+      this.data = data;
+
+      if (!this.isPathArray() && !this.isPathObject()) {
          throw new RegistryDataError(
             'Invalid registry data, the data must be an Object<key, value> or a JSON string or an ARRAY',
          );
       }
-
-      this.data = data || {};
 
       return this;
    }
