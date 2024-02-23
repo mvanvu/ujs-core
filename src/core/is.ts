@@ -348,7 +348,7 @@ export class Is {
       const suitable = options?.suitable ?? true;
       const validate = (v: any, rules?: any) => {
          if (!Is.object(v)) {
-            throw false;
+            throw new Error();
          }
 
          rules = rules ?? options?.rules;
@@ -357,7 +357,7 @@ export class Is {
             if (suitable) {
                for (const key in v) {
                   if (!rules.hasOwnProperty(key)) {
-                     throw false;
+                     throw new Error();
                   }
                }
             }
@@ -368,7 +368,7 @@ export class Is {
                if (isRuleObject) {
                   validate(v[key], rules[key]);
                } else if (!v.hasOwnProperty(key) || !Is.typeOf(v[key], rules[key])) {
-                  throw false;
+                  throw new Error();
                }
             }
          }
