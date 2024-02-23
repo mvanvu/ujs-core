@@ -71,12 +71,12 @@ export class DateTime {
       throw new Error(`Invalid offset ${offset}, the offset format must be a number or the string like: +07:00`);
    }
 
-   static create(datetimeLike?: DateTimeLike, offset?: number | string) {
+   static from(datetimeLike?: DateTimeLike, offset?: number | string) {
       return new DateTime(datetimeLike, offset);
    }
 
    static now(offset?: number | string) {
-      return DateTime.create('now', offset);
+      return DateTime.from('now', offset);
    }
 
    static utc() {
@@ -130,7 +130,7 @@ export class DateTime {
    }
 
    clone() {
-      const dt = DateTime.create(this.time);
+      const dt = DateTime.from(this.time);
       dt.offset = this.offset;
 
       return dt;
@@ -212,7 +212,7 @@ export class DateTime {
       if (datetime instanceof DateTime) {
          datetime = datetime.clone();
       } else {
-         datetime = DateTime.create(datetime);
+         datetime = DateTime.from(datetime);
       }
 
       const milliseconds = this.clone().time - datetime.time;

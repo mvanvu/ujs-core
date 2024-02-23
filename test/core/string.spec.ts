@@ -6,21 +6,24 @@ it('Core String', () => {
    expect(Str.camelToSnackCase('helloWorld')).toEqual('hello_world');
    expect(Str.snackToCamelCase('hello_world')).toEqual('helloWorld');
    expect(Str.snackToCamelCase('hello__world')).toEqual('helloWorld');
-   expect(Str.toCapitalize('hello__world')).toEqual('HelloWorld');
+   expect(Str.toCapitalize('hello__world')).toEqual('Hello__world');
+   expect(Str.toCapitalize('hello! word#')).toEqual('Hello! Word#');
+   expect(Str.toCapitalize('hello! word#', true)).toEqual('HelloWord');
+   expect(Str.toCapitalize('some123___testing string')).toEqual('Some123___testing String');
 
    // Prototypes
-   expect(Str.create('HelloWorld').lFirst()).toEqual('helloWorld');
-   expect(Str.create('helloWorld').uFirst()).toEqual('HelloWorld');
+   expect(Str.from('HelloWorld').lFirst()).toEqual('helloWorld');
+   expect(Str.from('helloWorld').uFirst()).toEqual('HelloWorld');
 
    // Truncate
    expect(Str.truncate('hi-diddly-ho there, neighborino', 19)).toEqual('hi-diddly-ho there,...');
-   expect(Str.create('hi-diddly-ho there, neighborino').truncate(19)).toEqual('hi-diddly-ho there,...');
+   expect(Str.from('hi-diddly-ho there, neighborino').truncate(19)).toEqual('hi-diddly-ho there,...');
 
-   // Str.repeat
+   // Repeat
    expect(Str.repeat('-', 0.4)).toEqual('');
    expect(Str.repeat('-', -1)).toEqual('');
    expect(Str.repeat('-', 0)).toEqual('');
    expect(Str.repeat('-', 1)).toEqual('-');
    expect(Str.repeat('-', 2)).toEqual('--');
-   expect(Str.create('==').repeat(2)).toEqual('====');
+   expect(Str.from('==').repeat(2)).toEqual('====');
 });

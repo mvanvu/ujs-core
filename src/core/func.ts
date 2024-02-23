@@ -4,11 +4,11 @@ import { DateTime } from './datetime';
 import { Is } from './is';
 
 export function clone<T extends any>(src: T): T {
-   if (Is.flat(src)) {
-      return <T>src;
-   }
+   let newInst: any = src;
 
-   let newInst: any;
+   if (Is.flat(newInst)) {
+      return <T>newInst;
+   }
 
    if (src instanceof DateTime || src instanceof Registry) {
       newInst = src.clone();

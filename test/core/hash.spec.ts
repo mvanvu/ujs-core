@@ -16,8 +16,8 @@ it('Core Hash', async () => {
    }
 
    // Base64
-   expect(Hash.base64Encode('Hello World!')).toEqual('SGVsbG8gV29ybGQh');
-   expect(Hash.base64Decode('SGVsbG8gV29ybGQh')).toEqual('Hello World!');
+   expect(Hash.encodeBase64('Hello World!')).toEqual('SGVsbG8gV29ybGQh');
+   expect(Hash.decodeBase64('SGVsbG8gV29ybGQh')).toEqual('Hello World!');
 
    // JWT
    const data = { sub: 123456, username: 'Im' };
@@ -40,4 +40,3 @@ it('Core Hash', async () => {
       expect(false).toBeFalsy();
    }
 });
-``;

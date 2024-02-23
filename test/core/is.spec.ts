@@ -19,6 +19,10 @@ it('Core Is', () => {
    expect(Is.int(123)).toBeTruthy();
    expect(Is.sInt(-1)).toBeFalsy();
    expect(Is.uInt(123.4)).toBeFalsy();
+   expect(Is.bigInt(1)).toBeFalsy();
+   expect(Is.bigInt(1n)).toBeTruthy();
+   expect(Is.sBigInt(1n)).toBeTruthy();
+   expect(Is.uBigInt(-1n)).toBeTruthy();
    expect(Is.number(-123)).toBeTruthy();
    expect(Is.sNumber(-123)).toBeFalsy();
    expect(Is.uNumber(-123.456)).toBeTruthy();
@@ -37,9 +41,9 @@ it('Core Is', () => {
    expect(Is.equals({ foo: 'bar', bar: 123 }, { bar: 123, foo: 'bar' })).toBeTruthy();
 
    const date = new Date();
-   const date2 = DateTime.create(date).native;
+   const date2 = DateTime.from(date).native;
    expect(Is.equals(date, date2)).toBeTruthy();
-   expect(Is.equals(date, DateTime.create(date))).toBeTruthy();
+   expect(Is.equals(date, DateTime.from(date))).toBeTruthy();
 
    // Flat value
    expect(Is.flat(123)).toBeTruthy();
@@ -104,4 +108,12 @@ it('Core Is', () => {
          rules: { foo: 'number', bar: { number: { digit: 'sint' } } },
       }),
    ).toBeTruthy();
+
+   // Strong password
+   const pwd = 'MyStrongPwd@123';
+   expect(Is.strongPassword(pwd)).toBeTruthy();
+   expect(Is.strongPassword(pwd, { minLength: pwd.length + 1 })).toBeFalsy();
+   expect(Is.strongPassword('MyWeakPwd@')).toBeFalsy();
+   expect(Is.strongPassword(`${pwd} has space`)).toBeFalsy();
+   expect(Is.strongPassword(`${pwd} has space`, { noSpaces: false })).toBeTruthy();
 });

@@ -1,7 +1,7 @@
-import { Registry } from '../../src';
+import { Registry, RegistryDataError } from '../../src';
 
 it('Util Registry', () => {
-   const registry = Registry.create({ foo: 123, bar: { foo1: 'bar1', foo2: 'bar2' } });
+   const registry = Registry.from({ foo: 123, bar: { foo1: 'bar1', foo2: 'bar2' } });
 
    // Pick
    expect(registry.pick('bar.foo2').has('foo')).toBeFalsy();
@@ -34,7 +34,7 @@ it('Util Registry', () => {
    expect(registry.get('3.0.num')).toEqual(123);
    expect(registry.get('4.foo')).toEqual('bar');
 
-   registry.parse({ array: registry.toObject() });
+   registry.parse({ array: registry.valueOf() });
    expect(registry.get('array.3.0.num')).toEqual(123);
 
    registry.remove('array.4.foo');
@@ -42,5 +42,25 @@ it('Util Registry', () => {
 
    // Cached
    registry.set('array.4.foo', 456);
-   expect(registry.has('array.4.foo')).toBeTruthy();
+   registry.get('array.4.foo');
+   expect(registry.isCached('array.4.foo')).toBeTruthy();
+
+   registry.set('array.4', 456);
+   expect(registry.isCached('array.4.foo')).toBeFalsy();
+
+   // Validate
+   // -- No function value
+   expect(() => registry.parse({ foo: () => {} }).validate()).toThrow(RegistryDataError);
+
+   // -- No Object<key, value> pair value
+   expect(() => registry.parse({ foo: new Map(), bar: new Set() }).validate()).toThrow(RegistryDataError);
+
+   // -- Deep array/object
+   expect(() => Registry.from({ foo: new Map(), bar: new Set() }).validate()).toThrow(RegistryDataError);
+   expect(() => Registry.from([{ foo: 1 }, { bar: { func: () => {} } }]).validate()).toThrow(RegistryDataError);
+   const reg = Registry.from([{ foo: 1 }, { bar: { func: () => {} } }]);
+
+   // -- Check is valid
+   expect(Registry.from([{ foo: 1 }, { bar: { bar2: 123 } }]).isValidData()).toBeTruthy();
+   expect(Registry.from([{ foo: 1 }, { bar: { func: () => {} } }]).isValidData()).toBeFalsy();
 });

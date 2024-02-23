@@ -3,10 +3,12 @@ import { Registry } from './registry';
 import { Is } from './is';
 import { clone, resetObject } from './func';
 
-export class Obj extends Object {
+export class Obj {
+   constructor(private objects: Record<string, any>) {}
+
    static pick<T extends object>(source: T, props: string | string[]) {
-      const src = Registry.create(source);
-      const dest = Registry.create();
+      const src = Registry.from(source);
+      const dest = Registry.from();
 
       if (!Array.isArray(props)) {
          props = [props];
@@ -16,11 +18,11 @@ export class Obj extends Object {
          dest.set(prop, src.get(prop));
       }
 
-      return dest.toObject();
+      return dest.valueOf();
    }
 
    static omit<T extends object>(source: T, props: string | string[]) {
-      const dest = Registry.create(source);
+      const dest = Registry.from(source);
 
       if (!Array.isArray(props)) {
          props = [props];
@@ -30,7 +32,7 @@ export class Obj extends Object {
          dest.remove(prop);
       }
 
-      return dest.toObject();
+      return dest.valueOf();
    }
 
    static contains(source: object, target: object) {
@@ -67,13 +69,24 @@ export class Obj extends Object {
       return target;
    }
 
-   // Alias from resetObject function
-   static reset<T extends object>(obj: object, newData?: T): T | {} {
-      return resetObject(obj, newData);
-   }
-
    // Alias from Is.object (not Array)
    static isObject(value: any) {
       return Is.object(value);
+   }
+
+   static create(o: object) {
+      return new Obj(o);
+   }
+
+   contains(target: object) {
+      return Obj.contains(this.objects, target);
+   }
+
+   extends(...sources: object[]) {
+      return Obj.extends(this.objects, ...sources);
+   }
+
+   reset<T extends object>(newData?: T) {
+      return resetObject(this.objects, newData);
    }
 }

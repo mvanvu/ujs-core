@@ -36,4 +36,8 @@ it('Util Transform', () => {
    );
    expect(Transform.toSafeHtml(' <iframe> ')).toEqual('');
    expect(Transform.toSafeHtml('<h1>Heading</h1>')).toEqual('<h1>Heading</h1>');
+
+   // Int
+   expect(Transform.toInt(Number.MAX_SAFE_INTEGER + 100)).toEqual(Number.MAX_SAFE_INTEGER);
+   expect(Transform.toInt(-Number.MAX_SAFE_INTEGER - 100)).toEqual(-Number.MAX_SAFE_INTEGER);
 });

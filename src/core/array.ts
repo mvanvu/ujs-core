@@ -4,8 +4,14 @@ import { Registry } from './registry';
 import { Is } from './is';
 
 export class Arr extends Array {
-   get data() {
-      return Arr.from(this.values());
+   #index = 0;
+
+   get elements() {
+      return [...this.values()];
+   }
+
+   get currentIndex() {
+      return this.#index;
    }
 
    private static calc<T>(source: T[], options: { type: 'sum' | 'avg' | 'min' | 'max'; key?: string }) {
@@ -25,7 +31,7 @@ export class Arr extends Array {
                if (typeof rec === 'number') {
                   sum += Number(rec) || 0;
                } else if (key && Is.object(rec)) {
-                  sum += Registry.create(rec).get<number>(key, 0, 'toNumber');
+                  sum += Registry.from(rec).get<number>(key, 0, 'toNumber');
                }
             }
 
@@ -42,7 +48,7 @@ export class Arr extends Array {
                   state.value = el;
                   state.index = i;
                } else if (key && Is.object(el)) {
-                  const num = Registry.create(<object>el).get(key);
+                  const num = Registry.from(<object>el).get(key);
 
                   if (
                      typeof num === 'number' &&
@@ -72,13 +78,6 @@ export class Arr extends Array {
 
    static max<T>(source: T[], options?: { key?: string }) {
       return Arr.calc(source, { ...(options || {}), type: 'max' });
-   }
-
-   static create<T>(data: Iterable<T> | ArrayLike<T>) {
-      const arr = new Arr();
-      arr.push(...Array.from(data));
-
-      return arr;
    }
 
    private static compare<T>(a: T[], b: T[], type: 'intersect' | 'diff') {
@@ -119,14 +118,6 @@ export class Arr extends Array {
       return Arr.compare(a, b, 'diff');
    }
 
-   static first<T>(array: T[]): T | undefined {
-      return array.length ? array[0] : undefined;
-   }
-
-   static last<T>(array: T[]): T | undefined {
-      return array.length ? array[array.length - 1] : undefined;
-   }
-
    static chunk<T>(array: T[], size = 1): Array<T[]> {
       const output = [];
       let index = 0;
@@ -149,43 +140,76 @@ export class Arr extends Array {
       return output;
    }
 
-   calc(options: { type: 'sum' | 'avg' | 'min' | 'max'; key?: string }) {
-      return Arr.calc(this.data, options);
+   static from(elements: Iterable<any> | ArrayLike<any>) {
+      const arr = new Arr();
+      arr.push(...Array.from(elements));
+
+      return arr;
    }
 
    sum(options?: { key?: string }) {
-      return Arr.sum(this.data, options);
+      return Arr.sum(this.elements, options);
    }
 
    avg(options?: { key?: string }) {
-      return Arr.avg(this.data, options);
+      return Arr.avg(this.elements, options);
    }
 
    min(options?: { key?: string }) {
-      return Arr.min(this.data, options);
+      return Arr.min(this.elements, options);
    }
 
    max(options?: { key?: string }) {
-      return Arr.max(this.data, options);
+      return Arr.max(this.elements, options);
    }
 
    intersect(target: any[]) {
-      return Arr.intersect(this.data, target);
+      return Arr.intersect(this.elements, target);
    }
 
    diff(target: any[]) {
-      return Arr.diff(this.data, target);
-   }
-
-   first() {
-      return Arr.first(this.data);
-   }
-
-   last() {
-      return Arr.last(this.data);
+      return Arr.diff(this.elements, target);
    }
 
    chunk(size = 1) {
-      return Arr.chunk(this.data, size);
+      return Arr.chunk(this.elements, size);
+   }
+
+   reset() {
+      this.#index = 0;
+
+      return this;
+   }
+
+   current() {
+      return this.elements[this.#index];
+   }
+
+   first() {
+      return this.elements[(this.#index = 0)];
+   }
+
+   last() {
+      return this.elements[(this.#index = this.elements.length - 1)];
+   }
+
+   prev() {
+      return this.elements[--this.#index];
+   }
+
+   next() {
+      return this.elements[++this.#index];
+   }
+
+   empty() {
+      this.splice(0, this.elements.length);
+
+      return this;
+   }
+
+   update(elements: Iterable<any> | ArrayLike<any>) {
+      this.empty().push(...Arr.from(elements));
+
+      return this;
    }
 }

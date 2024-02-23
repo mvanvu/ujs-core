@@ -103,11 +103,11 @@ export class Transform {
          case 'string':
             value = value.trim().toLowerCase();
 
-            if (value === 'true') {
+            if (value === 'true' || value === '1') {
                return true;
             }
 
-            if (value === 'false') {
+            if (value === 'false' || value === '0') {
                return false;
             }
       }
@@ -141,7 +141,15 @@ export class Transform {
 
    // Convert to integer
    static toInt(value: any) {
-      return Number.parseInt(Transform.toNumber(value).toString());
+      let num = Transform.toNumber(value);
+
+      if (num > Number.MAX_SAFE_INTEGER) {
+         num = Number.MAX_SAFE_INTEGER;
+      } else if (num < -Number.MAX_SAFE_INTEGER) {
+         num = -Number.MAX_SAFE_INTEGER;
+      }
+
+      return Number.parseInt(num.toString());
    }
 
    // Convert to unsigned integer

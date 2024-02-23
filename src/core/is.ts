@@ -245,7 +245,7 @@ export class Is {
    }
 
    static date(d: any): DateTime | false {
-      const date = DateTime.create(d);
+      const date = DateTime.from(d);
 
       return date.valid ? date : false;
    }
@@ -454,5 +454,19 @@ export class Is {
 
    static nullOrUndefined(value: any) {
       return value === undefined || value === null;
+   }
+
+   static strongPassword(value: string, options?: { minLength?: number; noSpaces?: boolean }) {
+      const minLength = options?.minLength ?? 8;
+      const noSpaces = options?.noSpaces ?? true;
+
+      if (noSpaces && value.match(/\s+/)) {
+         return false;
+      }
+
+      return (
+         value.length >= minLength && // Min length
+         /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9\s])/g.test(value) // At less 1 lower char, 1 upper char, 1 digit and 1 special char
+      );
    }
 }

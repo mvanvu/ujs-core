@@ -1,5 +1,9 @@
 'use strict';
 export class Str extends String {
+   get text() {
+      return this.toString();
+   }
+
    static uFirst(str: string) {
       return str.length > 1 ? `${str[0].toUpperCase()}${str.substring(1)}` : str;
    }
@@ -8,16 +12,18 @@ export class Str extends String {
       return str.length > 1 ? `${str[0].toLowerCase()}${str.substring(1)}` : str;
    }
 
-   static toCapitalize(str: string) {
-      return str
-         .split(/[^a-z0-9]/i)
-         .map((word) => Str.uFirst(word))
-         .filter((word) => !!word.trim())
-         .join('');
+   static toCapitalize(str: string, ignoreNoneWord = false) {
+      const words = str.split(/\b/).map(Str.uFirst);
+
+      if (ignoreNoneWord) {
+         return words.filter((word) => !!word.trim() && !/\W/.test(word)).join('');
+      }
+
+      return words.join('');
    }
 
    static toCamelCase(str: string) {
-      return Str.lFirst(Str.toCapitalize(str));
+      return Str.lFirst(Str.toCapitalize(str, true));
    }
 
    static camelToSnackCase(str: string) {
@@ -58,7 +64,8 @@ export class Str extends String {
       return output.join('');
    }
 
-   static truncate(str: string, maxLength = 50, pad = '...') {
+   static truncate(str: string, maxLength = 50, pad?: string) {
+      pad = pad || '...';
       str = str.trim();
       const len = str.length;
       str = str.substring(0, maxLength);
@@ -70,7 +77,7 @@ export class Str extends String {
       return str;
    }
 
-   static create(strLike: any) {
+   static from(strLike: any) {
       return new Str(strLike);
    }
 
@@ -89,30 +96,34 @@ export class Str extends String {
    }
 
    uFirst() {
-      return Str.uFirst(this.valueOf());
+      return Str.uFirst(this.text);
    }
 
    lFirst() {
-      return Str.lFirst(this.valueOf());
+      return Str.lFirst(this.text);
+   }
+
+   toCapitalize(ignoreNoneWord = false) {
+      return Str.toCapitalize(this.text, ignoreNoneWord);
    }
 
    toCamelCase() {
-      return Str.toCamelCase(this.valueOf());
+      return Str.toCamelCase(this.text);
    }
 
    camelToSnackCase() {
-      return Str.camelToSnackCase(this.valueOf());
+      return Str.camelToSnackCase(this.text);
    }
 
    snackToCamelCase() {
-      return Str.snackToCamelCase(this.valueOf());
+      return Str.snackToCamelCase(this.text);
    }
 
-   truncate(maxLength = 50, pad = '...') {
-      return Str.truncate(this.valueOf(), maxLength, pad);
+   truncate(maxLength = 50, pad?: string) {
+      return Str.truncate(this.text, maxLength, pad);
    }
 
    repeat(level = 0) {
-      return Str.repeat(this.valueOf(), level);
+      return Str.repeat(this.text, level);
    }
 }

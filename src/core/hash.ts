@@ -2,9 +2,6 @@
 import { DateTime, DateTimeLike } from './datetime';
 import { Is } from './is';
 
-export class JWTError extends Error {}
-export class InvalidJWT extends JWTError {}
-export class ExpiredJWT extends JWTError {}
 export class Hash {
    static getCrypto() {
       // Node & Browser support
@@ -115,16 +112,16 @@ export class Hash {
       throw new Error('Crypto not available in your environment');
    }
 
-   static base64Encode(str: string) {
+   static encodeBase64(str: string) {
       return btoa(str);
    }
 
-   static base64Decode(str: string) {
+   static decodeBase64(str: string) {
       return atob(str);
    }
 
    static base64UrlEncode(str: string) {
-      return Hash.base64Encode(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      return Hash.encodeBase64(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
    }
 
    static base64UrlDecode(str: string) {
@@ -135,62 +132,70 @@ export class Hash {
          str += '='.repeat(4 - padLength);
       }
 
-      return Hash.base64Decode(str);
+      return Hash.decodeBase64(str);
    }
 
    static jwt() {
-      return new (class {
-         readonly validHeader = { alg: 'HS256', typ: 'JWT' };
+      return new JWT();
+   }
+}
 
-         async create(data: any, options: { iat: DateTimeLike; secret: string }) {
-            const iat = DateTime.create(options.iat);
+export class JWTError extends Error {}
+export class JWTErrorInvalid extends JWTError {
+   constructor() {
+      super(JWT.INVALID_TOKEN);
+   }
+}
+export class JWTErrorExpired extends JWTError {
+   constructor() {
+      super(JWT.EXPIRED_TOKEN);
+   }
+}
+export class JWT {
+   readonly validHeader = { alg: 'HS256', typ: 'JWT' };
+   static readonly INVALID_TOKEN = 'INVALID_TOKEN';
+   static readonly EXPIRED_TOKEN = 'INVALID_IAT';
+   static readonly EXPIRED = 'EXPIRED_TOKEN';
 
-            if (!iat.valid) {
-               throw new InvalidJWT('INVALID_JWT_IAT');
-            }
+   async create(data: any, options: { iat: DateTimeLike; secret: string }) {
+      const iat = DateTime.from(options.iat);
 
-            const header = Hash.base64UrlEncode(JSON.stringify(this.validHeader));
-            const payload = Hash.base64UrlEncode(JSON.stringify({ data, iat: iat.iso }));
-            const signature = Hash.base64UrlEncode(await Hash.sha256(`${header}.${payload}.${options.secret}`));
+      if (!iat.valid) {
+         throw new JWTErrorInvalid();
+      }
 
-            return `${header}.${payload}.${signature}`;
-         }
+      const header = Hash.base64UrlEncode(JSON.stringify(this.validHeader));
+      const payload = Hash.base64UrlEncode(JSON.stringify({ data, iat: iat.iso }));
+      const signature = Hash.base64UrlEncode(await Hash.sha256(`${header}.${payload}.${options.secret}`));
 
-         async verify(token: string, options: { secret: string }) {
-            try {
-               const parts = token.split('.');
+      return `${header}.${payload}.${signature}`;
+   }
 
-               if (parts.length !== 3) {
-                  throw false;
-               }
+   async verify(token: string, options: { secret: string }) {
+      const parts = token.split('.');
 
-               const header = JSON.parse(Hash.base64UrlDecode(parts[0]));
-               const payload = JSON.parse(Hash.base64UrlDecode(parts[1]));
-               let d: DateTime | false;
+      if (parts.length !== 3) {
+         throw new JWTErrorInvalid();
+      }
 
-               if (
-                  !Is.equals(header, this.validHeader) ||
-                  !Is.object(payload) ||
-                  !Is.equals(Object.keys(payload).sort(), ['data', 'iat']) ||
-                  !(d = Is.date(payload.iat)) ||
-                  Hash.base64UrlEncode(await Hash.sha256(`${parts[0]}.${parts[1]}.${options.secret}`)) !== parts[2]
-               ) {
-                  throw false;
-               }
+      const header = JSON.parse(Hash.base64UrlDecode(parts[0]));
+      const payload = JSON.parse(Hash.base64UrlDecode(parts[1]));
+      let d: DateTime | false;
 
-               if (d.lt('now', 'second')) {
-                  throw new ExpiredJWT('EXPRIED_JWT');
-               }
+      if (
+         !Is.equals(header, this.validHeader) ||
+         !Is.object(payload) ||
+         !Is.equals(Object.keys(payload).sort(), ['data', 'iat']) ||
+         !(d = Is.date(payload.iat)) ||
+         Hash.base64UrlEncode(await Hash.sha256(`${parts[0]}.${parts[1]}.${options.secret}`)) !== parts[2]
+      ) {
+         throw new JWTErrorInvalid();
+      }
 
-               return payload.data;
-            } catch (e) {
-               if (e instanceof JWTError) {
-                  throw e;
-               }
+      if (d.lt('now', 'second')) {
+         throw new JWTErrorExpired();
+      }
 
-               throw new InvalidJWT('INVALID_JWT');
-            }
-         }
-      })();
+      return payload.data;
    }
 }
