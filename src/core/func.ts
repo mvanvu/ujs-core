@@ -6,7 +6,7 @@ import { Is } from './is';
 export function clone<T>(src: T): T {
    let newInst: any = src;
 
-   if (Is.flat(newInst)) {
+   if (Is.flatValue(newInst)) {
       return newInst;
    }
 

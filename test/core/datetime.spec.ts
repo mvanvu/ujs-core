@@ -2,7 +2,7 @@ import { DateTime } from '../../src';
 
 it('Util Datetime', () => {
    const date = new Date();
-   const datetime = DateTime.create(date);
+   const datetime = DateTime.from(date);
    expect(datetime.native).toEqual(date);
 
    // Clone

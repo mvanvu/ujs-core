@@ -125,10 +125,6 @@ export class DateTime {
       return this;
    }
 
-   getDate() {
-      return this.date;
-   }
-
    clone() {
       const dt = DateTime.from(this.time);
       dt.offset = this.offset;

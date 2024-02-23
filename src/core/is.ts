@@ -250,7 +250,7 @@ export class Is {
       return date.valid ? date : false;
    }
 
-   static flat(value: any) {
+   static flatValue(value: any) {
       return (typeof value !== 'object' && typeof value !== 'function') || value === null;
    }
 
@@ -294,6 +294,52 @@ export class Is {
       return value !== null && !Array.isArray(value) && typeof value === 'object';
    }
 
+   static flatObject(value: any, allowArray?: boolean | { root?: boolean; deep?: boolean }) {
+      let rootArray = true;
+      let deepArray = true;
+
+      if (allowArray === false) {
+         rootArray = deepArray = false;
+      } else if (Is.object(allowArray)) {
+         rootArray = allowArray['root'] !== false;
+         deepArray = allowArray['deep'] !== false;
+      }
+
+      if (!rootArray && Array.isArray(value)) {
+         throw new Error();
+      }
+
+      const deepCheck = (data: any) => {
+         if (Array.isArray(data)) {
+            if (!deepArray) {
+               throw new Error();
+            }
+
+            for (const datum of data) {
+               deepCheck(datum);
+            }
+         } else if (Is.object(data)) {
+            if (Object.prototype.toString.call(data) !== '[object Object]') {
+               throw new Error();
+            }
+
+            for (const k in data) {
+               deepCheck(data[k]);
+            }
+         } else if (Is.func(data)) {
+            throw new Error();
+         }
+      };
+
+      try {
+         deepCheck(value);
+      } catch {
+         return false;
+      }
+
+      return true;
+   }
+
    static objectOrArray(value: any) {
       return Is.object(value) || Is.array(value);
    }
@@ -331,7 +377,7 @@ export class Is {
       validate(value);
    }
 
-   static record(value: any, options?: RulesOptions) {
+   static suitableObject(value: any, options?: RulesOptions) {
       try {
          Is.validateObject(value, options);
       } catch {

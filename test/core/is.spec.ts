@@ -46,19 +46,19 @@ it('Core Is', () => {
    expect(Is.equals(date, DateTime.from(date))).toBeTruthy();
 
    // Flat value
-   expect(Is.flat(123)).toBeTruthy();
-   expect(Is.flat(-123)).toBeTruthy();
-   expect(Is.flat(null)).toBeTruthy();
-   expect(Is.flat(void 0)).toBeTruthy();
-   expect(Is.flat('')).toBeTruthy();
-   expect(Is.flat(true)).toBeTruthy();
-   expect(Is.flat(false)).toBeTruthy();
-   expect(Is.flat(NaN)).toBeTruthy();
-   expect(Is.flat([])).toBeFalsy();
-   expect(Is.flat({})).toBeFalsy();
-   expect(Is.flat(() => {})).toBeFalsy();
-   expect(Is.flat(new Set())).toBeFalsy();
-   expect(Is.flat(new Map())).toBeFalsy();
+   expect(Is.flatValue(123)).toBeTruthy();
+   expect(Is.flatValue(-123)).toBeTruthy();
+   expect(Is.flatValue(null)).toBeTruthy();
+   expect(Is.flatValue(void 0)).toBeTruthy();
+   expect(Is.flatValue('')).toBeTruthy();
+   expect(Is.flatValue(true)).toBeTruthy();
+   expect(Is.flatValue(false)).toBeTruthy();
+   expect(Is.flatValue(NaN)).toBeTruthy();
+   expect(Is.flatValue([])).toBeFalsy();
+   expect(Is.flatValue({})).toBeFalsy();
+   expect(Is.flatValue(() => {})).toBeFalsy();
+   expect(Is.flatValue(new Set())).toBeFalsy();
+   expect(Is.flatValue(new Map())).toBeFalsy();
 
    // Empty
    expect(Is.empty(0)).toBeTruthy();
@@ -87,11 +87,11 @@ it('Core Is', () => {
    expect(Is.object([])).toBeFalsy();
    expect(Is.object({})).toBeTruthy();
 
-   // Record (advance object)
-   expect(Is.record({ foo: 123, bar: 456 }, { rules: { foo: 'number' } })).toBeFalsy();
-   expect(Is.record({ foo: 123, bar: 456 }, { rules: { foo: 'number' }, suitable: false })).toBeTruthy();
-   expect(Is.record({ foo: 123, bar: false }, { rules: { foo: 'number', bar: 'boolean' } })).toBeTruthy();
-   expect(Is.record({ foo: 123, bar: false }, { rules: { foo: 'number', bar: { number: 'number' } } })).toBeFalsy();
+   // Suitable object (advance object)
+   expect(Is.suitableObject({ foo: 123, bar: 456 }, { rules: { foo: 'number' } })).toBeFalsy();
+   expect(Is.suitableObject({ foo: 123, bar: 456 }, { rules: { foo: 'number' }, suitable: false })).toBeTruthy();
+   expect(Is.suitableObject({ foo: 123, bar: false }, { rules: { foo: 'number', bar: 'boolean' } })).toBeTruthy();
+   expect(Is.suitableObject({ foo: 123, bar: false }, { rules: { foo: 'number', bar: { number: 'number' } } })).toBeFalsy();
 
    // Array
    expect(Is.array({})).toBeFalsy();
@@ -116,4 +116,10 @@ it('Core Is', () => {
    expect(Is.strongPassword('MyWeakPwd@')).toBeFalsy();
    expect(Is.strongPassword(`${pwd} has space`)).toBeFalsy();
    expect(Is.strongPassword(`${pwd} has space`, { noSpaces: false })).toBeTruthy();
+
+   // Flat object
+   expect(Is.flatObject({ foo: new Map(), bar: new Set() })).toBeFalsy();
+   expect(Is.flatObject({ foo: 1, bar: [{ bar: 2 }] })).toBeTruthy();
+   expect(Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }, false)).toBeFalsy();
+   expect(Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }, { root: false, deep: true })).toBeTruthy();
 });

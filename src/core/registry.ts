@@ -67,39 +67,17 @@ export class Registry {
    }
 
    validate(data?: any) {
-      const deepCheck = (data: any) => {
-         if (Array.isArray(data)) {
-            for (const datum of data) {
-               deepCheck(datum);
-            }
-         } else if (Is.object(data)) {
-            if (Object.prototype.toString.call(data) !== '[object Object]') {
-               throw new RegistryDataError(
-                  'The object element data must be an Object<key, value> pair, not from any Class/Function constructor',
-               );
-            }
-
-            for (const k in data) {
-               deepCheck(data[k]);
-            }
-         } else if (Is.func(data)) {
-            throw new RegistryDataError('The object element data must be not a function');
-         }
-      };
-
-      deepCheck(data === undefined ? this.data : data);
+      if (!Is.flatObject(data === undefined ? this.data : data)) {
+         throw new RegistryDataError(
+            'The object element data must be a Record<key, value> or Array<[flat] | Record<key, value>> not from any Class/Function constructor',
+         );
+      }
 
       return this;
    }
 
    isValidData() {
-      try {
-         this.validate();
-      } catch {
-         return false;
-      }
-
-      return true;
+      return Is.flatObject(this.data);
    }
 
    private isPathNum(path: string) {
@@ -239,7 +217,7 @@ export class Registry {
    }
 
    isPathFlat(path: string) {
-      return Is.flat(this.get(path));
+      return Is.flatValue(this.get(path));
    }
 
    remove(path: string) {

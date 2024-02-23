@@ -61,7 +61,7 @@ export class Obj {
             if (Is.object(target[key]) && Is.object(data)) {
                Obj.extends(target[key], data);
             } else {
-               Object.assign(target, { [key]: Is.flat(data) ? data : clone(data) });
+               Object.assign(target, { [key]: Is.flatValue(data) ? data : clone(data) });
             }
          }
       }
