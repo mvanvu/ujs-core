@@ -8,7 +8,10 @@ export declare class Registry {
         validate?: boolean;
         clone?: boolean;
     });
-    static from(data?: any): Registry;
+    static from(data?: any, options?: {
+        validate?: boolean;
+        clone?: boolean;
+    }): Registry;
     merge(data: any): this;
     parse(data?: any, options?: {
         validate?: boolean;

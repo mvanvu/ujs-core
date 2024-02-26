@@ -13,8 +13,8 @@ export class Registry {
       this.parse(data, options);
    }
 
-   static from(data?: any) {
-      return new Registry(data);
+   static from(data?: any, options?: { validate?: boolean; clone?: boolean }) {
+      return new Registry(data, options);
    }
 
    merge(data: any) {
