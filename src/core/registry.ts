@@ -9,8 +9,8 @@ export class Registry {
    private cached: Record<string, any> = {};
    private data: RegistryDataType;
 
-   constructor(data?: any, validate?: boolean) {
-      this.parse(data, validate);
+   constructor(data?: any, options?: { validate?: boolean; clone?: boolean }) {
+      this.parse(data, options);
    }
 
    static from(data?: any) {
@@ -37,7 +37,7 @@ export class Registry {
       return this;
    }
 
-   parse(data?: any, validate?: boolean) {
+   parse(data?: any, options?: { validate?: boolean; clone?: boolean }) {
       if (data === undefined) {
          data = {};
       } else if (Is.string(data) && ['{', '['].includes(data[0])) {
@@ -46,7 +46,7 @@ export class Registry {
          } catch {
             throw new RegistryDataError('Invalid JSON string data');
          }
-      } else if (Is.object(data) || Is.array(data)) {
+      } else if ((Is.object(data) || Is.array(data)) && options?.clone !== false) {
          // Renew data to ignore the Object reference
          data = clone(data);
       }
@@ -59,7 +59,7 @@ export class Registry {
          );
       }
 
-      if (validate === true) {
+      if (options?.validate === true) {
          this.validate();
       }
 
