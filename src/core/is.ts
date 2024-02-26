@@ -25,7 +25,7 @@ export class Is {
             case 'int':
             case 'sint':
             case 'uint':
-               if (!Number.isInteger(val) || (type === 'sint' && val < 0) || (type === 'uint' && val >= 0)) {
+               if (!Number.isInteger(val) || (type === 'sint' && val >= 0) || (type === 'uint' && val < 0)) {
                   return false;
                }
 
@@ -34,7 +34,7 @@ export class Is {
             case 'number':
             case 'snumber':
             case 'unumber':
-               if (!Number(val) || (type === 'snumber' && val < 0) || (type === 'unumber' && val >= 0)) {
+               if (!Number(val) || (type === 'snumber' && val >= 0) || (type === 'unumber' && val < 0)) {
                   return false;
                }
 
@@ -43,7 +43,7 @@ export class Is {
             case 'bigint':
             case 'sbigint':
             case 'ubigint':
-               if (typeValue !== 'bigint' || (type === 'sbigint' && val < 0) || (type === 'ubigint' && val >= 0)) {
+               if (typeValue !== 'bigint' || (type === 'sbigint' && val >= 0) || (type === 'ubigint' && val < 0)) {
                   return false;
                }
 

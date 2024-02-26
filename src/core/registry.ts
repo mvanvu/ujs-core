@@ -1,7 +1,7 @@
 'use strict';
 import { Is } from './is';
 import { Transform } from './transform';
-import { clone } from './func';
+import { Util } from './util';
 export type RegistryDataType = Record<string, any> | any[];
 export class RegistryDataError extends Error {}
 
@@ -48,7 +48,7 @@ export class Registry {
          }
       } else if ((Is.object(data) || Is.array(data)) && options?.clone !== false) {
          // Renew data to ignore the Object reference
-         data = clone(data);
+         data = Util.clone(data);
       }
 
       this.data = data;

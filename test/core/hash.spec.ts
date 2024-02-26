@@ -22,7 +22,7 @@ it('Core Hash', async () => {
    // JWT
    const data = { sub: 123456, username: 'Im' };
    const jwt = Hash.jwt();
-   const token = await jwt.create(data, { iat: DateTime.now().add(30, 'second'), secret });
+   const token = await jwt.sign(data, { iat: DateTime.now().add(30, 'second'), secret });
 
    // -- Valid secret
    try {

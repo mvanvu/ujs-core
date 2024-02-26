@@ -1,7 +1,7 @@
 'use strict';
 import { Registry } from './registry';
 import { Is } from './is';
-import { clone, resetObject } from './func';
+import { Util } from './util';
 
 export class Obj {
    constructor(private objects: Record<string, any>) {}
@@ -61,7 +61,7 @@ export class Obj {
             if (Is.object(target[key]) && Is.object(data)) {
                Obj.extends(target[key], data);
             } else {
-               Object.assign(target, { [key]: Is.flatValue(data) ? data : clone(data) });
+               Object.assign(target, { [key]: Is.flatValue(data) ? data : Util.clone(data) });
             }
          }
       }
@@ -87,6 +87,6 @@ export class Obj {
    }
 
    reset<T extends object>(newData?: T) {
-      return resetObject(this.objects, newData);
+      return Util.resetObject(this.objects, newData);
    }
 }

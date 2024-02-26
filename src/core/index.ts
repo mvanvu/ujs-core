@@ -1,6 +1,6 @@
 export * from './array';
 export * from './datetime';
-export * from './func';
+export * from './util';
 export * from './hash';
 export * from './is';
 export * from './object';

@@ -17,15 +17,15 @@ it('Core Is', () => {
 
    // Typeof
    expect(Is.int(123)).toBeTruthy();
-   expect(Is.sInt(-1)).toBeFalsy();
-   expect(Is.uInt(123.4)).toBeFalsy();
+   expect(Is.sInt(1)).toBeFalsy();
+   expect(Is.uInt(-123.4)).toBeFalsy();
    expect(Is.bigInt(1)).toBeFalsy();
    expect(Is.bigInt(1n)).toBeTruthy();
-   expect(Is.sBigInt(1n)).toBeTruthy();
-   expect(Is.uBigInt(-1n)).toBeTruthy();
+   expect(Is.sBigInt(-1n)).toBeTruthy();
+   expect(Is.uBigInt(1n)).toBeTruthy();
    expect(Is.number(-123)).toBeTruthy();
-   expect(Is.sNumber(-123)).toBeFalsy();
-   expect(Is.uNumber(-123.456)).toBeTruthy();
+   expect(Is.sNumber(123)).toBeFalsy();
+   expect(Is.uNumber(123.456)).toBeTruthy();
    expect(Is.undefined(undefined)).toBeTruthy();
    expect(Is.null(null)).toBeTruthy();
    expect(Is.object(null)).toBeFalsy();
@@ -96,7 +96,7 @@ it('Core Is', () => {
    // Array
    expect(Is.array({})).toBeFalsy();
    expect(Is.array([1, 2, 3])).toBeTruthy();
-   expect(Is.array([1, 2, 3], { rules: 'sint' })).toBeTruthy();
+   expect(Is.array([1, 2, 3], { rules: 'uint' })).toBeTruthy();
    expect(Is.array([1, 2, -3], { rules: 'sint' })).toBeFalsy();
    expect(Is.array([{ foo: 123, bar: 456 }], { rules: { foo: 'number', bar: 'string' } })).toBeFalsy();
    expect(Is.array([{ foo: 123, bar: 456 }], { rules: { foo: 'number' } })).toBeFalsy();
@@ -105,7 +105,7 @@ it('Core Is', () => {
    expect(Is.array([{ foo: 123, bar: false }], { rules: { foo: 'number', bar: { number: 'number' } } })).toBeFalsy();
    expect(
       Is.array([{ foo: 123, bar: { number: { digit: 123 } } }], {
-         rules: { foo: 'number', bar: { number: { digit: 'sint' } } },
+         rules: { foo: 'number', bar: { number: { digit: 'uint' } } },
       }),
    ).toBeTruthy();
 
