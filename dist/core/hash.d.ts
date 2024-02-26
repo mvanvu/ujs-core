@@ -26,7 +26,7 @@ export declare class JWT {
     static readonly INVALID_TOKEN = "INVALID_TOKEN";
     static readonly EXPIRED_TOKEN = "INVALID_IAT";
     static readonly EXPIRED = "EXPIRED_TOKEN";
-    create(data: any, options: {
+    sign(data: any, options: {
         iat: DateTimeLike;
         secret: string;
     }): Promise<string>;

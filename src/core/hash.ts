@@ -157,7 +157,7 @@ export class JWT {
    static readonly EXPIRED_TOKEN = 'INVALID_IAT';
    static readonly EXPIRED = 'EXPIRED_TOKEN';
 
-   async create(data: any, options: { iat: DateTimeLike; secret: string }) {
+   async sign(data: any, options: { iat: DateTimeLike; secret: string }) {
       const iat = DateTime.from(options.iat);
 
       if (!iat.valid) {
