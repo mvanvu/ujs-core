@@ -290,7 +290,7 @@ export class Is {
       return [null, undefined, NaN].includes(value);
    }
 
-   static object(value: any) {
+   static object(value: any, path?: string) {
       return value !== null && !Array.isArray(value) && typeof value === 'object';
    }
 

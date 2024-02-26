@@ -12,7 +12,7 @@ export declare class Is {
     static flatValue(value: any): boolean;
     static empty(value: any): boolean;
     static nothing(value: any): boolean;
-    static object(value: any): boolean;
+    static object(value: any, path?: string): boolean;
     static flatObject(value: any, allowArray?: boolean | {
         root?: boolean;
         deep?: boolean;

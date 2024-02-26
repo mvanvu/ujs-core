@@ -35,10 +35,25 @@ export class Obj {
       return dest.valueOf();
    }
 
-   static contains(source: object, target: object) {
-      for (const key in target) {
-         if (!source.hasOwnProperty(key) || !Is.equals(source[key], target[key])) {
-            return false;
+   static contains(source: object, target: object | string) {
+      if (typeof target === 'string') {
+         const paths = target.split('.');
+         let o = source;
+
+         for (let i = 0, n = paths.length; i < n; i++) {
+            const prop = paths[i];
+
+            if (!Is.object(o) || !o.hasOwnProperty(prop)) {
+               return false;
+            }
+
+            o = o[prop];
+         }
+      } else {
+         for (const key in target) {
+            if (!source.hasOwnProperty(key) || !Is.equals(source[key], target[key])) {
+               return false;
+            }
          }
       }
 
@@ -74,11 +89,11 @@ export class Obj {
       return Is.object(value);
    }
 
-   static create(o: object) {
+   static from(o: object) {
       return new Obj(o);
    }
 
-   contains(target: object) {
+   contains(target: object | string) {
       return Obj.contains(this.objects, target);
    }
 

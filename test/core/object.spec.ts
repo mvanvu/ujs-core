@@ -24,7 +24,8 @@ it('Core Object', () => {
    expect(Obj.contains({ foo: 1, bar: 2 }, { bar: '2' })).toBeFalsy();
    expect(Obj.contains({ foo: 1, bar: 2 }, { deep: { foo: 123, bar: 456 } })).toBeFalsy();
    expect(Obj.contains({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, { deep: { foo: 123, bar: 456 } })).toBeTruthy();
-   expect(Obj.create({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }).contains({ deep: { foo: 123, bar: 456 } })).toBeTruthy();
+   expect(Obj.from({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }).contains({ deep: { foo: 123, bar: 456 } })).toBeTruthy();
+   expect(Obj.from({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }).contains('deep.bar')).toBeTruthy();
 
    // excludes
    const target = { foo: 1, bar: 2, deep: { foo: 123, bar: 456 } };
@@ -39,11 +40,11 @@ it('Core Object', () => {
    const obj = Obj.extends({ foo: 1, bar: 2 }, { bar2: { num: 789 } }, { bar2: { num2: 91011 } });
    expect(obj).toHaveProperty('bar2.num', 789);
    expect(obj).toHaveProperty('bar2.num2', 91011);
-   expect(Obj.create({ foo: 1, bar: 2 }).extends({ bar2: { num: 789 } }, { bar2: { num2: 91011 } })).toHaveProperty(
+   expect(Obj.from({ foo: 1, bar: 2 }).extends({ bar2: { num: 789 } }, { bar2: { num2: 91011 } })).toHaveProperty(
       'bar2.num2',
       91011,
    );
 
    // Reset
-   expect(Obj.create({ foo: 1, bar: 2 }).reset()).toMatchObject({});
+   expect(Obj.from({ foo: 1, bar: 2 }).reset()).toMatchObject({});
 });
