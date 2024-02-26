@@ -40,7 +40,13 @@ export function clone<T>(src: T): T {
 }
 
 export async function callback<T>(fn: any, params: any[] = [], inst?: any): Promise<T> {
-   return Is.asyncFunc(fn) ? await fn.apply(inst, params) : Is.func(fn) ? fn.apply(inst, params) : fn;
+   return Is.asyncFunc(fn)
+      ? await fn.apply(inst, params)
+      : fn instanceof Promise
+      ? await fn
+      : Is.func(fn)
+      ? fn.apply(inst, params)
+      : fn;
 }
 
 export function resetObject<T extends object>(obj: object, newData?: T): T | {} {

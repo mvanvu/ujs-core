@@ -411,13 +411,17 @@ export class Is {
       return true;
    }
 
-   // eslint-disable-next-line @typescript-eslint/no-empty-function
    static asyncFunc(value: any) {
-      return value instanceof Promise || value instanceof (async () => {}).constructor;
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      return value instanceof (async () => {}).constructor;
    }
 
    static func(value: any, each = false) {
       return Is.typeOf(value, 'function', each);
+   }
+
+   static callable(value: any) {
+      return Is.func(value) || Is.asyncFunc(value) || value instanceof Promise;
    }
 
    static number(value: any, each = false) {
