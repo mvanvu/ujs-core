@@ -1,6 +1,7 @@
 'use strict';
 export type DateTimeLike = number | string | Date | DateTime;
-export type DateTimeUnit = 'week' | 'day' | 'hour' | 'minute' | 'second' | 'millisecond';
+export type DateTimeUnit = 'week' | 'date' | 'hour' | 'minute' | 'second' | 'millisecond';
+export class DateTimeError extends Error {}
 export class DateTime {
    private isValid: boolean;
    private offset: number;
@@ -68,7 +69,7 @@ export class DateTime {
          return -offsetNum;
       }
 
-      throw new Error(`Invalid offset ${offset}, the offset format must be a number or the string like: +07:00`);
+      throw new DateTimeError(`Invalid offset ${offset}, the offset format must be a number or the string like: +07:00`);
    }
 
    static from(datetimeLike?: DateTimeLike, offset?: number | string) {
@@ -84,11 +85,11 @@ export class DateTime {
    }
 
    static yesterday(offset?: number | string) {
-      return DateTime.now(offset).sub(1, 'day').startOf();
+      return DateTime.now(offset).prevDate().startOf();
    }
 
    static tomorrow(offset?: number | string) {
-      return DateTime.now(offset).add(1, 'day').startOf();
+      return DateTime.now(offset).nextDate().startOf();
    }
 
    static parse(datetimeLike?: DateTimeLike) {
@@ -146,7 +147,7 @@ export class DateTime {
          case 'hour':
             return interval * 60 * 60 * 1000;
 
-         case 'day':
+         case 'date':
             return interval * 60 * 60 * 24 * 1000;
 
          case 'week':
@@ -161,11 +162,44 @@ export class DateTime {
       return this;
    }
 
-   sub(interval: number, unit: DateTimeUnit = 'millisecond') {
-      const time = this.time - this.intervalToMilliseconds(interval, unit);
-      this.date.setTime(time);
+   addWeek(week: number) {
+      return this.add(week, 'week');
+   }
 
-      return this;
+   addDate(date: number) {
+      return this.add(date, 'date');
+   }
+
+   addHour(hour: number) {
+      return this.add(hour, 'hour');
+   }
+
+   addMinute(minute: number) {
+      return this.add(minute, 'minute');
+   }
+
+   addSecond(second: number) {
+      return this.add(second, 'second');
+   }
+
+   addMillisecond(millisecond: number) {
+      return this.add(millisecond, 'millisecond');
+   }
+
+   nextDate() {
+      return this.addDate(1);
+   }
+
+   prevDate() {
+      return this.addDate(-1);
+   }
+
+   nextWeek() {
+      return this.addWeek(1);
+   }
+
+   prevWeek() {
+      return this.addWeek(-1);
    }
 
    startOf() {
@@ -225,7 +259,7 @@ export class DateTime {
          case 'hour':
             return Math.round(milliseconds / 3600000); // 60 * 60 * 1000
 
-         case 'day':
+         case 'date':
             return Math.round(milliseconds / 86400000); // 3600 * 24 * 1000
 
          case 'week':

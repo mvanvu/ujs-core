@@ -1,6 +1,6 @@
 import { Util } from '../../src';
 
-it('Core Func', () => {
+it('Core Util', () => {
    // Clone
    const foo = { bar: 123 };
    const foo2 = Util.clone(foo);
