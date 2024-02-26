@@ -4,10 +4,16 @@ export declare class RegistryDataError extends Error {
 export declare class Registry {
     private cached;
     private data;
-    constructor(data?: any, validate?: boolean);
+    constructor(data?: any, options?: {
+        validate?: boolean;
+        clone?: boolean;
+    });
     static from(data?: any): Registry;
     merge(data: any): this;
-    parse(data?: any, validate?: boolean): this;
+    parse(data?: any, options?: {
+        validate?: boolean;
+        clone?: boolean;
+    }): this;
     validate(data?: any): this;
     isValidData(): boolean;
     private isPathNum;
