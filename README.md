@@ -1,11 +1,15 @@
-# UJS
+# UJS (TypeScript)
 
 UMD JS work on the both Browser and NodeJs
 
 ## Install
 
 ```
+// With yarn
 yarn add git+https://github.com/mvanvu/ujs
+
+// With NPM
+npm install git+https://github.com/mvanvu/ujs
 ```
 
 ### Usage On Browser
