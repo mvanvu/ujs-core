@@ -1,6 +1,6 @@
 'use strict';
 export type DateTimeLike = number | string | Date | DateTime;
-export type DateTimeUnit = 'week' | 'date' | 'hour' | 'minute' | 'second' | 'millisecond';
+export type DateTimeUnit = 'year' | 'month' | 'week' | 'date' | 'hour' | 'minute' | 'second' | 'millisecond';
 export class DateTimeError extends Error {}
 export class DateTime {
    private isValid: boolean;
@@ -16,7 +16,7 @@ export class DateTime {
          this.offset = this.date.getTimezoneOffset();
 
          if (offset !== undefined) {
-            this.setOffset(DateTime.parseOffset(offset));
+            this.setOffset(offset);
          }
       } else {
          this.date = new Date(''); // An invalid date object
@@ -33,10 +33,6 @@ export class DateTime {
 
    public get native() {
       return this.date;
-   }
-
-   public get time() {
-      return this.date.getTime();
    }
 
    public get tzOffset() {
@@ -94,7 +90,7 @@ export class DateTime {
 
    static parse(datetimeLike?: DateTimeLike) {
       if (datetimeLike instanceof DateTime) {
-         datetimeLike = datetimeLike.time;
+         datetimeLike = datetimeLike.valueOf();
       } else if (datetimeLike === 'now' || datetimeLike === undefined) {
          datetimeLike = Date.now();
       }
@@ -108,7 +104,29 @@ export class DateTime {
       return Number.isNaN(date.getTime()) ? false : date;
    }
 
-   setOffset(offset: number) {
+   static daysInMonth(month: number, year?: number) {
+      const date = new Date(year || new Date().getFullYear(), month - 1, 27);
+      const mon = date.getMonth();
+
+      while (date.getMonth() === mon) {
+         date.setDate(date.getDate() + 1);
+      }
+
+      date.setDate(date.getDate() - 1);
+
+      return date.getDate();
+   }
+
+   static pad(value: number, number = 2) {
+      return String(Math.abs(value)).padStart(number, '0');
+   }
+
+   daysInMonth() {
+      return DateTime.daysInMonth(this.date.getMonth() + 1, this.date.getFullYear());
+   }
+
+   setOffset(offset: string | number) {
+      offset = DateTime.parseOffset(offset);
       const offsetDifference = this.offset - offset;
       this.date.setTime(this.date.getTime() + offsetDifference * 60000);
       this.offset = offset;
@@ -127,39 +145,56 @@ export class DateTime {
    }
 
    clone() {
-      const dt = DateTime.from(this.time);
+      const dt = DateTime.from(this.valueOf());
       dt.offset = this.offset;
 
       return dt;
    }
 
-   intervalToMilliseconds(interval: number, unit: DateTimeUnit = 'millisecond') {
+   add(interval: number, unit: DateTimeUnit = 'millisecond') {
       switch (unit) {
          case 'millisecond':
-            return interval;
+            this.date.setMilliseconds(this.date.getMilliseconds() + interval);
+            break;
 
          case 'second':
-            return interval * 1000;
+            this.date.setSeconds(this.date.getSeconds() + interval);
+            break;
 
          case 'minute':
-            return interval * 60 * 1000;
+            this.date.setMinutes(this.date.getMinutes() + interval);
+            break;
 
          case 'hour':
-            return interval * 60 * 60 * 1000;
+            this.date.setHours(this.date.getHours() + interval);
+            break;
 
          case 'date':
-            return interval * 60 * 60 * 24 * 1000;
+            this.date.setDate(this.date.getDate() + interval);
+            break;
 
          case 'week':
-            return interval * 60 * 60 * 24 * 7 * 1000;
-      }
-   }
+            this.date.setDate(this.date.getDate() + 7 * interval);
+            break;
 
-   add(interval: number, unit: DateTimeUnit = 'millisecond') {
-      const time = this.time + this.intervalToMilliseconds(interval, unit);
-      this.date.setTime(time);
+         case 'month':
+            this.date.setMonth(this.date.getMonth() + interval);
+            break;
+
+         case 'year':
+            this.date.setFullYear(this.date.getFullYear() + interval);
+            break;
+      }
 
       return this;
+   }
+
+   addYear(year: number) {
+      return this.add(year, 'year');
+   }
+
+   addMonth(month: number) {
+      return this.add(month, 'month');
    }
 
    addWeek(week: number) {
@@ -202,6 +237,22 @@ export class DateTime {
       return this.addWeek(-1);
    }
 
+   nextMonth() {
+      return this.addMonth(1);
+   }
+
+   prevMonth() {
+      return this.addMonth(-1);
+   }
+
+   nextYear() {
+      return this.addYear(1);
+   }
+
+   prevYear() {
+      return this.addYear(-1);
+   }
+
    startOf() {
       this.date.setHours(0, 0, 0, 0);
 
@@ -214,12 +265,9 @@ export class DateTime {
       return this;
    }
 
-   pad(value: number, number = 2) {
-      return String(Math.abs(value)).padStart(number, '0');
-   }
-
    format(pattern = 'YYYY-MM-DD HH:mm:ss Z', locale?: string) {
-      const { date, pad, tzOffset } = this;
+      const { date, tzOffset } = this;
+      const { pad } = DateTime;
       let output = pattern.replace(/YYYY/g, date.getFullYear().toString());
       output = output.replace(/YY/g, date.getFullYear().toString().substring(2));
       output = output.replace(/MMMM/g, date.toLocaleString(locale, { month: 'long' }));
@@ -245,7 +293,8 @@ export class DateTime {
          datetime = DateTime.from(datetime);
       }
 
-      const milliseconds = this.clone().time - datetime.time;
+      const milliseconds = this.clone().valueOf() - datetime.valueOf();
+
       switch (unit) {
          case 'millisecond':
             return milliseconds;
@@ -293,7 +342,7 @@ export class DateTime {
    }
 
    valueOf() {
-      return this.time;
+      return this.date.getTime();
    }
 
    // Array syntax: [...DateTime.now()]

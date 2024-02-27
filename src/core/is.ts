@@ -1,8 +1,8 @@
 'use strict';
 import { DateTime } from './datetime';
 import { CommonType, ObjectCommonType } from '../type';
-type RulesOptions = { rules: ObjectCommonType; suitable?: boolean };
-
+export type ObjectRulesOptions = { rules: ObjectCommonType; suitable?: boolean };
+export class IsError extends Error {}
 export class Is {
    static typeOf(value: any, type: CommonType, each = false) {
       value = each ? (Array.isArray(value) ? value : [value]) : value;
@@ -290,8 +290,37 @@ export class Is {
       return [null, undefined, NaN].includes(value);
    }
 
-   static object(value: any, path?: string) {
-      return value !== null && !Array.isArray(value) && typeof value === 'object';
+   static object(value: any, options?: ObjectRulesOptions) {
+      const isObject = (o: any) => o !== null && !Array.isArray(o) && typeof o === 'object';
+
+      if (!isObject(value)) {
+         return false;
+      }
+
+      if (options) {
+         const suitable = options.suitable ?? true;
+         const validate = (v: any, rules?: any) => {
+            if (isObject(rules)) {
+               if (!isObject(v) || (suitable && !Is.equals(Object.keys(v).sort(), Object.keys(rules).sort()))) {
+                  throw new IsError();
+               }
+
+               for (const key in rules) {
+                  validate(v[key], rules[key]);
+               }
+            } else if (!Is.typeOf(v, rules)) {
+               throw new IsError();
+            }
+         };
+
+         try {
+            validate(value, options?.rules);
+         } catch {
+            return false;
+         }
+      }
+
+      return true;
    }
 
    static flatObject(value: any, allowArray?: boolean | { root?: boolean; deep?: boolean }) {
@@ -344,65 +373,22 @@ export class Is {
       return Is.object(value) || Is.array(value);
    }
 
-   private static validateObject(value: any, options?: RulesOptions) {
-      const suitable = options?.suitable ?? true;
-      const validate = (v: any, rules?: any) => {
-         if (!Is.object(v)) {
-            throw new Error();
-         }
-
-         rules = rules ?? options?.rules;
-
-         if (Is.object(rules)) {
-            if (suitable) {
-               for (const key in v) {
-                  if (!rules.hasOwnProperty(key)) {
-                     throw new Error();
-                  }
-               }
-            }
-
-            for (const key in rules) {
-               const isRuleObject = Is.object(rules[key]);
-
-               if (isRuleObject) {
-                  validate(v[key], rules[key]);
-               } else if (!v.hasOwnProperty(key) || !Is.typeOf(v[key], rules[key])) {
-                  throw new Error();
-               }
-            }
-         }
-      };
-
-      validate(value);
-   }
-
-   static suitableObject(value: any, options?: RulesOptions) {
-      try {
-         Is.validateObject(value, options);
-      } catch {
-         return false;
-      }
-
-      return true;
-   }
-
    static array(value: any, options?: { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean }) {
       if (!Array.isArray(value) || (options?.notEmpty && !value.length)) {
          return false;
       }
 
       const rules = options?.rules;
+      const suitable = options?.suitable;
 
       if (rules) {
          for (const val of value) {
-            if (Is.object(rules)) {
-               try {
-                  Is.validateObject(val, { rules: <ObjectCommonType>rules, suitable: options?.suitable });
-               } catch {
-                  return false;
-               }
-            } else if (!Is.typeOf(val, <CommonType>rules)) {
+            const isRulesObject = Is.object(rules);
+
+            if (
+               (isRulesObject && !Is.object(val, { rules: <ObjectCommonType>rules, suitable })) ||
+               (!isRulesObject && !Is.typeOf(val, <CommonType>rules))
+            ) {
                return false;
             }
          }

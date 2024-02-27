@@ -1,6 +1,6 @@
 import { DateTime } from '../../src';
 
-it('Util Datetime', () => {
+it('Util DateTime', () => {
    const date = new Date();
    const datetime = DateTime.from(date);
    expect(datetime.native).toEqual(date);
@@ -15,6 +15,30 @@ it('Util Datetime', () => {
    expect(datetime.eq(date));
 
    // TZ
-   datetime.setOffset(DateTime.parseOffset('+08:00'));
+   datetime.setOffset('+08:00');
    expect(datetime.format('Z')).toEqual('+08:00');
+
+   // Date, Week, Month, Year
+   const now = DateTime.now();
+
+   // -- Date
+   expect(now.clone().nextDate().diff(now, 'date')).toEqual(1);
+   expect(now.clone().prevDate().diff(now, 'date')).toEqual(-1);
+
+   // -- Week
+   expect(now.clone().nextWeek().diff(now, 'week')).toEqual(1);
+   expect(now.clone().prevWeek().diff(now, 'week')).toEqual(-1);
+
+   // -- Month
+   expect(now.clone().nextMonth().native.getMonth()).toEqual(now.native.getMonth() + 1);
+   expect(now.clone().prevMonth().native.getMonth()).toEqual(now.native.getMonth() - 1);
+
+   // -- Year
+   expect(now.clone().nextYear().native.getFullYear()).toEqual(now.native.getFullYear() + 1);
+   expect(now.clone().prevYear().native.getFullYear()).toEqual(now.native.getFullYear() - 1);
+
+   // -- Days In Months
+   expect(DateTime.daysInMonth(2, 2024)).toEqual(29);
+   expect(DateTime.daysInMonth(3, 2024)).toEqual(31);
+   expect(DateTime.from('2024-02-01', '+07:00').daysInMonth()).toEqual(29);
 });

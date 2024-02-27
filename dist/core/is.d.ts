@@ -1,9 +1,11 @@
 import { DateTime } from './datetime';
 import { CommonType, ObjectCommonType } from '../type';
-type RulesOptions = {
+export type ObjectRulesOptions = {
     rules: ObjectCommonType;
     suitable?: boolean;
 };
+export declare class IsError extends Error {
+}
 export declare class Is {
     static typeOf(value: any, type: CommonType, each?: boolean): boolean;
     static equals(a: any, b: any): boolean;
@@ -12,14 +14,12 @@ export declare class Is {
     static flatValue(value: any): boolean;
     static empty(value: any): boolean;
     static nothing(value: any): boolean;
-    static object(value: any, path?: string): boolean;
+    static object(value: any, options?: ObjectRulesOptions): boolean;
     static flatObject(value: any, allowArray?: boolean | {
         root?: boolean;
         deep?: boolean;
     }): boolean;
     static objectOrArray(value: any): boolean;
-    private static validateObject;
-    static suitableObject(value: any, options?: RulesOptions): boolean;
     static array(value: any, options?: {
         rules: CommonType | ObjectCommonType;
         suitable?: boolean;
@@ -53,4 +53,3 @@ export declare class Is {
         noSpaces?: boolean;
     }): boolean;
 }
-export {};

@@ -87,11 +87,11 @@ it('Core Is', () => {
    expect(Is.object([])).toBeFalsy();
    expect(Is.object({})).toBeTruthy();
 
-   // Suitable object (advance object)
-   expect(Is.suitableObject({ foo: 123, bar: 456 }, { rules: { foo: 'number' } })).toBeFalsy();
-   expect(Is.suitableObject({ foo: 123, bar: 456 }, { rules: { foo: 'number' }, suitable: false })).toBeTruthy();
-   expect(Is.suitableObject({ foo: 123, bar: false }, { rules: { foo: 'number', bar: 'boolean' } })).toBeTruthy();
-   expect(Is.suitableObject({ foo: 123, bar: false }, { rules: { foo: 'number', bar: { number: 'number' } } })).toBeFalsy();
+   // == Suitable object (advance object)
+   expect(Is.object({ foo: 123, bar: 456 }, { rules: { foo: 'number' } })).toBeFalsy(); // Must only "foo" property
+   expect(Is.object({ foo: 123, bar: 456 }, { rules: { foo: 'number' }, suitable: false })).toBeTruthy(); // Check rules only
+   expect(Is.object({ foo: 123, bar: false }, { rules: { foo: 'number', bar: 'boolean' } })).toBeTruthy(); //  Matched any properties
+   expect(Is.object({ foo: 123, bar: false }, { rules: { foo: 'number', bar: { number: 'number' } } })).toBeFalsy();
 
    // Array
    expect(Is.array({})).toBeFalsy();
