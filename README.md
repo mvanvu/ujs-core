@@ -42,4 +42,4 @@ See all the sample tests at: /test/core
 
 ### Documentation
 
-[See all docs at /docs](docs/)
+[See all docs at /docs/core](docs/core)
