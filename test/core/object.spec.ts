@@ -41,6 +41,6 @@ it('Core Object', () => {
    const obj2 = Obj.from({ foo: 1, bar: 2 });
    expect(obj2.extends({ bar2: { num: 789 } }, { bar2: { num2: 91011 } })).toHaveProperty('bar2.num2', 91011);
 
-   // # Reset
+   // # Reset (alias from Util.resetObject)
    expect(Obj.from({ foo: 1, bar: 2 }).reset()).toMatchObject({});
 });

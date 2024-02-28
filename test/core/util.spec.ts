@@ -1,7 +1,7 @@
 import { Util } from '../../src';
 
 it('Core Util', () => {
-   // # Clone (any type)
+   // # Clone (any type ignore reference pointer)
    const foo = { bar: 123 };
    const foo2 = Util.clone(foo);
    foo2.bar = 456;
@@ -10,8 +10,11 @@ it('Core Util', () => {
    const fn = () => 1;
    expect(Util.clone(fn)).toEqual(fn);
 
-   // # Reset object and assign new properties (maybe)
-   expect(Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' })).toHaveProperty('foo', 'bar');
+   // # Reset object
+   expect(Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' })).toMatchObject({});
+
+   // ## Reset & assign new properties
+   expect(Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' })).toMatchObject({ foo: 'bar' });
 
    // # Sort
    expect(Util.sort(['March', 'Jan', 'Feb', 'Dec'])).toEqual(['Dec', 'Feb', 'Jan', 'March']);

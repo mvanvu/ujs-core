@@ -159,7 +159,7 @@ it('Core Is', () => {
    // ## Defaults to allow deep properties array
    expect(Is.flatObject({ foo: 1, bar: [{ bar: 2 }] })).toBeTruthy();
 
-   // ## Don't allow deep properties
+   // ## Don't allow deep properties array
    expect(Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }, false)).toBeFalsy();
 
    // ## More options: Allow properies array on root level and don't allow properties array on deep level

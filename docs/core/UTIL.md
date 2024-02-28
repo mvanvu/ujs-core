@@ -6,7 +6,7 @@
 import { Util } from '@maivubc/ujs';
 ```
 
-### Clone (any type)
+### Clone (any type ignore reference pointer)
 
 ```javascript
 const foo = { bar: 123 };
@@ -18,10 +18,13 @@ const fn = () => 1;
 Util.clone(fn); // It returns: fn
 ```
 
-### Reset object and assign new properties (maybe)
+### Reset object
 
 ```javascript
-Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' }); // It returns: [ROOT].'foo' ===  'bar'
+Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' }); // It returns: {}
+
+// Reset & assign new properties
+Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' }); // It returns: { foo: 'bar' }
 ```
 
 ### Sort

@@ -61,7 +61,7 @@ const obj2 = Obj.from({ foo: 1, bar: 2 });
 obj2.extends({ bar2: { num: 789 } }, { bar2: { num2: 91011 } }); // It returns: [ROOT].'bar2.num2' ===  91011
 ```
 
-### Reset
+### Reset (alias from Util.resetObject)
 
 ```javascript
 Obj.from({ foo: 1, bar: 2 }).reset(); // It returns: {}

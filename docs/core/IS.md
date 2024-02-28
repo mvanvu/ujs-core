@@ -199,7 +199,7 @@ Is.flatObject({ foo: new Map(), bar: new Set() }); // It returns: false
 // Defaults to allow deep properties array
 Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }); // It returns: true
 
-// Don't allow deep properties
+// Don't allow deep properties array
 Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }, false); // It returns: false
 
 // More options: Allow properies array on root level and don't allow properties array on deep level
