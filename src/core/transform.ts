@@ -225,14 +225,11 @@ export class Transform {
    }
 
    static toASCIIString(value: any) {
-      return Transform.toString(value).replace(
-         /(?![x00-x7F]|[xC0-xDF][x80-xBF]|[xE0-xEF][x80-xBF]{2}|[xF0-xF7][x80-xBF]{3})./g,
-         '',
-      );
+      return Transform.toString(value).replace(/(?![x00-x7F]|[xC0-xDF][x80-xBF]|[xE0-xEF][x80-xBF]{2}|[xF0-xF7][x80-xBF]{3})./g, '');
    }
 
    static toSafeFileName(value: any): string {
-      let name = Transform.toASCIIString(Transform.toNonAccentVietnamese(value));
+      let name = Transform.toNonAccentVietnamese(value);
       let ext = '';
 
       if (name.includes('.')) {
@@ -241,7 +238,7 @@ export class Transform {
          name = parts.join('.');
       }
 
-      return `${Transform.toPath(name)}${ext ? `.${ext}` : ''}`;
+      return `${Transform.toASCIIString(Transform.toPath(name))}${ext ? `.${ext}` : ''}`;
    }
 
    static toDefault(value: any, ...defValues: any[]) {

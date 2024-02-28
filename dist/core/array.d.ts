@@ -41,6 +41,7 @@ export declare class Arr extends Array {
     last(): any;
     prev(): any;
     next(): any;
+    walk(index: number | 'first' | 'last' | 'prev' | 'next', callback: Function): any;
     empty(): this;
     update(elements: Iterable<any> | ArrayLike<any>): this;
 }
