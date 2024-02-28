@@ -201,6 +201,34 @@ export class Arr extends Array {
       return this.elements[++this.#index];
    }
 
+   walk(index: number | 'first' | 'last' | 'prev' | 'next', callback: Function) {
+      if (typeof index !== 'number') {
+         switch (index) {
+            case 'first':
+               index = 0;
+               break;
+
+            case 'last':
+               index = this.elements.length - 1;
+               break;
+
+            case 'prev':
+               index = this.#index - 1;
+               break;
+
+            case 'next':
+               index = this.#index + 1;
+               break;
+         }
+      }
+
+      if (this.elements[index] !== undefined) {
+         this.#index = index;
+
+         return callback.apply(this, [index, this.elements]);
+      }
+   }
+
    empty() {
       this.splice(0, this.elements.length);
 

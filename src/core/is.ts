@@ -324,6 +324,10 @@ export class Is {
    }
 
    static flatObject(value: any, allowArray?: boolean | { root?: boolean; deep?: boolean }) {
+      if (!Is.object(value)) {
+         return false;
+      }
+
       let rootArray = true;
       let deepArray = true;
 
@@ -332,10 +336,6 @@ export class Is {
       } else if (Is.object(allowArray)) {
          rootArray = allowArray['root'] !== false;
          deepArray = allowArray['deep'] !== false;
-      }
-
-      if (!rootArray && Array.isArray(value)) {
-         throw new Error();
       }
 
       const deepCheck = (data: any) => {
@@ -361,7 +361,13 @@ export class Is {
       };
 
       try {
-         deepCheck(value);
+         for (const k in value) {
+            if (!rootArray && Array.isArray(value[k])) {
+               throw new Error();
+            }
+
+            deepCheck(value[k]);
+         }
       } catch {
          return false;
       }

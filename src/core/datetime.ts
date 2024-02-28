@@ -276,7 +276,7 @@ export class DateTime {
       output = output.replace(/DD/g, pad(date.getDate()));
       output = output.replace(/HH/g, pad(date.getHours()));
       output = output.replace(/mm/g, pad(date.getMinutes()));
-      output = output.replace(/sss/g, pad(date.getMilliseconds()));
+      output = output.replace(/sss/g, pad(date.getMilliseconds(), 3));
       output = output.replace(/ss/g, pad(date.getSeconds()));
       output = output.replace(/dddd/g, date.toLocaleString(locale, { weekday: 'long' }));
       output = output.replace(/ddd/g, date.toLocaleString(locale, { weekday: 'short' }));

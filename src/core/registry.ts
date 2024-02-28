@@ -54,9 +54,7 @@ export class Registry {
       this.data = data;
 
       if (!this.isPathArray() && !this.isPathObject()) {
-         throw new RegistryDataError(
-            'Invalid registry data, the data must be an Object<key, value> or a JSON string or an ARRAY',
-         );
+         throw new RegistryDataError('Invalid registry data, the data must be an Object<key, value> or a JSON string or an ARRAY');
       }
 
       if (options?.validate === true) {
@@ -77,6 +75,16 @@ export class Registry {
    }
 
    isValidData() {
+      if (Array.isArray(this.data)) {
+         for (const data of this.data) {
+            if (!Is.flatObject(data)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
       return Is.flatObject(this.data);
    }
 

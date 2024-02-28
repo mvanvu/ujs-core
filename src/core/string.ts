@@ -82,6 +82,7 @@ export class Str extends String {
    }
 
    static repeat(char: string, level = 0) {
+      let output = char;
       level = parseInt(level.toString());
 
       if (level <= 0) {
@@ -89,10 +90,10 @@ export class Str extends String {
       }
 
       while (--level > 0) {
-         char += `${char}`;
+         output = `${output}${char}`;
       }
 
-      return char;
+      return output;
    }
 
    uFirst() {

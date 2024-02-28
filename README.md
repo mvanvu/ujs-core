@@ -38,6 +38,8 @@ yarn test
 yarn test datetime
 ```
 
+See all the sample tests at: /test/core
+
 ### Documentation
 
-See all the sample tests at: /test/core
+[See all docs at /docs](docs/)
