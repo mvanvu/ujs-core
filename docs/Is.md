@@ -100,12 +100,7 @@ Is.equals({ foo: 'bar', bar: 123 }, { bar: 123 }); // It returns: false
 ### Flat value
 
 ```javascript
-
-```
-
-### The flat value is a primitive value
-
-```javascript
+// The flat value is a primitive value
 Is.flatValue(123); // It returns: true
 Is.flatValue(-123); // It returns: true
 Is.flatValue(null); // It returns: true

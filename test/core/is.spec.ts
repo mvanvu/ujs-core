@@ -78,7 +78,7 @@ it('Core Is', () => {
    expect(Is.equals({ foo: 'bar', bar: 123 }, { bar: 123 })).toBeFalsy();
 
    // # Flat value
-   // # The flat value is a primitive value
+   // ## The flat value is a primitive value
    expect(Is.flatValue(123)).toBeTruthy();
    expect(Is.flatValue(-123)).toBeTruthy();
    expect(Is.flatValue(null)).toBeTruthy();
