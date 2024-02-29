@@ -42,12 +42,12 @@ See all the sample tests at: /test/core
 
 ### API Documentation
 
--  [Array](docs/Array.md)
--  [DateTime](docs/Datetime.md)
--  [Hash](docs/Hash.md)
--  [Is](docs/Is.md)
--  [Object](docs/Object.md)
--  [Registry](docs/Registry.md)
--  [String](docs/String.md)
--  [Transform](docs/Transform.md)
--  [Util](docs/Util.md)
+-  [Array](docs/Array.md) an advanced of the JS native Array
+-  [DateTime](docs/Datetime.md) an advanced of the JS native Date
+-  [Hash](docs/Hash.md) provide some useful methods such as: base64, sha256, uuid, JWT...
+-  [Is](docs/Is.md) validate the value that will (or will not) match some conditions
+-  [Object](docs/Object.md) provide some useful static and instance methods for the Object
+-  [Registry](docs/Registry.md) powerful object key-value pair manager
+-  [String](docs/String.md) an advanced of the JS native String
+-  [Transform](docs/Transform.md) provide the transformer to convert any value to some expected value
+-  [Util](docs/Util.md) provide some useful common util methods

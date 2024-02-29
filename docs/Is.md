@@ -36,28 +36,28 @@ Is.asyncFunc(async () => {}); // It returns: true
 
 ```javascript
 /**
-| 'string'
-| 'number'
-| 'snumber'
-| 'unumber'
-| 'int'
-| 'sint'
-| 'uint'
-| 'bigint'
-| 'sbigint'
-| 'ubigint'
-| 'object'
-| 'array'
-| 'boolean'
-| 'undefined'
-| 'symbol'
-| 'function'
-| 'null'
-| 'regex'
-| 'set'
-| 'map'
-| 'NaN'
-| 'date';
+   'string'       -> String (native)
+   'number'       -> Number (native)
+   'snumber'      -> Signed number
+   'unumber'      -> Unsigned number
+   'int'          -> Integer
+   'sint'         -> Signed integer
+   'uint'         -> Unsigned integer
+   'bigint'       -> Bigint (native)
+   'sbigint'      -> Signed bigint
+   'ubigint'      -> Unsigned bigint
+   'object'       -> Object (native)
+   'array'        -> Array (native)
+   'boolean'      -> Boolean (native)
+   'undefined'    -> undefined (primitive)
+   'symbol'       -> Symbol (native)
+   'function'     -> Function (native)
+   'null'         -> null (primitive)
+   'regex'        -> Regex (native)
+   'set'          -> Set (native)
+   'map'          -> Map (native)
+   'NaN'          -> NaN (native)
+   'date';        -> DateTimeLike (number | string | Date (native) | DateTime)
 */
 
 Is.int(123); // It returns: true
