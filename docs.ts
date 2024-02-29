@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { Arr, Str, Transform, Util } from './src';
+import { Arr, Str } from './src';
 (async () => {
    const docsPath = process.cwd() + '/test/core';
    const testFiles = fs.readdirSync(docsPath);
@@ -42,8 +42,7 @@ import { Arr, Str, Transform, Util } from './src';
 
             if (toBe) {
                let ret = '';
-               const regex =
-                  /(toEqual)|(toBeTruthy)|(toBeFalsy)|(toThrow)|(toMatchObject)|(toHaveProperty)|(not\.toHaveProperty)/g;
+               const regex = /(toEqual)|(toBeTruthy)|(toBeFalsy)|(toThrow)|(toMatchObject)|(toHaveProperty)|(not\.toHaveProperty)|toBeInstanceOf/g;
 
                if (toBe.match(regex)) {
                   ret = toBe.replace(regex, '').replace(/^\s*\(|\)\s*$/g, '');
@@ -64,6 +63,8 @@ import { Arr, Str, Transform, Util } from './src';
                      } else {
                         ret = `[ROOT].${parts[0].trim()} === ${parts.length > 1 ? parts[1] : 'undefined'}`;
                      }
+                  } else if (toBe.match(/toBeInstanceOf/)) {
+                     ret = `an instanceof ${ret}`;
                   }
                }
 
@@ -73,7 +74,7 @@ import { Arr, Str, Transform, Util } from './src';
 
                docFile.push(`${expectMatched[1]}; // ${ret}`);
             } else {
-               docFile.push(line);
+               docFile.push(line.replace(/^-+/g, (match) => Str.repeat(' ', match.length)));
             }
          }
       }

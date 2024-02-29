@@ -55,8 +55,6 @@ DateTime.now().endOf().eq(DateTime.yesterday().addDate(1).endOf()); // It return
 ```javascript
 const clone = datetime.clone();
 clone.addDate(1);
-clone.native.getDate() - 1 === date.getDate(); // It returns: true
-datetime.native.getDate() - 1 < date.getDate(); // It returns: true
 clone.gt(date); // It returns: true
 datetime.eq(date); // It returns: true
 ```
@@ -64,27 +62,80 @@ datetime.eq(date); // It returns: true
 ### TimeZone
 
 ```javascript
-dt.setOffset('+08:00');
-dt.format('Z'); // It returns: '+08:00'
+// Create the UTC now
+const utc = DateTime.utc();
+utc.format('Z'); // It returns: '+00:00'
 
-// UTC: Convert to UTC dt.utc()
+// Clone to another UTC and convert to +07:00
+const gmt7 = utc.clone().setOffset('+07:00');
+gmt7.format('Z'); // It returns: '+07:00'
 
-// Create a UTC now
-DateTime.utc().format('Z'); // It returns: '+00:00'
+// Compare to date
+utc.diff(gmt7, 'hour'); // It returns: -7
+gmt7.diff(utc, 'hour'); // It returns: 7
+
+// Compare by unix miliseconds
+utc.valueOf() - gmt7.valueOf(); // It returns: -7 * 60 * 60 * 1000
 ```
 
 ### Format
 
 ```javascript
-// const dt = DateTime.from('2024-02-28');
+/**
+Year
+   YY: 70 71 … 29 30
+   YYYY: 1970 1971 … 2029 2030
+Month
+   M: 1 2 … 11 12
+   MM: 01 02 … 11 12
+   MMM: Jan Feb … Nov Dec
+   MMMM: January February … November December
+Day of Month
+   D: 1 2 … 30 31
+   DD: 01 02 … 30 31
+Day of Week
+   ddd: Sun Mon … Fri Sat
+   dddd: Sunday Monday … Friday Saturday
+Hour
+   H: 0 1 … 22 23
+   HH: 00 01 … 22 23
+   hh: 01 02 … 11 12
+   h: 0 … 11 12
+Minute
+   m: 0 1 … 58 59
+   mm: 00 01 … 58 59
+Second
+   s: 0 1 … 58 59
+   ss: 00 01 … 58 59
+Milisecond
+   SS: 00 01 … 98 99
+   SSS: 000 001 … 998 999
+AM/PM
+   A: AM, PM
+   a: am, pm
+Timezone offset
+   Z: -07:00 -06:00 … +06:00 +07:00
+Unix Timestamp
+   x: 1360013296
+*/
+const nowUtc = DateTime.from('2024-02-29').utc();
+nowUtc.format('YYYY-MM-DD HH:mm:ss:Z'); // It returns: '2024-02-29 00:00:00:+00:00'
+nowUtc.format('YYYY-MM-DD H:m:s:Z'); // It returns: '2024-02-29 0:0:0:+00:00'
 
-// dt.setOffset('+08:00');
-dt.format('YYYY-MM-DD HH:mm:ss:Z'); // It returns: '2024-02-28 08:00:00:+08:00'
+// Hour
+nowUtc.format('YYYY-MM-DD HH:mm A'); // It returns: '2024-02-29 00:00 AM'
+nowUtc.addHour(13);
+
+nowUtc.format('YYYY-MM-DD HH:mm:ss'); // It returns: '2024-02-29 13:00:00'
+nowUtc.format('YYYY-MM-DD HH:mm A'); // It returns: '2024-02-29 13:00 PM'
+nowUtc.format('YYYY-MM-DD hh:mm:ss'); // It returns: '2024-02-29 01:00:00'
+nowUtc.format('YYYY-MM-DD hh:mm a'); // It returns: '2024-02-29 01:00 pm'
 ```
 
 ### Diff by: 'week' | 'date' | 'hour' | 'minute' | 'second' | 'millisecond'
 
 ```javascript
+// const dt = DateTime.from('2024-02-28');
 dt.diff('2024-02-30', 'date'); // It returns: -2
 dt.diff('2024-02-27', 'date'); // It returns: 1
 dt.diff('2024-02-27', 'week'); // It returns: 0
@@ -96,20 +147,20 @@ dt.diff('2024-02-27', 'week'); // It returns: 0
 const now = DateTime.now();
 
 // Date
-now.clone().nextDate().diff(now, 'date'); // It returns: 1
-now.clone().prevDate().diff(now, 'date'); // It returns: -1
+DateTime.now().nextDate().diff(now, 'date'); // It returns: 1
+DateTime.now().prevDate().diff(now, 'date'); // It returns: -1
 
 // Week
-now.clone().nextWeek().diff(now, 'week'); // It returns: 1
-now.clone().prevWeek().diff(now, 'week'); // It returns: -1
+DateTime.now().nextWeek().diff(now, 'week'); // It returns: 1
+DateTime.now().prevWeek().diff(now, 'week'); // It returns: -1
 
 // Month
-now.clone().nextMonth().native.getMonth(); // It returns: now.native.getMonth() + 1
-now.clone().prevMonth().native.getMonth(); // It returns: now.native.getMonth() - 1
+DateTime.now().nextMonth().native.getMonth(); // It returns: now.native.getMonth() + 1
+DateTime.now().prevMonth().native.getMonth(); // It returns: now.native.getMonth() - 1
 
 // Year
-now.clone().nextYear().native.getFullYear(); // It returns: now.native.getFullYear() + 1
-now.clone().prevYear().native.getFullYear(); // It returns: now.native.getFullYear() - 1
+DateTime.now().nextYear().native.getFullYear(); // It returns: now.native.getFullYear() + 1
+DateTime.now().prevYear().native.getFullYear(); // It returns: now.native.getFullYear() - 1
 ```
 
 ### Days In Months
@@ -152,8 +203,20 @@ DateTime.from('2024-02-28 13:00:00').addSecond(60).format('HH:mm:ss'); // It ret
 DateTime.from('2024-02-28 13:00:00').addSecond(-90).format('HH:mm:ss'); // It returns: '12:58:30'
 
 // Milisecond
-DateTime.from('2024-02-28 13:00:00').addMillisecond(999).format('HH:mm:ss.sss'); // It returns: '13:00:00.999'
-DateTime.from('2024-02-28 13:00:00').addMillisecond(-999).format('HH:mm:ss.sss'); // It returns: '12:59:59.001'
+DateTime.from('2024-02-28 13:00:00').addMillisecond(999).format('HH:mm:ss.SSS'); // It returns: '13:00:00.999'
+DateTime.from('2024-02-28 13:00:00').addMillisecond(-999).format('HH:mm:ss.SSS'); // It returns: '12:59:59.001'
+```
+
+### DateTimeLike: number | string | Date | DateTime
+
+```javascript
+// Parse
+DateTime.parse(Date.now()); // It returns: an instanceof Date
+DateTime.parse(DateTime.now()); // It returns: an instanceof Date
+DateTime.parse('2024-02-28 13:00:00'); // It returns: an instanceof Date
+DateTime.parse('2024-02-28_13:00:00'); // It returns: false
+DateTime.parse(''); // It returns: false
+DateTime.parse(0); // It returns: false
 ```
 
 ### Other
@@ -163,7 +226,7 @@ DateTime.from('2024-02-28 13:00:00').addMillisecond(-999).format('HH:mm:ss.sss')
 dt.valueOf(); // It returns a number of time in miliseconds
 
 // ISO
-dt.iso; // It returns a ISO date time string like
+dt.iso; // It returns a ISO date time string like: YYYY-MM-DDTHH:mm:ss.sss
 
 // Check if the date is valid
 dt.valid; // It returns: true

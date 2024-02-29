@@ -133,5 +133,6 @@ it('Util Transform', () => {
    expect(Transform.toNonAccentVietnamese('Chào thế giới')).toEqual('Chao the gioi');
 
    // # To ASCII string
-   expect(Transform.toASCIIString('Chào thế giới')).toEqual('Chothgii');
+   expect(Transform.toASCIIString('Chào thế giới')).toEqual('Chao the gioi');
+   expect(Transform.toASCIIString('Đây là')).toEqual('ay la');
 });

@@ -16,7 +16,7 @@ export declare class Transform {
     static toAlnum(value: any): string;
     static toNoneDiacritics(value: any): string;
     static toNonAccentVietnamese(value: any): string;
-    static toASCIIString(value: any): string;
+    static toASCIIString(value: any): any;
     static toSafeFileName(value: any): string;
     static toDefault(value: any, ...defValues: any[]): any;
     static toStripTags(value: any, allowed?: string): string;

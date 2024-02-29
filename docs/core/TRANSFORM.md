@@ -176,5 +176,6 @@ Transform.toNonAccentVietnamese('Chào thế giới'); // It returns: 'Chao the 
 ### To ASCII string
 
 ```javascript
-Transform.toASCIIString('Chào thế giới'); // It returns: 'Chothgii'
+Transform.toASCIIString('Chào thế giới'); // It returns: 'Chao the gioi'
+Transform.toASCIIString('Đây là'); // It returns: 'ay la'
 ```
