@@ -1,4 +1,4 @@
-## OBJECT
+## Object
 
 ### Usage
 

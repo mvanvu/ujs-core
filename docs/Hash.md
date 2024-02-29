@@ -1,4 +1,4 @@
-## HASH
+## Hash
 
 ### Usage
 

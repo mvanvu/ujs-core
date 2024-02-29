@@ -1,4 +1,4 @@
-## TRANSFORM
+## Transform
 
 ### Usage
 

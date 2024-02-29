@@ -1,4 +1,4 @@
-## ARRAY
+## Array
 
 ### Usage
 

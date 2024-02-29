@@ -20,7 +20,7 @@
       "serve": "webpack server",
       "build": "webpack build",
       "test": "jest",
-      "docs": "ts-node docs.ts && prettier --parser markdown --write \"docs/**/*.md\"",
+      "docs": "ts-node scripts/docs.ts && prettier --parser markdown --write \"docs/*.md\"",
       "npm-publish": "yarn publish --access=public"
    },
    "devDependencies": {

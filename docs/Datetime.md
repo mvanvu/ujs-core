@@ -1,4 +1,4 @@
-## DATETIME
+## Datetime
 
 ### Usage
 

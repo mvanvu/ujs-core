@@ -1,4 +1,4 @@
-## REGISTRY
+## Registry
 
 ### Usage
 

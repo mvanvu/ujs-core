@@ -40,6 +40,14 @@ yarn test datetime
 
 See all the sample tests at: /test/core
 
-### Documentation
+### API Documentation
 
-[See all docs at /docs/core](docs/core)
+-  [Array](docs/Array.md)
+-  [DateTime](docs/Datetime.md)
+-  [Hash](docs/Hash.md)
+-  [Is](docs/Is.md)
+-  [Object](docs/Object.md)
+-  [Registry](docs/Registry.md)
+-  [String](docs/String.md)
+-  [Transform](docs/Transform.md)
+-  [Util](docs/Util.md)

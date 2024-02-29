@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { Arr, Str } from './src';
+import { Arr, Str } from '../src';
 (async () => {
    const docsPath = process.cwd() + '/test/core';
    const testFiles = fs.readdirSync(docsPath);
@@ -86,8 +86,8 @@ import { Arr, Str } from './src';
             }
          });
 
-         const outPath = `${process.cwd()}/docs/core`;
-         const file = testFile.toUpperCase().split('.')[0];
+         const outPath = `${process.cwd()}/docs`;
+         const file = Str.uFirst(testFile).split('.')[0];
 
          if (!fs.existsSync(outPath)) {
             fs.mkdirSync(outPath, { recursive: true });

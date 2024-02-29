@@ -1,4 +1,4 @@
-## STRING
+## String
 
 ### Usage
 
