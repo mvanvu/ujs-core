@@ -21,6 +21,9 @@ it('Core String', () => {
    expect(Str.truncate('hi-diddly-ho there, neighborino', 19)).toEqual('hi-diddly-ho there,...');
    expect(Str.from('hi-diddly-ho there, neighborino').truncate(19)).toEqual('hi-diddly-ho there,...');
 
+   // # Custom three dots
+   expect(Str.from('hi-diddly-ho there, neighborino').truncate(19, '$$$')).toEqual('hi-diddly-ho there,$$$');
+
    // # Repeat
    expect(Str.repeat('-', 0.4)).toEqual('');
    expect(Str.repeat('-', -1)).toEqual('');
@@ -28,4 +31,9 @@ it('Core String', () => {
    expect(Str.repeat('-', 1)).toEqual('-');
    expect(Str.repeat('-', 2)).toEqual('--');
    expect(Str.from('==').repeat(2)).toEqual('====');
+
+   // # The string instance has the same the static method: toCamelCase, camelToSnackCase, snackToCamelCase, toCapitalize and truncate
+   const str = Str.from('Hello world!');
+   expect(str.toCamelCase()).toEqual('helloWorld');
+   expect(str.truncate(5, '...$$')).toEqual('Hello...$$');
 });

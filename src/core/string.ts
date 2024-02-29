@@ -123,8 +123,4 @@ export class Str extends String {
    truncate(maxLength = 50, pad?: string) {
       return Str.truncate(this.text, maxLength, pad);
    }
-
-   repeat(level = 0) {
-      return Str.repeat(this.text, level);
-   }
 }

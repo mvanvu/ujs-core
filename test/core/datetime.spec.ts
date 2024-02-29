@@ -186,7 +186,7 @@ it('Util DateTime', () => {
    dt.valueOf(); // It returns a number of time in miliseconds
 
    // ## ISO
-   dt.iso; // It returns a ISO date time string like: YYYY-MM-DDTHH:mm:ss.sss
+   dt.iso; // It returns a ISO date time string like: YYYY-MM-DDTHH:mm:ss.SSS
 
    // ## Check if the date is valid
    expect(dt.valid).toBeTruthy();

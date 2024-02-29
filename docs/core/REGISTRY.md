@@ -10,6 +10,8 @@ import { Registry, RegistryDataError } from '@maivubc/ujs';
 
 ```javascript
 const registry = Registry.from({ foo: 123, bar: { foo1: 'bar1', foo2: 'bar2' } });
+
+// OR const registry = Registry.from(); // the original data = {}
 ```
 
 ### Pick

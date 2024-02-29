@@ -3,6 +3,7 @@ import { Registry, RegistryDataError } from '../../src';
 it('Util Registry', () => {
    // # Create a registry instance
    const registry = Registry.from({ foo: 123, bar: { foo1: 'bar1', foo2: 'bar2' } });
+   // ## OR const registry = Registry.from(); // the original data = {}
 
    // # Pick
    expect(registry.pick('bar.foo2').has('foo')).toBeFalsy();

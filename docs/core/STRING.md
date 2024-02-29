@@ -35,6 +35,12 @@ Str.truncate('hi-diddly-ho there, neighborino', 19); // It returns: 'hi-diddly-h
 Str.from('hi-diddly-ho there, neighborino').truncate(19); // It returns: 'hi-diddly-ho there,...'
 ```
 
+### Custom three dots
+
+```javascript
+Str.from('hi-diddly-ho there, neighborino').truncate(19, '$$$'); // It returns: 'hi-diddly-ho there,$$$'
+```
+
 ### Repeat
 
 ```javascript
@@ -44,4 +50,12 @@ Str.repeat('-', 0); // It returns: ''
 Str.repeat('-', 1); // It returns: '-'
 Str.repeat('-', 2); // It returns: '--'
 Str.from('==').repeat(2); // It returns: '===='
+```
+
+### The string instance has the same the static method: toCamelCase, camelToSnackCase, snackToCamelCase, toCapitalize and truncate
+
+```javascript
+const str = Str.from('Hello world!');
+str.toCamelCase(); // It returns: 'helloWorld'
+str.truncate(5, '...$$'); // It returns: 'Hello...$$'
 ```

@@ -226,7 +226,7 @@ DateTime.parse(0); // It returns: false
 dt.valueOf(); // It returns a number of time in miliseconds
 
 // ISO
-dt.iso; // It returns a ISO date time string like: YYYY-MM-DDTHH:mm:ss.sss
+dt.iso; // It returns a ISO date time string like: YYYY-MM-DDTHH:mm:ss.SSS
 
 // Check if the date is valid
 dt.valid; // It returns: true

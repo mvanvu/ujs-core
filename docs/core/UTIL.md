@@ -6,7 +6,7 @@
 import { Util } from '@maivubc/ujs';
 ```
 
-### Clone (any type ignore reference pointer)
+### Clone (any type and ignore reference pointer)
 
 ```javascript
 const foo = { bar: 123 };

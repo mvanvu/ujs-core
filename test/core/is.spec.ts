@@ -77,7 +77,8 @@ it('Core Is', () => {
    expect(Is.equals({ foo: 'bar', bar: 123 }, { bar: 123, foo: 'bar2' })).toBeFalsy();
    expect(Is.equals({ foo: 'bar', bar: 123 }, { bar: 123 })).toBeFalsy();
 
-   // # Flat Value
+   // # Flat value
+   // # The flat value is a primitive value
    expect(Is.flatValue(123)).toBeTruthy();
    expect(Is.flatValue(-123)).toBeTruthy();
    expect(Is.flatValue(null)).toBeTruthy();
@@ -153,16 +154,16 @@ it('Core Is', () => {
    expect(Is.strongPassword(`${pwd} has space`)).toBeFalsy();
    expect(Is.strongPassword(`${pwd} has space`, { noSpaces: false })).toBeTruthy();
 
-   // # Flat object
+   // # Flat object: the flat object contains all the properties which are flat value (primitive)
    expect(Is.flatObject({ foo: new Map(), bar: new Set() })).toBeFalsy();
 
-   // ## Defaults to allow deep properties array
+   // ## Defaults to allow deep properties as array
    expect(Is.flatObject({ foo: 1, bar: [{ bar: 2 }] })).toBeTruthy();
 
-   // ## Don't allow deep properties array
+   // ## Don't allow deep properties as  array
    expect(Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }, false)).toBeFalsy();
 
-   // ## More options: Allow properies array on root level and don't allow properties array on deep level
+   // ## More options: Allow properies as array on root level and don't allow properties as array on deep level
    expect(Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }, { root: false, deep: true })).toBeFalsy();
    expect(Is.flatObject({ foo: 1, bar: 2 }, { root: false, deep: true })).toBeTruthy();
 });

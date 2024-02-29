@@ -1,7 +1,7 @@
 import { Util } from '../../src';
 
 it('Core Util', () => {
-   // # Clone (any type ignore reference pointer)
+   // # Clone (any type and ignore reference pointer)
    const foo = { bar: 123 };
    const foo2 = Util.clone(foo);
    foo2.bar = 456;

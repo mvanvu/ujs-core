@@ -97,7 +97,13 @@ Is.equals({ foo: 'bar', bar: 123 }, { bar: 123, foo: 'bar2' }); // It returns: f
 Is.equals({ foo: 'bar', bar: 123 }, { bar: 123 }); // It returns: false
 ```
 
-### Flat Value
+### Flat value
+
+```javascript
+
+```
+
+### The flat value is a primitive value
 
 ```javascript
 Is.flatValue(123); // It returns: true
@@ -191,18 +197,18 @@ Is.strongPassword(`${pwd} has space`); // It returns: false
 Is.strongPassword(`${pwd} has space`, { noSpaces: false }); // It returns: true
 ```
 
-### Flat object
+### Flat object: the flat object contains all the properties which are flat value (primitive)
 
 ```javascript
 Is.flatObject({ foo: new Map(), bar: new Set() }); // It returns: false
 
-// Defaults to allow deep properties array
+// Defaults to allow deep properties as array
 Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }); // It returns: true
 
-// Don't allow deep properties array
+// Don't allow deep properties as  array
 Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }, false); // It returns: false
 
-// More options: Allow properies array on root level and don't allow properties array on deep level
+// More options: Allow properies as array on root level and don't allow properties as array on deep level
 Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }, { root: false, deep: true }); // It returns: false
 Is.flatObject({ foo: 1, bar: 2 }, { root: false, deep: true }); // It returns: true
 ```

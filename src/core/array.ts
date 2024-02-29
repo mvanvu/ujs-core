@@ -50,10 +50,7 @@ export class Arr extends Array {
                } else if (key && Is.object(el)) {
                   const num = Registry.from(<object>el).get(key);
 
-                  if (
-                     typeof num === 'number' &&
-                     ((num < state.value && type === 'min') || (num > state.value && type === 'max'))
-                  ) {
+                  if (typeof num === 'number' && ((num < state.value && type === 'min') || (num > state.value && type === 'max'))) {
                      state.value = num;
                      state.index = i;
                   }
@@ -194,14 +191,30 @@ export class Arr extends Array {
    }
 
    prev() {
-      return this.elements[--this.#index];
+      const index = this.#index - 1;
+
+      if (this.elements[index] !== undefined) {
+         this.#index = index;
+      }
+
+      return this.elements[index];
    }
 
    next() {
-      return this.elements[++this.#index];
+      const index = this.#index + 1;
+
+      if (this.elements[index] !== undefined) {
+         this.#index = index;
+      }
+
+      return this.elements[index];
    }
 
    walk(index: number | 'first' | 'last' | 'prev' | 'next', callback: Function) {
+      if (typeof callback !== 'function') {
+         return;
+      }
+
       if (typeof index !== 'number') {
          switch (index) {
             case 'first':
