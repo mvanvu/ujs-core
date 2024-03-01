@@ -191,8 +191,7 @@ export class Transform {
    static toAlnum(value: any) {
       return Transform.toString(value)
          .trim()
-         .replace(/[^a-z0-9]/gi, '')
-         .toLowerCase();
+         .replace(/[^a-zA-Z0-9]/g, '');
    }
 
    static toNoneDiacritics(value: any) {
@@ -259,9 +258,9 @@ export class Transform {
       return undefined;
    }
 
-   static toStripTags(value: any, allowed?: string) {
+   static toStripTags(value: any, allowedTags?: string) {
       // Making sure the allowed arg is a string containing only tags in lowercase (<a><b><c>)
-      allowed = (((allowed || '') + '').toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('');
+      allowedTags = (((allowedTags || '') + '').toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('');
       const tags = /<\/?([a-z0-9]*)\b[^>]*>?/gi;
       const commentsAndPhpTags = /<!--[\s\S]*?-->|<\?(?:php)?[\s\S]*?\?>/gi;
       let after = Transform.toString(value);
@@ -272,7 +271,7 @@ export class Transform {
       while (true) {
          const before = after;
          after = before.replace(commentsAndPhpTags, '').replace(tags, function ($0, $1) {
-            return allowed.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
+            return allowedTags.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
          });
 
          // Return once no more tags are removed

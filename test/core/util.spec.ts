@@ -1,6 +1,6 @@
 import { Util } from '../../src';
 
-it('Core Util', () => {
+it('Core Util', async () => {
    // # Clone (any type and ignore reference pointer)
    const foo = { bar: 123 };
    const foo2 = Util.clone(foo);
@@ -15,6 +15,27 @@ it('Core Util', () => {
 
    // ## Reset & assign new properties
    expect(Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' })).toMatchObject({ foo: 'bar' });
+
+   // # Callback(fn, params: any[], instanceThis?: any): an async function to call if the value is callable
+   // ## Call a none function, just do nothing and return it
+   expect(await Util.callback('Im not callable')).toEqual('Im not callable');
+
+   // ## Call a function
+   expect(await Util.callback(() => 'Hi!')).toEqual('Hi!');
+
+   // ## Call a function with arguments
+   expect(await Util.callback((name: string, age: number) => `I'm ${name}, ${age} years old!`, ['Yu', 25])).toEqual(`I'm Yu, 25 years old!`);
+
+   // ## Call a function with this instance
+   // ## Note: this instance can't call with arrow function
+   function whoAmI() {
+      return this;
+   }
+
+   expect(await Util.callback(whoAmI, [], 'Iron man')).toEqual('Iron man');
+
+   // ## When the callback is an instance of Promise, then the arguments and this instance will be ignored
+   expect(await Util.callback(new Promise((resolve) => resolve('Im here')))).toEqual('Im here');
 
    // # Sort
    expect(Util.sort(['March', 'Jan', 'Feb', 'Dec'])).toEqual(['Dec', 'Feb', 'Jan', 'March']);

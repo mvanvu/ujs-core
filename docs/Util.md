@@ -27,6 +27,36 @@ Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' }); // It returns: {}
 Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' }); // It returns: { foo: 'bar' }
 ```
 
+### Callback(fn, params: any[], instanceThis?: any): an async function to call if the value is callable
+
+```javascript
+// Call a none function, just do nothing and return it
+await Util.callback('Im not callable'); // It returns: 'Im not callable'
+
+
+// Call a function
+await Util.callback(() => 'Hi!'); // It returns: 'Hi!'
+
+
+// Call a function with arguments
+await Util.callback((name: string, age: number) => `I'm ${name}, ${age} years old!`, ['Yu', 25]); // It returns: `I'm Yu, 25 years old!`
+
+
+// Call a function with this instance
+
+// Note: this instance can't call with arrow function
+function whoAmI() {
+return this;
+}
+
+await Util.callback(whoAmI, [], 'Iron man'); // It returns: 'Iron man'
+
+
+// When the callback is an instance of Promise, then the arguments and this instance will be ignored
+await Util.callback(new Promise((resolve) => resolve('Im here'))); // It returns: 'Im here'
+
+```
+
 ### Sort
 
 ```javascript

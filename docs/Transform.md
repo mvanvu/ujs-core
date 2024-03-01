@@ -6,7 +6,32 @@
 import { Transform } from '@maivubc/ujs';
 ```
 
-### To string
+### Transform methods
+
+```javascript
+/**
+   toString
+   toArrayUnique
+   trim
+   toDefault
+   toStripTags
+   toSafeHtml
+   toNumber
+   toUNumber
+   toInt
+   toUInt
+   toBoolean
+   toJsonObject
+   toPath
+   toSafeFileName
+   toNoneDiacritics
+   toNonAccentVietnamese
+   toASCIIString
+   toAlnum
+*/
+```
+
+### toString(value: any)
 
 ```javascript
 // From the primitive value (by String(value))
@@ -20,7 +45,7 @@ Transform.toString(true); // It returns: 'true'
 Transform.toString({ foo: 'bar' }); // It returns: JSON.stringify({ foo: 'bar' })
 ```
 
-### Array unique
+### toArrayUnique(value: any)
 
 ```javascript
 const unique = Transform.toArrayUnique([{ foo: 123 }, { foo: 123 }, { foo: 456 }]);
@@ -28,7 +53,7 @@ unique.length; // It returns: 2
 unique; // It returns: [{ foo: 123 }, { foo: 456 }]
 ```
 
-### Trim
+### trim(value: any, options?: { specialChars?: string; pos?: 'left' | 'right' | 'both' })
 
 ```javascript
 // Trim any space|tab|new line and option to specific some special characters
@@ -48,7 +73,7 @@ Transform.trim(strWithNewLine); // It returns: 'String with new line'
 Transform.trim(`~!@#$%${strWithNewLine}@#`, { specialChars: '~!@#$%' }); // It returns: 'String with new line'
 ```
 
-### To default
+### toDefault(value: any, ...defValues: any[])
 
 ```javascript
 // Returns the last value if the previous sibling is nothing (undefined | null | NaN)
@@ -59,7 +84,7 @@ Transform.toDefault(undefined, false); // It returns: false
 Transform.toDefault(null); // It returns: undefined
 ```
 
-### Strip tags
+### toStripTags(value: any, allowedTags?: string)
 
 ```javascript
 Transform.toStripTags('1 <br/> 1', '<br><br/>'); // It returns: '1 <br/> 1'
@@ -67,7 +92,7 @@ Transform.toStripTags('<i>hello</i> <<foo>script>world<</foo>/script>'); // It r
 Transform.toStripTags(4); // It returns: '4'
 ```
 
-### Safe HTML
+### toSafeHtml(value: any, options?: { allowedTags?: string[]; allowedAttributes?: string[] })
 
 ```javascript
 Transform.toSafeHtml('<a href="/path/to/url" >Click me</a>'); // It returns: '<a href="/path/to/url">Click me</a>'
@@ -85,7 +110,7 @@ const link = '<a href="/path/to/url" data-src="#">Click me</a>';
 Transform.toSafeHtml(link, { allowedAttributes: ['href'] }); // It returns: '<a href="/path/to/url">Click me</a>'
 ```
 
-### To number
+### toNumber(value: any)
 
 ```javascript
 Transform.toNumber(''); // It returns: 0
@@ -96,12 +121,12 @@ Transform.toNumber(true); // It returns: 1
 Transform.toNumber({}); // It returns: 0
 Transform.toNumber([]); // It returns: 0
 
-// To unsigned number
+// toUNumber(value: any) => unsigned number
 Transform.toUNumber(-1.25); // It returns: 1.25
 Transform.toUNumber('-1.25'); // It returns: 1.25
 ```
 
-### To integer
+### toInt(value: any) => integer
 
 ```javascript
 Transform.toInt(Number.MAX_SAFE_INTEGER + 100); // It returns: Number.MAX_SAFE_INTEGER
@@ -109,11 +134,14 @@ Transform.toInt(-Number.MAX_SAFE_INTEGER - 100); // It returns: -Number.MAX_SAFE
 Transform.toInt(1.25); // It returns: 1
 Transform.toInt('1.25'); // It returns: 1
 
-// To unsigned integer
+// toUInt(value: any) => unsigned integer
 Transform.toUInt(-1); // It returns: 1
 Transform.toUInt('-1'); // It returns: 1
+```
 
-// To boolean
+### toBoolean(value: any)
+
+```javascript
 Transform.toBoolean(true); // It returns: true
 Transform.toBoolean('true'); // It returns: true
 Transform.toBoolean('1'); // It returns: true
@@ -135,7 +163,7 @@ Transform.toBoolean({}); // It returns: true
 Transform.toBoolean(''); // It returns: false
 ```
 
-### To json object
+### toJsonObject<T = any[] | Record<string, any>>(value: any, defaultJson?: T) => T
 
 ```javascript
 // From the JSON string
@@ -152,30 +180,68 @@ Transform.toJsonObject(123); // It returns: {}
 Transform.toJsonObject(null, { defaults: { foo: 'bar' } }); // It returns: { defaults: { foo: 'bar' } }
 ```
 
-### To path
+### toPath(value: any) => valid path (URL)
 
 ```javascript
 Transform.toPath('/from_path/to_path///to/file .txt'); // It returns: 'from-path/to-path/to/file-txt'
 ```
 
-### To safe file name
+### toSafeFileName(value: any) => cleaned file name
 
 ```javascript
 Transform.toSafeFileName('/from_path/to_path///to/file .txt'); // It returns: 'frompathtopathtofile.txt'
 ```
 
-### To none diacritics
+### toNoneDiacritics(value: any) => striped diacritics string
 
 ```javascript
 Transform.toNoneDiacritics("J'aime boire du café"); // It returns: "J'aime boire du cafe"
 
-// To none accent Vietnamese
+// toNonAccentVietnamese(value: any) => none diacritics vietnamese string
 Transform.toNonAccentVietnamese('Chào thế giới'); // It returns: 'Chao the gioi'
 ```
 
-### To ASCII string
+### toASCIIString(value: string) => ASCII string
 
 ```javascript
 Transform.toASCIIString('Chào thế giới'); // It returns: 'Chao the gioi'
 Transform.toASCIIString('Đây là'); // It returns: 'ay la'
+```
+
+### toAlnum(value: any) => Alpha number string
+
+```javascript
+// Only character and number are accepted
+Transform.toAlnum('^Hello @World! 2024'); // It returns: 'HelloWorld2024'
+```
+
+### clean(value: any, typeTransform: string | string[], ...params: any[]): convert to multiple types
+
+```javascript
+// Transform to String->Boolean
+Transform.clean(1, ['toString', 'toBoolean']); // It returns: true
+
+// Transform to Boolean->String
+Transform.clean(0, ['toBoolean', 'toString']); // It returns: 'false'
+
+// The same with short way
+Transform.clean(1, ['string', 'boolean']); // It returns: true
+Transform.clean(0, ['boolean', 'string']); // It returns: 'false'
+```
+
+### CleanIfType(value: any, typeTransform: string | string[], typeValue: CommonType | CommonType[]): clean if the value matches type
+
+```javascript
+// Trim if the value is string
+Transform.cleanIfType(' Hi! ', 'trim', 'string'); // It returns: 'Hi!'
+
+// Trim and remove one alpha string
+Transform.cleanIfType(' Hi! ', ['trim', 'alnum'], 'string'); // It returns: 'Hi'
+
+// Trim and convert to unsigned integer if the value is string or number
+Transform.cleanIfType(' 1.25 ', ['trim', 'uint'], ['string', 'number']); // It returns: 1
+Transform.cleanIfType(1.25, ['trim', 'uint'], ['string', 'number']); // It returns: 1
+
+// Do nothing if the value isn't match with they type(s), 1.25 is not the string type
+Transform.cleanIfType(1.25, ['uint'], ['string']); // It returns: 1.25
 ```

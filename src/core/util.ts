@@ -41,13 +41,7 @@ export class Util {
    }
 
    static async callback<T>(fn: any, params: any[] = [], inst?: any): Promise<T> {
-      return Is.asyncFunc(fn)
-         ? await fn.apply(inst, params)
-         : fn instanceof Promise
-         ? await fn
-         : Is.func(fn)
-         ? fn.apply(inst, params)
-         : fn;
+      return Is.asyncFunc(fn) ? await fn.apply(inst, params) : fn instanceof Promise ? await fn : Is.func(fn) ? fn.apply(inst, params) : fn;
    }
 
    static resetObject<T extends object>(obj: object, newData?: T): T | {} {
