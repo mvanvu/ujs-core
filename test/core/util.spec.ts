@@ -1,7 +1,8 @@
-import { Util } from '../../src';
+import { constants } from 'fs/promises';
+import { Util, UtilRaceError } from '../../src';
 
 it('Core Util', async () => {
-   // # Clone (any type and ignore reference pointer)
+   // # clone<T>(src: T): T (any type and ignore reference pointer)
    const foo = { bar: 123 };
    const foo2 = Util.clone(foo);
    foo2.bar = 456;
@@ -10,7 +11,7 @@ it('Core Util', async () => {
    const fn = () => 1;
    expect(Util.clone(fn)).toEqual(fn);
 
-   // # Reset object
+   // # resetObject<T extends object>(obj: object, newData?: T): T | {}
    expect(Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' })).toMatchObject({});
 
    // ## Reset & assign new properties
@@ -37,7 +38,7 @@ it('Core Util', async () => {
    // ## When the callback is an instance of Promise, then the arguments and this instance will be ignored
    expect(await Util.callback(new Promise((resolve) => resolve('Im here')))).toEqual('Im here');
 
-   // # Sort
+   // # sort(data: any[] | object, options?: { key?: string })
    expect(Util.sort(['March', 'Jan', 'Feb', 'Dec'])).toEqual(['Dec', 'Feb', 'Jan', 'March']);
    expect(Util.sort([1, 30, 4, 21, 100000])).toEqual([1, 4, 21, 30, 100000]);
    expect(Object.keys(Util.sort({ foo: 10, bar: 20 }))).toEqual(['bar', 'foo']);
@@ -45,12 +46,27 @@ it('Core Util', async () => {
    const sorted = Util.sort(Array({ foo: 10, bar: 20 }, { foo: 5, bar: 10 }), { key: 'foo' });
    expect(sorted).toEqual(Array({ foo: 5, bar: 10 }, { foo: 10, bar: 20 }));
 
-   // # Base name
+   // # baseName(path: string, suffix?: string)
    expect(Util.baseName('/www/site/home.html')).toEqual('home.html');
    expect(Util.baseName('/www/site/home.html', '.html')).toEqual('home');
    expect(Util.baseName('/some/path/')).toEqual('path');
 
-   // # Dir name
+   // # dirName(path: string)
    expect(Util.dirName('/etc/passwd')).toEqual('/etc');
    expect(Util.dirName('/some/path/to/')).toEqual('/some/path');
+
+   // # async race(callback: any, maxSeconds: number) -> Run a callback in the limited time (seconds)
+   // ## Run the callback in around of maximum seconds otherwise it will be thrown an instance of UtilRaceError
+   expect(await Util.race('Im not callable', 1)).toEqual('Im not callable');
+
+   // ## Throw UtilRaceError because the callback run in 2 seconds while the maximum time is 1 seconds
+   const timeout = async () => {
+      try {
+         await Util.race(new Promise((resolve) => setTimeout(resolve, 2000)), 1);
+      } catch (e) {
+         return e;
+      }
+   };
+
+   expect((await timeout()) instanceof UtilRaceError).toBeTruthy();
 });

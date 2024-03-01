@@ -7,8 +7,13 @@ export declare class Obj {
     static excludes<T extends object, K extends keyof T>(target: T, props: K[] | K): Omit<T, K>;
     static extends(target: object, ...sources: object[]): object;
     static isObject(value: any): boolean;
-    static from(o: object): Obj;
-    contains(target: object | string): boolean;
-    extends(...sources: object[]): object;
-    reset<T extends object>(newData?: T): {} | T;
+    static reset<T extends Record<string, any>>(o: Record<string, any>, newData?: T): {} | T;
+    static from(o: Record<string, any>): Obj;
+    static initPropValue<T>(o: Record<string, any>, prop: string, value: T): T;
+    contains(target: Record<string, any> | string): boolean;
+    extends(...sources: Record<string, any>[]): object;
+    reset<T extends Record<string, any>>(newData?: T): {} | T;
+    initPropValue<T>(prop: string, value: T): T;
+    valueOf(): Record<string, any>;
+    toString(): string;
 }

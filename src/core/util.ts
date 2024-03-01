@@ -3,6 +3,7 @@ import { Registry } from './registry';
 import { DateTime } from './datetime';
 import { Is } from './is';
 
+export class UtilRaceError extends Error {}
 export class Util {
    static clone<T>(src: T): T {
       let newInst: any = src;
@@ -107,5 +108,14 @@ export class Util {
 
    static dirName(path: string) {
       return path.replace(/\\/g, '/').replace(/\/[^/]*\/?$/, '');
+   }
+
+   static async race(callback: any, maxSeconds: number) {
+      return await Promise.race([
+         Promise.resolve(Util.callback(callback)),
+         new Promise((_resolve, reject) => {
+            setTimeout(() => reject(new UtilRaceError('Race timeout.')), maxSeconds * 1000);
+         }),
+      ]);
    }
 }

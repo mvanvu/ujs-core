@@ -22,6 +22,7 @@ export declare class Registry {
     private isPathNum;
     get<T>(path: string, defaultValue?: any, filter?: string | string[]): T;
     set(path: string, value: any): this;
+    initPathValue<T>(path: string, value: T): T;
     has(path: string): boolean;
     is(path: string, compareValue?: any): boolean;
     isCached(path: string): boolean;

@@ -61,6 +61,9 @@ export class Registry {
          this.validate();
       }
 
+      // Reset caching
+      this.cached = {};
+
       return this;
    }
 
@@ -191,6 +194,14 @@ export class Registry {
       }
 
       return this;
+   }
+
+   initPathValue<T>(path: string, value: T): T {
+      if (!this.has(path)) {
+         this.set(path, value);
+      }
+
+      return value;
    }
 
    has(path: string) {

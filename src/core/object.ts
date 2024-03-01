@@ -89,19 +89,39 @@ export class Obj {
       return Is.object(value);
    }
 
-   static from(o: object) {
+   static reset<T extends Record<string, any>>(o: Record<string, any>, newData?: T) {
+      return Util.resetObject(o, newData);
+   }
+
+   static from(o: Record<string, any>) {
       return new Obj(o);
    }
 
-   contains(target: object | string) {
+   static initPropValue<T>(o: Record<string, any>, prop: string, value: T): T {
+      return Registry.from(o, { clone: false }).initPathValue(prop, value);
+   }
+
+   contains(target: Record<string, any> | string) {
       return Obj.contains(this.objects, target);
    }
 
-   extends(...sources: object[]) {
+   extends(...sources: Record<string, any>[]) {
       return Obj.extends(this.objects, ...sources);
    }
 
-   reset<T extends object>(newData?: T) {
-      return Util.resetObject(this.objects, newData);
+   reset<T extends Record<string, any>>(newData?: T) {
+      return Obj.reset(this.objects, newData);
+   }
+
+   initPropValue<T>(prop: string, value: T): T {
+      return Obj.initPropValue(this.objects, prop, value);
+   }
+
+   valueOf() {
+      return this.objects;
+   }
+
+   toString() {
+      return JSON.stringify(this.objects);
    }
 }

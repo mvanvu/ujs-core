@@ -3,10 +3,10 @@
 ### Usage
 
 ```javascript
-import { Util } from '@maivubc/ujs';
+import { constants } from '@maivubc/ujs';
 ```
 
-### Clone (any type and ignore reference pointer)
+### clone<T>(src: T): T (any type and ignore reference pointer)
 
 ```javascript
 const foo = { bar: 123 };
@@ -18,7 +18,7 @@ const fn = () => 1;
 Util.clone(fn); // It returns: fn
 ```
 
-### Reset object
+### resetObject<T extends object>(obj: object, newData?: T): T | {}
 
 ```javascript
 Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' }); // It returns: {}
@@ -57,7 +57,7 @@ await Util.callback(new Promise((resolve) => resolve('Im here'))); // It returns
 
 ```
 
-### Sort
+### sort(data: any[] | object, options?: { key?: string })
 
 ```javascript
 Util.sort(['March', 'Jan', 'Feb', 'Dec']); // It returns: ['Dec', 'Feb', 'Jan', 'March']
@@ -68,7 +68,7 @@ const sorted = Util.sort(Array({ foo: 10, bar: 20 }, { foo: 5, bar: 10 }), { key
 sorted; // It returns: Array({ foo: 5, bar: 10 }, { foo: 10, bar: 20 })
 ```
 
-### Base name
+### baseName(path: string, suffix?: string)
 
 ```javascript
 Util.baseName('/www/site/home.html'); // It returns: 'home.html'
@@ -76,9 +76,27 @@ Util.baseName('/www/site/home.html', '.html'); // It returns: 'home'
 Util.baseName('/some/path/'); // It returns: 'path'
 ```
 
-### Dir name
+### dirName(path: string)
 
 ```javascript
 Util.dirName('/etc/passwd'); // It returns: '/etc'
 Util.dirName('/some/path/to/'); // It returns: '/some/path'
+```
+
+### async race(callback: any, maxSeconds: number) -> Run a callback in the limited time (seconds)
+
+```javascript
+// Run the callback in around of maximum seconds otherwise it will be thrown an instance of UtilRaceError
+await Util.race('Im not callable', 1); // It returns: 'Im not callable'
+
+// Throw UtilRaceError because the callback run in 2 seconds while the maximum time is 1 seconds
+const timeout = async () => {
+   try {
+      await Util.race(new Promise((resolve) => setTimeout(resolve, 2000)), 1);
+   } catch (e) {
+      return e;
+   }
+};
+
+(await timeout()) instanceof UtilRaceError; // It returns: true
 ```
