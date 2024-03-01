@@ -120,8 +120,11 @@ Transform.toNumber(false); // It returns: 0
 Transform.toNumber(true); // It returns: 1
 Transform.toNumber({}); // It returns: 0
 Transform.toNumber([]); // It returns: 0
+```
 
-// toUNumber(value: any) => unsigned number
+### toUNumber(value: any) => unsigned number
+
+```javascript
 Transform.toUNumber(-1.25); // It returns: 1.25
 Transform.toUNumber('-1.25'); // It returns: 1.25
 ```
@@ -133,8 +136,11 @@ Transform.toInt(Number.MAX_SAFE_INTEGER + 100); // It returns: Number.MAX_SAFE_I
 Transform.toInt(-Number.MAX_SAFE_INTEGER - 100); // It returns: -Number.MAX_SAFE_INTEGER
 Transform.toInt(1.25); // It returns: 1
 Transform.toInt('1.25'); // It returns: 1
+```
 
-// toUInt(value: any) => unsigned integer
+### toUInt(value: any) => unsigned integer
+
+```javascript
 Transform.toUInt(-1); // It returns: 1
 Transform.toUInt('-1'); // It returns: 1
 ```
@@ -173,10 +179,14 @@ Transform.toJsonObject(JSON.stringify([{ foo: 'bar' }])); // It returns: [{ foo:
 // From the object
 Transform.toJsonObject({ foo: 'bar' }); // It returns: { foo: 'bar' }
 
-// If can't convert to object then returns an empty object {}
-Transform.toJsonObject(123); // It returns: {}
+// If can't convert to object then returns an array wrapper of the value [value]
+Transform.toJsonObject(123); // It returns: [123]
 
-// Or set a default
+// If the value is nothing (null | undefined | NaN), it returns the empty object {}
+Transform.toJsonObject(null); // It returns: {}
+
+// Or set a default object (defaults must be an object)
+Transform.toJsonObject(123, { defaults: { foo: 'bar' } }); // It returns: { defaults: { foo: 'bar' } }
 Transform.toJsonObject(null, { defaults: { foo: 'bar' } }); // It returns: { defaults: { foo: 'bar' } }
 ```
 

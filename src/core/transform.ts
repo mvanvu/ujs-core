@@ -74,19 +74,21 @@ export class Transform {
 
    // Convert to JSON
    static toJsonObject<T = any[] | Record<string, any>>(value: any, defaultJson?: T): T {
-      const type = typeof value;
+      if (Array.isArray(value)) {
+         return <T>value;
+      }
 
-      if (type === 'string' && ['{', '['].includes(value[0])) {
+      if (Is.string(value) && ['{', '['].includes(value[0])) {
          try {
             return JSON.parse(value);
          } catch {}
       }
 
-      if (type === 'object' && value !== null) {
+      if (Is.object(value)) {
          return value;
       }
 
-      return defaultJson || <T>{};
+      return <T>(Is.object(defaultJson) ? defaultJson : Is.nothing(value) ? {} : [value]);
    }
 
    // Convert to boolean

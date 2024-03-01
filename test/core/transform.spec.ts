@@ -93,7 +93,7 @@ it('Util Transform', () => {
    expect(Transform.toNumber({})).toEqual(0);
    expect(Transform.toNumber([])).toEqual(0);
 
-   // ## toUNumber(value: any) => unsigned number
+   // # toUNumber(value: any) => unsigned number
    expect(Transform.toUNumber(-1.25)).toEqual(1.25);
    expect(Transform.toUNumber('-1.25')).toEqual(1.25);
 
@@ -103,7 +103,7 @@ it('Util Transform', () => {
    expect(Transform.toInt(1.25)).toEqual(1);
    expect(Transform.toInt('1.25')).toEqual(1);
 
-   // ## toUInt(value: any) => unsigned integer
+   // # toUInt(value: any) => unsigned integer
    expect(Transform.toUInt(-1)).toEqual(1);
    expect(Transform.toUInt('-1')).toEqual(1);
 
@@ -136,10 +136,14 @@ it('Util Transform', () => {
    // ## From the object
    expect(Transform.toJsonObject({ foo: 'bar' })).toMatchObject({ foo: 'bar' });
 
-   // ## If can't convert to object then returns an empty object {}
-   expect(Transform.toJsonObject(123)).toMatchObject({});
+   // ## If can't convert to object then returns an array wrapper of the value [value]
+   expect(Transform.toJsonObject(123)).toEqual([123]);
 
-   // ## Or set a default
+   // ## If the value is nothing (null | undefined | NaN), it returns the empty object {}
+   expect(Transform.toJsonObject(null)).toMatchObject({});
+
+   // ## Or set a default object (defaults must be an object)
+   expect(Transform.toJsonObject(123, { defaults: { foo: 'bar' } })).toMatchObject({ defaults: { foo: 'bar' } });
    expect(Transform.toJsonObject(null, { defaults: { foo: 'bar' } })).toMatchObject({ defaults: { foo: 'bar' } });
 
    // # toPath(value: any) => valid path (URL)

@@ -16,5 +16,4 @@ export declare class Str extends String {
     camelToSnackCase(): string;
     snackToCamelCase(): string;
     truncate(maxLength?: number, pad?: string): string;
-    repeat(level?: number): string;
 }

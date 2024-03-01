@@ -19,7 +19,7 @@ export declare class Transform {
     static toASCIIString(value: any): any;
     static toSafeFileName(value: any): string;
     static toDefault(value: any, ...defValues: any[]): any;
-    static toStripTags(value: any, allowed?: string): string;
+    static toStripTags(value: any, allowedTags?: string): string;
     static toSafeHtml(value: any, options?: {
         allowedTags?: string[];
         allowedAttributes?: string[];
