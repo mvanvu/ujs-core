@@ -64,7 +64,7 @@ const obj2 = Obj.from({ foo: 1, bar: 2 });
 obj2.extends({ bar2: { num: 789 } }, { bar2: { num2: 91011 } }); // It returns: [ROOT].'bar2.num2' ===  91011
 ```
 
-### reset<T extends Record<string, any>>(newData?: T) => (alias from Util.resetObject)
+### reset<T extends Record<string, any>>(newData?: T)
 
 ```javascript
 Obj.reset({ foo: 1, bar: 2 }); // It returns: {}

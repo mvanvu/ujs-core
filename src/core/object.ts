@@ -84,13 +84,17 @@ export class Obj {
       return target;
    }
 
-   // Alias from Is.object (not Array)
-   static isObject(value: any) {
-      return Is.object(value);
-   }
+   static reset<T extends object>(obj: object, newData?: T): T | {} {
+      // Clean the object first
+      for (const k in obj) {
+         delete obj[k];
+      }
 
-   static reset<T extends Record<string, any>>(o: Record<string, any>, newData?: T) {
-      return Util.resetObject(o, newData);
+      if (newData) {
+         Object.assign(obj, newData);
+      }
+
+      return obj;
    }
 
    static from(o: Record<string, any>) {

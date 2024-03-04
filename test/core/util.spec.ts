@@ -1,4 +1,3 @@
-import { constants } from 'fs/promises';
 import { Util, UtilRaceError } from '../../src';
 
 it('Core Util', async () => {
@@ -10,12 +9,6 @@ it('Core Util', async () => {
    expect(foo2.bar).toEqual(456);
    const fn = () => 1;
    expect(Util.clone(fn)).toEqual(fn);
-
-   // # resetObject<T extends object>(obj: object, newData?: T): T | {}
-   expect(Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' })).toMatchObject({});
-
-   // ## Reset & assign new properties
-   expect(Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' })).toMatchObject({ foo: 'bar' });
 
    // # Callback(fn, params: any[], instanceThis?: any): an async function to call if the value is callable
    // ## Call a none function, just do nothing and return it

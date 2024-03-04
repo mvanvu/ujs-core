@@ -45,19 +45,6 @@ export class Util {
       return Is.asyncFunc(fn) ? await fn.apply(inst, params) : fn instanceof Promise ? await fn : Is.func(fn) ? fn.apply(inst, params) : fn;
    }
 
-   static resetObject<T extends object>(obj: object, newData?: T): T | {} {
-      // Clean the object first
-      for (const k in obj) {
-         delete obj[k];
-      }
-
-      if (newData) {
-         Object.assign(obj, newData);
-      }
-
-      return obj;
-   }
-
    static sort(data: any[] | object, options?: { key?: string }) {
       const k = options?.key;
       const compare = (a: any, b: any) => (a < b ? -1 : a > b ? 1 : 0);
@@ -83,7 +70,11 @@ export class Util {
             obj[key] = Util.clone(data[key]);
          }
 
-         Util.resetObject(data, obj);
+         for (const key in data) {
+            delete data[key];
+         }
+
+         Object.assign(data, obj);
       }
 
       return data;

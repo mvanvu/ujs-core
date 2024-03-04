@@ -3,7 +3,7 @@
 ### Usage
 
 ```javascript
-import { constants } from '@maivubc/ujs';
+import { Util, UtilRaceError } from '@maivubc/ujs';
 ```
 
 ### clone<T>(src: T): T (any type and ignore reference pointer)
@@ -16,15 +16,6 @@ foo.bar; // It returns: 123
 foo2.bar; // It returns: 456
 const fn = () => 1;
 Util.clone(fn); // It returns: fn
-```
-
-### resetObject<T extends object>(obj: object, newData?: T): T | {}
-
-```javascript
-Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' }); // It returns: {}
-
-// Reset & assign new properties
-Util.resetObject({ foo: 1, bar: 2 }, { foo: 'bar' }); // It returns: { foo: 'bar' }
 ```
 
 ### Callback(fn, params: any[], instanceThis?: any): an async function to call if the value is callable
