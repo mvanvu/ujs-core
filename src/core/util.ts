@@ -118,4 +118,61 @@ export class Util {
          }),
       ]);
    }
+
+   static debug(entry: any) {
+      const colors = {
+         object: '\u001b[35m', // Magenta for objects
+         prop: '\u001b[36m', // Cyan for properties
+         array: '\u001b[35m', // Magenta for arrays
+         string: '\u001b[37m', // White for strings
+         number: '\u001b[33m', // Yellow for numbers
+         boolean: '\u001b[34m', // Blue for booleans
+         null: '\u001b[34m', // Blue for null,
+         reset: '\u001b[0m',
+      };
+      const paintChar = (str: string, color: string) => `${color}${str}${colors.reset}`;
+      const dump = (entry: any, depth: number) => {
+         let str = '';
+
+         if (Is.object(entry)) {
+            str += paintChar('{', colors.object) + '\n';
+
+            for (const key in entry) {
+               if (Object.prototype.hasOwnProperty.call(entry, key)) {
+                  str += '  '.repeat(depth + 1) + paintChar(key, colors.prop) + ': ';
+                  str += dump(entry[key], depth + 1);
+                  str += ',\n';
+               }
+            }
+
+            str = str.slice(0, -2) + '\n' + '  '.repeat(depth) + paintChar('}', colors.object);
+         } else if (Is.array(entry)) {
+            str += paintChar('[', colors.array);
+
+            for (let i = 0; i < entry.length; i++) {
+               if (i > 0) {
+                  str += ', ';
+               }
+
+               str += dump(entry[i], depth + 1);
+            }
+
+            str += paintChar(']', colors.array);
+         } else if (Is.string(entry)) {
+            str += `${colors.string}${JSON.stringify(entry)}`;
+         } else if (Is.number(entry)) {
+            str += `${colors.number}${entry}`;
+         } else if (Is.boolean(entry)) {
+            str += `${colors.boolean}${entry}`;
+         } else if (Is.null(entry)) {
+            str += `${colors.null}null`;
+         } else {
+            str += entry;
+         }
+
+         return str + colors.reset;
+      };
+
+      console.debug(dump(entry, 0));
+   }
 }

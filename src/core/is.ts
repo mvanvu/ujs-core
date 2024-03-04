@@ -34,7 +34,7 @@ export class Is {
             case 'number':
             case 'snumber':
             case 'unumber':
-               if (!Number(val) || (type === 'snumber' && val >= 0) || (type === 'unumber' && val < 0)) {
+               if (typeValue !== 'number' || !Number(val) || (type === 'snumber' && val >= 0) || (type === 'unumber' && val < 0)) {
                   return false;
                }
 
@@ -391,10 +391,7 @@ export class Is {
          for (const val of value) {
             const isRulesObject = Is.object(rules);
 
-            if (
-               (isRulesObject && !Is.object(val, { rules: <ObjectCommonType>rules, suitable })) ||
-               (!isRulesObject && !Is.typeOf(val, <CommonType>rules))
-            ) {
+            if ((isRulesObject && !Is.object(val, { rules: <ObjectCommonType>rules, suitable })) || (!isRulesObject && !Is.typeOf(val, <CommonType>rules))) {
                return false;
             }
          }
