@@ -5,11 +5,7 @@ import { Is } from './is';
 export class Hash {
    static getCrypto() {
       // Node & Browser support
-      return typeof crypto !== 'undefined'
-         ? crypto
-         : typeof window !== 'undefined'
-         ? window.crypto || window['msCrypto']
-         : void 0;
+      return typeof crypto !== 'undefined' ? crypto : typeof window !== 'undefined' ? window.crypto || window['msCrypto'] : void 0;
    }
 
    static randomBytes(size: number) {
@@ -186,7 +182,7 @@ export class JWT {
          !Is.equals(header, this.validHeader) ||
          !Is.object(payload) ||
          !Is.equals(Object.keys(payload).sort(), ['data', 'iat']) ||
-         !(d = Is.date(payload.iat)) ||
+         !(d = DateTime.from(payload.iat)).valid ||
          Hash.base64UrlEncode(await Hash.sha256(`${parts[0]}.${parts[1]}.${options.secret}`)) !== parts[2]
       ) {
          throw new JWTErrorInvalid();

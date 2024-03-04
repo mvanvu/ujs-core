@@ -99,7 +99,21 @@ export class Is {
                break;
 
             case 'date':
-               if (!Is.date(val)) {
+               if (!(val instanceof Date)) {
+                  return false;
+               }
+
+               break;
+
+            case 'datetime':
+               if (!(val instanceof DateTime)) {
+                  return false;
+               }
+
+               break;
+
+            case 'datestring':
+               if (typeValue !== 'string' || !DateTime.parse(val)) {
                   return false;
                }
 
@@ -244,10 +258,16 @@ export class Is {
       return Is.object(obj) && !Object.keys(obj).length;
    }
 
-   static date(d: any): DateTime | false {
-      const date = DateTime.from(d);
+   static date(d: any) {
+      return Is.typeOf(d, 'date');
+   }
 
-      return date.valid ? date : false;
+   static datetime(d: any) {
+      return Is.typeOf(d, 'datetime');
+   }
+
+   static dateString(d: any) {
+      return Is.typeOf(d, 'datestring');
    }
 
    static flatValue(value: any) {

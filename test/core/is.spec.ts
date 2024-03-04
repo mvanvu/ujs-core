@@ -9,8 +9,8 @@ it('Core Is', () => {
 
    // # Date
    expect(Is.date(new Date())).toBeTruthy();
-   expect(Is.date(DateTime.now())).toBeTruthy();
-   expect(Is.date('2024-02-28')).toBeTruthy();
+   expect(Is.datetime(DateTime.now())).toBeTruthy();
+   expect(Is.dateString('2024-02-28')).toBeTruthy();
    expect(Is.date('')).toBeFalsy();
 
    // # Async Function

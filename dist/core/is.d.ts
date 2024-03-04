@@ -1,4 +1,3 @@
-import { DateTime } from './datetime';
 import { CommonType, ObjectCommonType } from '../type';
 export type ObjectRulesOptions = {
     rules: ObjectCommonType;
@@ -10,7 +9,9 @@ export declare class Is {
     static typeOf(value: any, type: CommonType, each?: boolean): boolean;
     static equals(a: any, b: any): boolean;
     static emptyObject(obj: any): boolean;
-    static date(d: any): DateTime | false;
+    static date(d: any): boolean;
+    static datetime(d: any): boolean;
+    static dateString(d: any): boolean;
     static flatValue(value: any): boolean;
     static empty(value: any): boolean;
     static nothing(value: any): boolean;

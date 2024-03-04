@@ -20,7 +20,9 @@ export type CommonType =
    | 'set'
    | 'map'
    | 'NaN'
-   | 'date';
+   | 'datestring'
+   | 'date'
+   | 'datetime';
 
 export interface ObjectCommonType {
    [key: string]: CommonType | ObjectCommonType;
