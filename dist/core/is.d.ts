@@ -49,7 +49,7 @@ export declare class Is {
     static regex(value: any, each?: boolean): boolean;
     static nodeJs(): boolean;
     static nullOrUndefined(value: any): boolean;
-    static strongPassword(value: string, options?: {
+    static strongPassword(value: any, options?: {
         minLength?: number;
         noSpaces?: boolean;
     }): boolean;

@@ -519,7 +519,11 @@ export class Is {
       return value === undefined || value === null;
    }
 
-   static strongPassword(value: string, options?: { minLength?: number; noSpaces?: boolean }) {
+   static strongPassword(value: any, options?: { minLength?: number; noSpaces?: boolean }) {
+      if (typeof value !== 'string') {
+         return false;
+      }
+
       const minLength = options?.minLength ?? 8;
       const noSpaces = options?.noSpaces ?? true;
 
