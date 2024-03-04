@@ -64,14 +64,27 @@ export class Str extends String {
       return output.join('');
    }
 
-   static truncate(str: string, maxLength = 50, pad?: string) {
-      pad = pad || '...';
+   static truncate(str: string, options?: { maxLength?: number; wordCount?: boolean; pad?: string }) {
+      const pad = options.pad || '...';
+      const len = options.maxLength || 50;
       str = str.trim();
-      const len = str.length;
-      str = str.substring(0, maxLength);
 
-      if (len > str.length) {
-         str += pad;
+      if (options.wordCount === true) {
+         const strs = str.split(/\s+/);
+         const orgLen = strs.length;
+         const copy = strs.slice(0, len);
+         str = copy.join(' ');
+
+         if (orgLen > copy.length) {
+            str += pad;
+         }
+      } else {
+         const orgLen = str.length;
+         str = str.substring(0, len);
+
+         if (orgLen > str.length) {
+            str += pad;
+         }
       }
 
       return str;
@@ -120,7 +133,7 @@ export class Str extends String {
       return Str.snackToCamelCase(this.text);
    }
 
-   truncate(maxLength = 50, pad?: string) {
-      return Str.truncate(this.text, maxLength, pad);
+   truncate(options?: { maxLength?: number; wordCount?: boolean; pad?: string }) {
+      return Str.truncate(this.text, options);
    }
 }

@@ -17,14 +17,17 @@ it('Core String', () => {
    expect(Str.from('HelloWorld').lFirst()).toEqual('helloWorld');
    expect(Str.from('helloWorld').uFirst()).toEqual('HelloWorld');
 
-   // # Truncate
-   expect(Str.truncate('hi-diddly-ho there, neighborino', 19)).toEqual('hi-diddly-ho there,...');
-   expect(Str.from('hi-diddly-ho there, neighborino').truncate(19)).toEqual('hi-diddly-ho there,...');
+   // # Str.truncate(str: string, options?: { maxLength?: number; wordCount?: boolean; pad?: string })
+   expect(Str.truncate('hi-diddly-ho there, neighborino', { maxLength: 19 })).toEqual('hi-diddly-ho there,...');
+   expect(Str.from('hi-diddly-ho there, neighborino').truncate({ maxLength: 19 })).toEqual('hi-diddly-ho there,...');
 
-   // # Custom three dots
-   expect(Str.from('hi-diddly-ho there, neighborino').truncate(19, '$$$')).toEqual('hi-diddly-ho there,$$$');
+   // ## Word count
+   expect(Str.truncate('Hello world, Im new guy', { maxLength: 3, wordCount: true })).toEqual('Hello world, Im...');
 
-   // # Repeat
+   // ## Custom three dots
+   expect(Str.from('hi-diddly-ho there, neighborino').truncate({ maxLength: 19, pad: '$$$' })).toEqual('hi-diddly-ho there,$$$');
+
+   // # Str.repeat(char: string, level = 0)
    expect(Str.repeat('-', 0.4)).toEqual('');
    expect(Str.repeat('-', -1)).toEqual('');
    expect(Str.repeat('-', 0)).toEqual('');
@@ -35,5 +38,5 @@ it('Core String', () => {
    // # The string instance has the same the static method: toCamelCase, camelToSnackCase, snackToCamelCase, toCapitalize and truncate
    const str = Str.from('Hello world!');
    expect(str.toCamelCase()).toEqual('helloWorld');
-   expect(str.truncate(5, '...$$')).toEqual('Hello...$$');
+   expect(str.truncate({ maxLength: 5, pad: '...$$' })).toEqual('Hello...$$');
 });

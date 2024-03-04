@@ -12,17 +12,17 @@ export declare class Registry {
         validate?: boolean;
         clone?: boolean;
     }): Registry;
-    merge(data: any): this;
+    merge(data: any, validate?: boolean): this;
     parse(data?: any, options?: {
         validate?: boolean;
         clone?: boolean;
     }): this;
     validate(data?: any): this;
-    isValidData(): boolean;
+    isValidData(data?: any): boolean;
     private isPathNum;
     get<T>(path: string, defaultValue?: any, filter?: string | string[]): T;
-    set(path: string, value: any): this;
-    initPathValue<T>(path: string, value: T): T;
+    set(path: string, value: any, validate?: boolean): this;
+    initPathValue<T>(path: string, value: T, validate?: boolean): T;
     has(path: string): boolean;
     is(path: string, compareValue?: any): boolean;
     isCached(path: string): boolean;

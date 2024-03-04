@@ -6,7 +6,11 @@ export declare class Str extends String {
     static toCamelCase(str: string): string;
     static camelToSnackCase(str: string): string;
     static snackToCamelCase(str: string): string;
-    static truncate(str: string, maxLength?: number, pad?: string): string;
+    static truncate(str: string, options?: {
+        maxLength?: number;
+        wordCount?: boolean;
+        pad?: string;
+    }): string;
     static from(strLike: any): Str;
     static repeat(char: string, level?: number): string;
     uFirst(): string;
@@ -15,5 +19,9 @@ export declare class Str extends String {
     toCamelCase(): string;
     camelToSnackCase(): string;
     snackToCamelCase(): string;
-    truncate(maxLength?: number, pad?: string): string;
+    truncate(options?: {
+        maxLength?: number;
+        wordCount?: boolean;
+        pad?: string;
+    }): string;
 }

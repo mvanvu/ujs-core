@@ -28,20 +28,20 @@ Str.from('HelloWorld').lFirst(); // It returns: 'helloWorld'
 Str.from('helloWorld').uFirst(); // It returns: 'HelloWorld'
 ```
 
-### Truncate
+### Str.truncate(str: string, options?: { maxLength?: number; wordCount?: boolean; pad?: string })
 
 ```javascript
-Str.truncate('hi-diddly-ho there, neighborino', 19); // It returns: 'hi-diddly-ho there,...'
-Str.from('hi-diddly-ho there, neighborino').truncate(19); // It returns: 'hi-diddly-ho there,...'
+Str.truncate('hi-diddly-ho there, neighborino', { maxLength: 19 }); // It returns: 'hi-diddly-ho there,...'
+Str.from('hi-diddly-ho there, neighborino').truncate({ maxLength: 19 }); // It returns: 'hi-diddly-ho there,...'
+
+// Word count
+Str.truncate('Hello world, Im new guy', { maxLength: 3, wordCount: true }); // It returns: 'Hello world, Im...'
+
+// Custom three dots
+Str.from('hi-diddly-ho there, neighborino').truncate({ maxLength: 19, pad: '$$$' }); // It returns: 'hi-diddly-ho there,$$$'
 ```
 
-### Custom three dots
-
-```javascript
-Str.from('hi-diddly-ho there, neighborino').truncate(19, '$$$'); // It returns: 'hi-diddly-ho there,$$$'
-```
-
-### Repeat
+### Str.repeat(char: string, level = 0)
 
 ```javascript
 Str.repeat('-', 0.4); // It returns: ''
@@ -57,5 +57,5 @@ Str.from('==').repeat(2); // It returns: '===='
 ```javascript
 const str = Str.from('Hello world!');
 str.toCamelCase(); // It returns: 'helloWorld'
-str.truncate(5, '...$$'); // It returns: 'Hello...$$'
+str.truncate({ maxLength: 5, pad: '...$$' }); // It returns: 'Hello...$$'
 ```

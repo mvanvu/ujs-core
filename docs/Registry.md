@@ -14,7 +14,7 @@ const registry = Registry.from({ foo: 123, bar: { foo1: 'bar1', foo2: 'bar2' } }
 // OR const registry = Registry.from(); // the original data = {}
 ```
 
-### get<T>(path: string, defaultValue?: any, filter?: string | string[]): T
+### registry.get<T>(path: string, defaultValue?: any, filter?: string | string[]): T
 
 ```javascript
 registry.get('foo'); // It returns: 123
@@ -35,7 +35,7 @@ registry.get('foo', undefined, ['boolean', 'string']); // It returns: 'true'
 registry.get('bar.foo3', 1, 'string'); // It returns: 1
 ```
 
-### set(path: string, value: any)
+### registry.set(path: string, value: any)
 
 ```javascript
 registry.set('animal.list', ['dog', 'cat']);
@@ -50,7 +50,7 @@ registry.get('animal'); // It returns: ['dog', 'cat', 'tiger']
 registry.get('animal.2'); // It returns: 'tiger'
 ```
 
-### has(path: string)
+### registry.has(path: string)
 
 ```javascript
 registry.has('animal'); // It returns: true
@@ -58,7 +58,7 @@ registry.has('animal.list'); // It returns: false
 registry.has('animal.2'); // It returns: true
 ```
 
-### is(path: string, compareValue?: any)
+### registry.is(path: string, compareValue?: any)
 
 ```javascript
 registry.is('animal.2', 'cat'); // It returns: false
@@ -78,7 +78,7 @@ registry.is('animal.3'); // It returns: false
 registry.valueOf();
 ```
 
-### pick(paths: string[] | string)
+### registry.pick(paths: string[] | string)
 
 ```javascript
 registry.pick('bar.foo2').has('foo'); // It returns: false
@@ -86,13 +86,13 @@ registry.pick('bar.foo2').has('bar.foo1'); // It returns: false
 registry.pick('bar.foo2').has('bar.foo2'); // It returns: true
 ```
 
-### omit(paths: string[] | string)
+### registry.omit(paths: string[] | string)
 
 ```javascript
 registry.omit('bar.foo2').has('bar.foo2'); // It returns: false
 ```
 
-### clone()
+### registry.clone()
 
 ```javascript
 const clone = registry.clone();
@@ -101,7 +101,7 @@ clone.get('foo'); // It returns: 456
 registry.get('foo'); // It returns: 123
 ```
 
-### merge(data: any)
+### registry.merge(data: any)
 
 ```javascript
 registry.merge({ bar: { foo3: 'bar3' }, foo2: 456 });
@@ -113,7 +113,7 @@ registry.get('bar'); // It returns: 456
 registry.isValidData(); // It returns: false
 ```
 
-### parse(data?: any, options?: { validate?: boolean; clone?: boolean })
+### registry.parse(data?: any, options?: { validate?: boolean; clone?: boolean })
 
 ```javascript
 // Parse the data to Array or Flat Object and override the current data
@@ -143,7 +143,7 @@ registry.set('array.4', 456);
 registry.isCached('array.4.foo'); // It returns: false
 ```
 
-### initPathValue<T>(o: Record<string, any>, prop: string, value: T) : T
+### registry.initPathValue<T>(o: Record<string, any>, prop: string, value: T) : T
 
 ```javascript
 // Init and returns the property value if it isn't set yet
@@ -170,7 +170,7 @@ registry.initPathValue('animal.list', ['tiger']);
 registry.get('animal.list'); // It returns: ['dog', 'cat']
 ```
 
-### Validate
+### registry.validate() -> validate data
 
 ```javascript
 // No function value
@@ -183,7 +183,7 @@ registry.parse({ foo: new Map(), bar: new Set() }).validate(); // Throw an excep
 Registry.from({ foo: new Map(), bar: new Set() }).validate(); // Throw an exception which instance of RegistryDataError
 Registry.from([{ foo: 1 }, { bar: { func: () => {} } }]).validate(); // Throw an exception which instance of RegistryDataError
 
-// Check is valid
+// registry.isValidData() -> check the data is valid
 Registry.from([{ foo: 1 }, { bar: { bar2: 123 } }]).isValidData(); // It returns: true
 Registry.from([{ foo: 1 }, { bar: { func: () => {} } }]).isValidData(); // It returns: false
 ```

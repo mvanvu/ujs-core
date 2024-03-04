@@ -17,7 +17,7 @@ export class Registry {
       return new Registry(data, options);
    }
 
-   merge(data: any) {
+   merge(data: any, validate?: boolean) {
       const deepMerge = (data: any, path?: string) => {
          if (Is.array(data)) {
             for (let i = 0, n = data.length; i < n; i++) {
@@ -28,7 +28,7 @@ export class Registry {
                deepMerge(data[p], `${path ? `${path}.` : ''}${p}`);
             }
          } else {
-            this.set(path, data);
+            this.set(path, data, validate);
          }
       };
 
@@ -68,7 +68,7 @@ export class Registry {
    }
 
    validate(data?: any) {
-      if (!Is.flatObject(data === undefined ? this.data : data)) {
+      if (!this.isValidData(data)) {
          throw new RegistryDataError(
             'The object element data must be a Record<key, value> or Array<[flat] | Record<key, value>> not from any Class/Function constructor',
          );
@@ -77,18 +77,22 @@ export class Registry {
       return this;
    }
 
-   isValidData() {
-      if (Array.isArray(this.data)) {
-         for (const data of this.data) {
-            if (!Is.flatObject(data)) {
+   isValidData(data?: any) {
+      data = data ?? this.data;
+
+      if (Array.isArray(data)) {
+         for (const datum of data) {
+            if (Is.object(datum) && !Is.flatObject(datum)) {
                return false;
             }
          }
 
          return true;
+      } else if (Is.object(data) && !Is.flatObject(data)) {
+         return false;
       }
 
-      return Is.flatObject(this.data);
+      return true;
    }
 
    private isPathNum(path: string) {
@@ -126,7 +130,11 @@ export class Registry {
       return <T>(filter ? Transform.clean(this.cached[path], filter) : this.cached[path]);
    }
 
-   set(path: string, value: any) {
+   set(path: string, value: any, validate?: boolean) {
+      if (validate === true) {
+         this.validate(value);
+      }
+
       // Remove cached data
       for (const key in this.cached) {
          if (key.startsWith(path)) {
@@ -196,9 +204,9 @@ export class Registry {
       return this;
    }
 
-   initPathValue<T>(path: string, value: T): T {
+   initPathValue<T>(path: string, value: T, validate?: boolean): T {
       if (!this.has(path)) {
-         this.set(path, value);
+         this.set(path, value, validate);
       }
 
       return value;
