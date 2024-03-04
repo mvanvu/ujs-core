@@ -9,5 +9,6 @@ export declare class Util {
     static baseName(path: string, suffix?: string): string;
     static dirName(path: string): string;
     static race(callback: any, maxSeconds: number): Promise<unknown>;
-    static debug(entry: any): void;
+    static debug(...entries: any[]): void;
+    static debugDev(...entries: any[]): void;
 }

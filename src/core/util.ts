@@ -110,7 +110,7 @@ export class Util {
       ]);
    }
 
-   static debug(entry: any) {
+   static debug(...entries: any[]) {
       const colors = {
          object: '\u001b[35m', // Magenta for objects
          prop: '\u001b[36m', // Cyan for properties
@@ -164,6 +164,12 @@ export class Util {
          return str + colors.reset;
       };
 
-      console.debug(dump(entry, 0));
+      console.log(...entries.map((entry) => dump(entry, 0)));
+   }
+
+   static debugDev(...entries: any[]) {
+      if (Is.nodeJs() && process?.env?.NODE_ENV === 'development') {
+         Util.debug(...entries);
+      }
    }
 }

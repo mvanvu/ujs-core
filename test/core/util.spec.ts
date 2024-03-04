@@ -62,4 +62,11 @@ it('Core Util', async () => {
    };
 
    expect((await timeout()) instanceof UtilRaceError).toBeTruthy();
+
+   // # Util.debug(...entries: any[])
+   // ## Log the variable with deep properties and color
+   Util.debug({ user: { id: 1, ua: 'admin', age: 30, major: ['Full stack developer'] } });
+
+   // # Util.debugDev(...entries: any[])
+   // ## The same Util.debug but only log in NodeJS and process?.env?.NODE_ENV === 'development'
 });
