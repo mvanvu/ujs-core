@@ -6,10 +6,10 @@ UMD JS work on the both Browser and NodeJs
 
 ```
 // With yarn
-yarn add git+https://github.com/mvanvu/ujs
+yarn add @ujs/core
 
 // With NPM
-npm install git+https://github.com/mvanvu/ujs
+npm install @ujs/core
 ```
 
 ### Usage On Browser

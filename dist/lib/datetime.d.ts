@@ -1,0 +1,56 @@
+export type DateTimeLike = number | string | Date | DateTime;
+export type DateTimeUnit = 'year' | 'month' | 'week' | 'date' | 'hour' | 'minute' | 'second' | 'millisecond';
+export declare class DateTimeError extends Error {
+}
+export declare class DateTime {
+    private isValid;
+    private offset;
+    private date;
+    constructor(datetimeLike?: DateTimeLike, offset?: number | string);
+    get valid(): boolean;
+    get iso(): string;
+    get native(): Date;
+    get tzOffset(): string;
+    static parseOffset(offset: number | string): number;
+    static from(datetimeLike?: DateTimeLike, offset?: number | string): DateTime;
+    static now(offset?: number | string): DateTime;
+    static utc(): DateTime;
+    static yesterday(offset?: number | string): DateTime;
+    static tomorrow(offset?: number | string): DateTime;
+    static parse(datetimeLike?: DateTimeLike): false | Date;
+    static daysInMonth(month: number, year?: number): number;
+    static pad(value: number, number?: number): string;
+    daysInMonth(): number;
+    setOffset(offset: string | number): this;
+    utc(): this;
+    clone(): DateTime;
+    add(interval: number, unit?: DateTimeUnit): this;
+    addYear(year: number): this;
+    addMonth(month: number): this;
+    addWeek(week: number): this;
+    addDate(date: number): this;
+    addHour(hour: number): this;
+    addMinute(minute: number): this;
+    addSecond(second: number): this;
+    addMillisecond(millisecond: number): this;
+    nextDate(): this;
+    prevDate(): this;
+    nextWeek(): this;
+    prevWeek(): this;
+    nextMonth(): this;
+    prevMonth(): this;
+    nextYear(): this;
+    prevYear(): this;
+    startOf(): this;
+    endOf(): this;
+    format(pattern?: string, locale?: string): string;
+    diff(datetime?: DateTimeLike, unit?: DateTimeUnit): number;
+    gt(datetime?: DateTimeLike, unit?: DateTimeUnit): boolean;
+    gte(datetime?: DateTimeLike, unit?: DateTimeUnit): boolean;
+    lt(datetime?: DateTimeLike, unit?: DateTimeUnit): boolean;
+    lte(datetime?: DateTimeLike, unit?: DateTimeUnit): boolean;
+    eq(datetime?: DateTimeLike, unit?: DateTimeUnit): boolean;
+    toString(): string;
+    valueOf(): number;
+    [Symbol.iterator](): Generator<number, void, unknown>;
+}
