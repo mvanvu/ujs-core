@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { Arr, Str } from '../src';
 (async () => {
-   const docsPath = process.cwd() + '/test/core';
+   const docsPath = process.cwd() + '/test/lib';
    const testFiles = fs.readdirSync(docsPath);
 
    for (const testFile of testFiles) {
@@ -97,7 +97,7 @@ import { Arr, Str } from '../src';
          const importMatched = /\s*import\s*\{\s*(.+)\s*\}/g.exec(lines[0]);
 
          if (importMatched?.[1]) {
-            contents = '### Usage\n```javascript\nimport { ' + importMatched[1] + " } from '@maivubc/ujs';\n```\n" + contents;
+            contents = '### Usage\n```javascript\nimport { ' + importMatched[1] + " } from '@ujs/core';\n```\n" + contents;
          }
 
          fs.writeFileSync(`${outPath}/${file}.md`, `## ${file}\n${contents}`);
