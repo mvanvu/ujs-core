@@ -6,7 +6,7 @@
 import { Transform } from '@ujs/core';
 ```
 
-### Transform methods
+#### Transform methods
 
 ```javascript
 /**
@@ -31,7 +31,7 @@ import { Transform } from '@ujs/core';
 */
 ```
 
-### Transform.toString(value: any)
+#### Transform.toString(value: any)
 
 ```javascript
 // From the primitive value (by String(value))
@@ -45,7 +45,7 @@ Transform.toString(true); // It returns: 'true'
 Transform.toString({ foo: 'bar' }); // It returns: JSON.stringify({ foo: 'bar' })
 ```
 
-### Transform.toArrayUnique(value: any)
+#### Transform.toArrayUnique(value: any)
 
 ```javascript
 const unique = Transform.toArrayUnique([{ foo: 123 }, { foo: 123 }, { foo: 456 }]);
@@ -53,7 +53,7 @@ unique.length; // It returns: 2
 unique; // It returns: [{ foo: 123 }, { foo: 456 }]
 ```
 
-### Transform.trim(value: any, options?: { specialChars?: string; pos?: 'left' | 'right' | 'both' })
+#### Transform.trim(value: any, options?: { specialChars?: string; pos?: 'left' | 'right' | 'both' })
 
 ```javascript
 // Trim any space|tab|new line and option to specific some special characters
@@ -73,7 +73,7 @@ Transform.trim(strWithNewLine); // It returns: 'String with new line'
 Transform.trim(`~!@#$%${strWithNewLine}@#`, { specialChars: '~!@#$%' }); // It returns: 'String with new line'
 ```
 
-### Transform.toDefault(value: any, ...defValues: any[])
+#### Transform.toDefault(value: any, ...defValues: any[])
 
 ```javascript
 // Returns the last value if the previous sibling is nothing (undefined | null | NaN)
@@ -84,7 +84,7 @@ Transform.toDefault(undefined, false); // It returns: false
 Transform.toDefault(null); // It returns: undefined
 ```
 
-### Transform.toStripTags(value: any, allowedTags?: string)
+#### Transform.toStripTags(value: any, allowedTags?: string)
 
 ```javascript
 Transform.toStripTags('1 <br/> 1', '<br><br/>'); // It returns: '1 <br/> 1'
@@ -92,7 +92,7 @@ Transform.toStripTags('<i>hello</i> <<foo>script>world<</foo>/script>'); // It r
 Transform.toStripTags(4); // It returns: '4'
 ```
 
-### Transform.toSafeHtml(value: any, options?: { allowedTags?: string[]; allowedAttributes?: string[] })
+#### Transform.toSafeHtml(value: any, options?: { allowedTags?: string[]; allowedAttributes?: string[] })
 
 ```javascript
 Transform.toSafeHtml('<a href="/path/to/url" >Click me</a>'); // It returns: '<a href="/path/to/url">Click me</a>'
@@ -110,7 +110,7 @@ const link = '<a href="/path/to/url" data-src="#">Click me</a>';
 Transform.toSafeHtml(link, { allowedAttributes: ['href'] }); // It returns: '<a href="/path/to/url">Click me</a>'
 ```
 
-### Transform.toNumber(value: any)
+#### Transform.toNumber(value: any)
 
 ```javascript
 Transform.toNumber(''); // It returns: 0
@@ -122,14 +122,14 @@ Transform.toNumber({}); // It returns: 0
 Transform.toNumber([]); // It returns: 0
 ```
 
-### Transform.toUNumber(value: any) => unsigned number
+#### Transform.toUNumber(value: any) => unsigned number
 
 ```javascript
 Transform.toUNumber(-1.25); // It returns: 1.25
 Transform.toUNumber('-1.25'); // It returns: 1.25
 ```
 
-### Transform.toInt(value: any) => integer
+#### Transform.toInt(value: any) => integer
 
 ```javascript
 Transform.toInt(Number.MAX_SAFE_INTEGER + 100); // It returns: Number.MAX_SAFE_INTEGER
@@ -138,14 +138,14 @@ Transform.toInt(1.25); // It returns: 1
 Transform.toInt('1.25'); // It returns: 1
 ```
 
-### Transform.toUInt(value: any) => unsigned integer
+#### Transform.toUInt(value: any) => unsigned integer
 
 ```javascript
 Transform.toUInt(-1); // It returns: 1
 Transform.toUInt('-1'); // It returns: 1
 ```
 
-### Transform.toBoolean(value: any)
+#### Transform.toBoolean(value: any)
 
 ```javascript
 Transform.toBoolean(true); // It returns: true
@@ -169,7 +169,7 @@ Transform.toBoolean({}); // It returns: true
 Transform.toBoolean(''); // It returns: false
 ```
 
-### Transform.toJsonObject<T = any[] | Record<string, any>>(value: any, defaultJson?: T) => T
+#### Transform.toJsonObject<T = any[] | Record<string, any>>(value: any, defaultJson?: T) => T
 
 ```javascript
 // From the JSON string
@@ -190,19 +190,19 @@ Transform.toJsonObject(123, { defaults: { foo: 'bar' } }); // It returns: { defa
 Transform.toJsonObject(null, { defaults: { foo: 'bar' } }); // It returns: { defaults: { foo: 'bar' } }
 ```
 
-### Transform.toPath(value: any) => valid path (URL)
+#### Transform.toPath(value: any) => valid path (URL)
 
 ```javascript
 Transform.toPath('/from_path/to_path///to/file .txt'); // It returns: 'from-path/to-path/to/file-txt'
 ```
 
-### Transform.toSafeFileName(value: any) => cleaned file name
+#### Transform.toSafeFileName(value: any) => cleaned file name
 
 ```javascript
 Transform.toSafeFileName('/from_path/to_path///to/file .txt'); // It returns: 'frompathtopathtofile.txt'
 ```
 
-### Transform.toNoneDiacritics(value: any) => striped diacritics string
+#### Transform.toNoneDiacritics(value: any) => striped diacritics string
 
 ```javascript
 Transform.toNoneDiacritics("J'aime boire du café"); // It returns: "J'aime boire du cafe"
@@ -211,21 +211,21 @@ Transform.toNoneDiacritics("J'aime boire du café"); // It returns: "J'aime boir
 Transform.toNonAccentVietnamese('Chào thế giới'); // It returns: 'Chao the gioi'
 ```
 
-### Transform.toASCIIString(value: string) => ASCII string
+#### Transform.toASCIIString(value: string) => ASCII string
 
 ```javascript
 Transform.toASCIIString('Chào thế giới'); // It returns: 'Chao the gioi'
 Transform.toASCIIString('Đây là'); // It returns: 'ay la'
 ```
 
-### Transform.toAlnum(value: any) => Alpha number string
+#### Transform.toAlnum(value: any) => Alpha number string
 
 ```javascript
 // Only character and number are accepted
 Transform.toAlnum('^Hello @World! 2024'); // It returns: 'HelloWorld2024'
 ```
 
-### Transform.clean(value: any, typeTransform: string | string[], ...params: any[]): convert to multiple types
+#### Transform.clean(value: any, typeTransform: string | string[], ...params: any[]): convert to multiple types
 
 ```javascript
 // Transform to String->Boolean
@@ -239,7 +239,7 @@ Transform.clean(1, ['string', 'boolean']); // It returns: true
 Transform.clean(0, ['boolean', 'string']); // It returns: 'false'
 ```
 
-### Transform.cleanIfType(value: any, typeTransform: string | string[], typeValue: CommonType | CommonType[]): clean if the value matches type
+#### Transform.cleanIfType(value: any, typeTransform: string | string[], typeValue: CommonType | CommonType[]): clean if the value matches type
 
 ```javascript
 // Trim if the value is string

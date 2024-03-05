@@ -25,7 +25,7 @@ import { Arr, Str } from '../src';
                   docFile.push('```\n');
                }
 
-               docFile.push(`### ${matched[2]}\n`, '```javascript');
+               docFile.push(`#### ${matched[2]}\n`, '```javascript');
             } else {
                const code = matched[2];
                let subComment = code.indexOf('#') === 0 ? code.substring(1).trim() : `// ${code}`;

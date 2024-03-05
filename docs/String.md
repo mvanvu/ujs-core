@@ -6,7 +6,7 @@
 import { Str } from '@ujs/core';
 ```
 
-### Common
+#### Common
 
 ```javascript
 Str.toCamelCase('Hello world!'); // It returns: 'helloWorld'
@@ -21,14 +21,14 @@ Str.toCapitalize('hello! word#', true); // It returns: 'HelloWord'
 Str.toCapitalize('some123___testing string'); // It returns: 'Some123___testing String'
 ```
 
-### Prototypes
+#### Prototypes
 
 ```javascript
 Str.from('HelloWorld').lFirst(); // It returns: 'helloWorld'
 Str.from('helloWorld').uFirst(); // It returns: 'HelloWorld'
 ```
 
-### Str.truncate(str: string, options?: { maxLength?: number; wordCount?: boolean; pad?: string })
+#### Str.truncate(str: string, options?: { maxLength?: number; wordCount?: boolean; pad?: string })
 
 ```javascript
 Str.truncate('hi-diddly-ho there, neighborino', { maxLength: 19 }); // It returns: 'hi-diddly-ho there,...'
@@ -41,7 +41,7 @@ Str.truncate('Hello world, Im new guy', { maxLength: 3, wordCount: true }); // I
 Str.from('hi-diddly-ho there, neighborino').truncate({ maxLength: 19, pad: '$$$' }); // It returns: 'hi-diddly-ho there,$$$'
 ```
 
-### Str.repeat(char: string, level = 0)
+#### Str.repeat(char: string, level = 0)
 
 ```javascript
 Str.repeat('-', 0.4); // It returns: ''
@@ -52,7 +52,7 @@ Str.repeat('-', 2); // It returns: '--'
 Str.from('==').repeat(2); // It returns: '===='
 ```
 
-### The string instance has the same the static method: toCamelCase, camelToSnackCase, snackToCamelCase, toCapitalize and truncate
+#### The string instance has the same the static method: toCamelCase, camelToSnackCase, snackToCamelCase, toCapitalize and truncate
 
 ```javascript
 const str = Str.from('Hello world!');

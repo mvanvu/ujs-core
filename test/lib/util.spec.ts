@@ -48,14 +48,14 @@ it('Core Util', async () => {
    expect(Util.dirName('/etc/passwd')).toEqual('/etc');
    expect(Util.dirName('/some/path/to/')).toEqual('/some/path');
 
-   // # async race(callback: any, maxSeconds: number) -> Run a callback in the limited time (seconds)
+   // # async race(callback: any, maxMiliseconds: number) -> Run a callback in the limited time (miliseconds)
    // ## Run the callback in around of maximum seconds otherwise it will be thrown an instance of UtilRaceError
    expect(await Util.race('Im not callable', 1)).toEqual('Im not callable');
 
    // ## Throw UtilRaceError because the callback run in 2 seconds while the maximum time is 1 seconds
    const timeout = async () => {
       try {
-         await Util.race(new Promise((resolve) => setTimeout(resolve, 2000)), 1);
+         await Util.race(new Promise((resolve) => setTimeout(resolve, 2000)), 1000);
       } catch (e) {
          return e;
       }

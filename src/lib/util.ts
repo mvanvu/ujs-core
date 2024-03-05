@@ -101,11 +101,11 @@ export class Util {
       return path.replace(/\\/g, '/').replace(/\/[^/]*\/?$/, '');
    }
 
-   static async race(callback: any, maxSeconds: number) {
+   static async race(callback: any, maxMiliseconds: number) {
       return await Promise.race([
          Promise.resolve(Util.callback(callback)),
          new Promise((_resolve, reject) => {
-            setTimeout(() => reject(new UtilRaceError('Race timeout.')), maxSeconds * 1000);
+            setTimeout(() => reject(new UtilRaceError('Race timeout.')), maxMiliseconds);
          }),
       ]);
    }

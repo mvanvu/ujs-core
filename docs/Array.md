@@ -6,7 +6,7 @@
 import { Arr } from '@ujs/core';
 ```
 
-### Arr.sum<T>(source: T[], options?: { key?: string })
+#### Arr.sum<T>(source: T[], options?: { key?: string })
 
 ```javascript
 // Calc sum of all number elements
@@ -20,7 +20,7 @@ Arr.sum([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'foo' }); // It returns: 4
 Arr.sum([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'bar' }); // It returns: 2
 ```
 
-### Arr.avg<T>(source: T[], options?: { key?: string })
+#### Arr.avg<T>(source: T[], options?: { key?: string })
 
 ```javascript
 // Calc average of all number elements
@@ -34,7 +34,7 @@ Arr.avg([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'foo' }); // It returns: 4 
 Arr.avg([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'bar' }); // It returns: 2 / 3
 ```
 
-### Arr.min<T>(source: T[], options?: { key?: string })
+#### Arr.min<T>(source: T[], options?: { key?: string })
 
 ```javascript
 // Calc minimum of all number elements
@@ -48,7 +48,7 @@ Arr.min([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'foo' }); // It returns: { 
 Arr.min([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'bar' }); // It returns: { bar: 2 }
 ```
 
-### Arr.max<T>(source: T[], options?: { key?: string })
+#### Arr.max<T>(source: T[], options?: { key?: string })
 
 ```javascript
 // Calc maximum of all number elements
@@ -62,7 +62,7 @@ Arr.max([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'foo' }); // It returns: { 
 Arr.max([{ foo: 1 }, { bar: 2 }, { bar: 3 }], { key: 'bar' }); // It returns: { bar: 3 }
 ```
 
-### Arr.intersect(a: any[], b: any[])
+#### Arr.intersect(a: any[], b: any[])
 
 ```javascript
 // Found the intersect of two number arrays
@@ -74,7 +74,7 @@ Arr.intersect([2, 1, 4, 5], [1, 2, 3]); // It returns: [2, 1]
 Arr.intersect([{ foo: 1 }, { bar: 2 }], [{ foo: '1' }, { bar: 2 }]); // It returns: [{ bar: 2 }]
 ```
 
-### Arr.diff(a: any[], b: any[])
+#### Arr.diff(a: any[], b: any[])
 
 ```javascript
 // Find the difference of two arrays
@@ -92,7 +92,7 @@ Arr.diff([2, 1, 4, 5], [1, 2, 3]); // It returns: [4, 5, 3]
 Arr.diff([{ foo: 1 }, { bar: 2 }], [{ foo: 1 }, { bar2: '2' }]); // It returns: [{ bar: 2 }, { bar2: '2' }]
 ```
 
-### Step
+#### Step
 
 ```javascript
 const arr = Arr.from([1, 2, 3]);
@@ -133,7 +133,7 @@ arr.update([4, 5, 6]); // It returns: [4, 5, 6]
 arr.current(); // It returns: 4
 ```
 
-### Arr.walk(index: number | 'first' | 'last' | 'prev' | 'next', callback: Function)
+#### Arr.walk(index: number | 'first' | 'last' | 'prev' | 'next', callback: Function)
 
 ```javascript
 // Walk to end of element and update its values
@@ -142,7 +142,7 @@ arr.current(); // It returns: 12
 
 ```
 
-### Arr.chunk<T>(array: T[], size = 1): Array<T[]>
+#### Arr.chunk<T>(array: T[], size = 1): Array<T[]>
 
 ```javascript
 // Chunk the array by 1 size (defaults is 1)
@@ -154,7 +154,7 @@ Arr.from(['a', 'b', 'c', 'd']).chunk(3); // It returns: [['a', 'b', 'c'], ['d']]
 Arr.from(['a', 'b', 'c', 'd']).chunk(4); // It returns: [['a', 'b', 'c', 'd']]
 ```
 
-### Symbol.iterator
+#### Symbol.iterator
 
 ```javascript
 [...Arr.from([1, 2, 3])]; // It returns: [1, 2, 3]

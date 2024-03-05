@@ -6,7 +6,7 @@
 import { Util, UtilRaceError } from '@ujs/core';
 ```
 
-### clone<T>(src: T): T (any type and ignore reference pointer)
+#### clone<T>(src: T): T (any type and ignore reference pointer)
 
 ```javascript
 const foo = { bar: 123 };
@@ -18,7 +18,7 @@ const fn = () => 1;
 Util.clone(fn); // It returns: fn
 ```
 
-### Callback(fn, params: any[], instanceThis?: any): an async function to call if the value is callable
+#### Callback(fn, params: any[], instanceThis?: any): an async function to call if the value is callable
 
 ```javascript
 // Call a none function, just do nothing and return it
@@ -48,7 +48,7 @@ await Util.callback(new Promise((resolve) => resolve('Im here'))); // It returns
 
 ```
 
-### sort(data: any[] | object, options?: { key?: string })
+#### sort(data: any[] | object, options?: { key?: string })
 
 ```javascript
 Util.sort(['March', 'Jan', 'Feb', 'Dec']); // It returns: ['Dec', 'Feb', 'Jan', 'March']
@@ -59,7 +59,7 @@ const sorted = Util.sort(Array({ foo: 10, bar: 20 }, { foo: 5, bar: 10 }), { key
 sorted; // It returns: Array({ foo: 5, bar: 10 }, { foo: 10, bar: 20 })
 ```
 
-### baseName(path: string, suffix?: string)
+#### baseName(path: string, suffix?: string)
 
 ```javascript
 Util.baseName('/www/site/home.html'); // It returns: 'home.html'
@@ -67,14 +67,14 @@ Util.baseName('/www/site/home.html', '.html'); // It returns: 'home'
 Util.baseName('/some/path/'); // It returns: 'path'
 ```
 
-### dirName(path: string)
+#### dirName(path: string)
 
 ```javascript
 Util.dirName('/etc/passwd'); // It returns: '/etc'
 Util.dirName('/some/path/to/'); // It returns: '/some/path'
 ```
 
-### async race(callback: any, maxSeconds: number) -> Run a callback in the limited time (seconds)
+#### async race(callback: any, maxMiliseconds: number) -> Run a callback in the limited time (miliseconds)
 
 ```javascript
 // Run the callback in around of maximum seconds otherwise it will be thrown an instance of UtilRaceError
@@ -83,7 +83,7 @@ await Util.race('Im not callable', 1); // It returns: 'Im not callable'
 // Throw UtilRaceError because the callback run in 2 seconds while the maximum time is 1 seconds
 const timeout = async () => {
    try {
-      await Util.race(new Promise((resolve) => setTimeout(resolve, 2000)), 1);
+      await Util.race(new Promise((resolve) => setTimeout(resolve, 2000)), 1000);
    } catch (e) {
       return e;
    }
@@ -92,14 +92,14 @@ const timeout = async () => {
 (await timeout()) instanceof UtilRaceError; // It returns: true
 ```
 
-### Util.debug(...entries: any[])
+#### Util.debug(...entries: any[])
 
 ```javascript
 // Log the variable with deep properties and color
 Util.debug({ user: { id: 1, ua: 'admin', age: 30, major: ['Full stack developer'] } });
 ```
 
-### Util.debugDev(...entries: any[])
+#### Util.debugDev(...entries: any[])
 
 ```javascript
 // The same Util.debug but only log in NodeJS and process?.env?.NODE_ENV === 'development'

@@ -6,7 +6,7 @@
 import { DateTime } from '@ujs/core';
 ```
 
-### DateTime Instance
+#### DateTime Instance
 
 ```javascript
 const date = new Date();
@@ -16,7 +16,7 @@ const datetime = DateTime.from(date);
 datetime.native; // It returns: date
 ```
 
-### Comparison
+#### Comparison
 
 ```javascript
 // Equals
@@ -38,7 +38,7 @@ dt.gt('2024-02-27'); // It returns: true
 dt.gte('2024-02-28'); // It returns: true
 ```
 
-### Start/End Of
+#### Start/End Of
 
 ```javascript
 // startOf(): move to the start of date
@@ -50,7 +50,7 @@ DateTime.from('2024-02-28 13:00:00').endOf().format('YYYY-MM-DD HH:mm:ss'); // I
 DateTime.now().endOf().eq(DateTime.yesterday().addDate(1).endOf()); // It returns: true
 ```
 
-### Clone
+#### Clone
 
 ```javascript
 const clone = datetime.clone();
@@ -59,7 +59,7 @@ clone.gt(date); // It returns: true
 datetime.eq(date); // It returns: true
 ```
 
-### TimeZone
+#### TimeZone
 
 ```javascript
 // Create the UTC now
@@ -78,7 +78,7 @@ gmt7.diff(utc, 'hour'); // It returns: 7
 utc.valueOf() - gmt7.valueOf(); // It returns: -7 * 60 * 60 * 1000
 ```
 
-### Format
+#### Format
 
 ```javascript
 /**
@@ -132,7 +132,7 @@ nowUtc.format('YYYY-MM-DD hh:mm:ss'); // It returns: '2024-02-29 01:00:00'
 nowUtc.format('YYYY-MM-DD hh:mm a'); // It returns: '2024-02-29 01:00 pm'
 ```
 
-### Diff by: 'week' | 'date' | 'hour' | 'minute' | 'second' | 'millisecond'
+#### Diff by: 'week' | 'date' | 'hour' | 'minute' | 'second' | 'millisecond'
 
 ```javascript
 // const dt = DateTime.from('2024-02-28');
@@ -141,7 +141,7 @@ dt.diff('2024-02-27', 'date'); // It returns: 1
 dt.diff('2024-02-27', 'week'); // It returns: 0
 ```
 
-### Walking
+#### Walking
 
 ```javascript
 const now = DateTime.now();
@@ -163,7 +163,7 @@ DateTime.now().nextYear().native.getFullYear(); // It returns: now.native.getFul
 DateTime.now().prevYear().native.getFullYear(); // It returns: now.native.getFullYear() - 1
 ```
 
-### Days In Months
+#### Days In Months
 
 ```javascript
 DateTime.daysInMonth(2, 2024); // It returns: 29
@@ -171,7 +171,7 @@ DateTime.daysInMonth(3, 2024); // It returns: 31
 DateTime.from('2024-02-01', '+07:00').daysInMonth(); // It returns: 29
 ```
 
-### Add
+#### Add
 
 ```javascript
 // Year
@@ -207,7 +207,7 @@ DateTime.from('2024-02-28 13:00:00').addMillisecond(999).format('HH:mm:ss.SSS');
 DateTime.from('2024-02-28 13:00:00').addMillisecond(-999).format('HH:mm:ss.SSS'); // It returns: '12:59:59.001'
 ```
 
-### DateTimeLike: number | string | Date | DateTime
+#### DateTimeLike: number | string | Date | DateTime
 
 ```javascript
 // Parse
@@ -219,7 +219,7 @@ DateTime.parse(''); // It returns: false
 DateTime.parse(0); // It returns: false
 ```
 
-### Other
+#### Other
 
 ```javascript
 // ValueOf

@@ -6,7 +6,7 @@
 import { Registry, RegistryDataError } from '@ujs/core';
 ```
 
-### Create a registry instance
+#### Create a registry instance
 
 ```javascript
 const registry = Registry.from({ foo: 123, bar: { foo1: 'bar1', foo2: 'bar2' } });
@@ -14,7 +14,7 @@ const registry = Registry.from({ foo: 123, bar: { foo1: 'bar1', foo2: 'bar2' } }
 // OR const registry = Registry.from(); // the original data = {}
 ```
 
-### registry.get<T>(path: string, defaultValue?: any, filter?: string | string[]): T
+#### registry.get<T>(path: string, defaultValue?: any, filter?: string | string[]): T
 
 ```javascript
 registry.get('foo'); // It returns: 123
@@ -25,7 +25,7 @@ registry.get('bar.foo3'); // It returns: undefined
 registry.get('bar.foo3', '1'); // It returns: '1'
 ```
 
-### Get and transform to the value to specific types (see [Transform](Transform.md))
+#### Get and transform to the value to specific types (see [Transform](Transform.md))
 
 ```javascript
 registry.get('foo', undefined, 'string'); // It returns: '123'
@@ -35,7 +35,7 @@ registry.get('foo', undefined, ['boolean', 'string']); // It returns: 'true'
 registry.get('bar.foo3', 1, 'string'); // It returns: 1
 ```
 
-### registry.set(path: string, value: any)
+#### registry.set(path: string, value: any)
 
 ```javascript
 registry.set('animal.list', ['dog', 'cat']);
@@ -50,7 +50,7 @@ registry.get('animal'); // It returns: ['dog', 'cat', 'tiger']
 registry.get('animal.2'); // It returns: 'tiger'
 ```
 
-### registry.has(path: string)
+#### registry.has(path: string)
 
 ```javascript
 registry.has('animal'); // It returns: true
@@ -58,7 +58,7 @@ registry.has('animal.list'); // It returns: false
 registry.has('animal.2'); // It returns: true
 ```
 
-### registry.is(path: string, compareValue?: any)
+#### registry.is(path: string, compareValue?: any)
 
 ```javascript
 registry.is('animal.2', 'cat'); // It returns: false
@@ -71,14 +71,14 @@ registry.is('animal.2'); // It returns: true
 registry.is('animal.3'); // It returns: false
 ```
 
-### Extract data
+#### Extract data
 
 ```javascript
 // Return the object data
 registry.valueOf();
 ```
 
-### registry.pick(paths: string[] | string)
+#### registry.pick(paths: string[] | string)
 
 ```javascript
 registry.pick('bar.foo2').has('foo'); // It returns: false
@@ -86,13 +86,13 @@ registry.pick('bar.foo2').has('bar.foo1'); // It returns: false
 registry.pick('bar.foo2').has('bar.foo2'); // It returns: true
 ```
 
-### registry.omit(paths: string[] | string)
+#### registry.omit(paths: string[] | string)
 
 ```javascript
 registry.omit('bar.foo2').has('bar.foo2'); // It returns: false
 ```
 
-### registry.clone()
+#### registry.clone()
 
 ```javascript
 const clone = registry.clone();
@@ -101,7 +101,7 @@ clone.get('foo'); // It returns: 456
 registry.get('foo'); // It returns: 123
 ```
 
-### registry.merge(data: any)
+#### registry.merge(data: any)
 
 ```javascript
 registry.merge({ bar: { foo3: 'bar3' }, foo2: 456 });
@@ -113,7 +113,7 @@ registry.get('bar'); // It returns: 456
 registry.isValidData(); // It returns: false
 ```
 
-### registry.parse(data?: any, options?: { validate?: boolean; clone?: boolean })
+#### registry.parse(data?: any, options?: { validate?: boolean; clone?: boolean })
 
 ```javascript
 // Parse the data to Array or Flat Object and override the current data
@@ -132,7 +132,7 @@ registry.remove('array.4.foo');
 registry.has('array.4.foo'); // It returns: false
 ```
 
-### Caching (testing purpose)
+#### Caching (testing purpose)
 
 ```javascript
 registry.set('array.4.foo', 456);
@@ -143,7 +143,7 @@ registry.set('array.4', 456);
 registry.isCached('array.4.foo'); // It returns: false
 ```
 
-### registry.initPathValue<T>(o: Record<string, any>, prop: string, value: T) : T
+#### registry.initPathValue<T>(o: Record<string, any>, prop: string, value: T) : T
 
 ```javascript
 // Init and returns the property value if it isn't set yet
@@ -152,14 +152,14 @@ registry.initPathValue('foo', 'bar');
 registry.get('foo'); // It returns: 'bar'
 ```
 
-### The value will not change because the property has already init
+#### The value will not change because the property has already init
 
 ```javascript
 registry.initPathValue('foo', 'bar2');
 registry.get('foo'); // It returns: 'bar'
 ```
 
-### Init deep property
+#### Init deep property
 
 ```javascript
 registry.initPathValue('animal.list', ['dog', 'cat']);
@@ -170,7 +170,7 @@ registry.initPathValue('animal.list', ['tiger']);
 registry.get('animal.list'); // It returns: ['dog', 'cat']
 ```
 
-### registry.validate() -> validate data
+#### registry.validate() -> validate data
 
 ```javascript
 // No function value

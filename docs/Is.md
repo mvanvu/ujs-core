@@ -6,7 +6,7 @@
 import { Is, DateTime } from '@ujs/core';
 ```
 
-### Common Type
+#### Common Type
 
 ```javascript
 /**
@@ -37,7 +37,7 @@ import { Is, DateTime } from '@ujs/core';
 */
 ```
 
-### Is.emptyObject(obj: any)
+#### Is.emptyObject(obj: any)
 
 ```javascript
 // Check the object is empty, returns false if the value is not an object
@@ -47,7 +47,7 @@ Is.emptyObject({ foo: 'bar' }); // It returns: false
 Is.emptyObject({}); // It returns: true
 ```
 
-### Is.date(d: any)
+#### Is.date(d: any)
 
 ```javascript
 // Check the value is instance of Date
@@ -55,21 +55,21 @@ Is.date(new Date()); // It returns: true
 Is.date(''); // It returns: false
 ```
 
-### Is.datetime(d: any)
+#### Is.datetime(d: any)
 
 ```javascript
 // Check the value is instance of [DateTime](Datetime.md)
 Is.datetime(DateTime.now()); // It returns: true
 ```
 
-### Is.dateString(d: any)
+#### Is.dateString(d: any)
 
 ```javascript
 // Check the value is a valid string date, returns false if the value is not a string
 Is.dateString('2024-02-28'); // It returns: true
 ```
 
-### Is.asyncFunc(value: any)
+#### Is.asyncFunc(value: any)
 
 ```javascript
 // Check the value is an async function
@@ -78,7 +78,7 @@ Is.asyncFunc(() => {}); // It returns: false
 Is.asyncFunc(async () => {}); // It returns: true
 ```
 
-### Is.int(value: any, each = false)
+#### Is.int(value: any, each = false)
 
 ```javascript
 // Check the value is an integer number
@@ -95,7 +95,7 @@ Is.int([123, 456, 789], true); // It returns: true
 Is.int([123, '456', 789], true); // It returns: false
 ```
 
-### Is.bigInt(value: any, each = false)
+#### Is.bigInt(value: any, each = false)
 
 ```javascript
 // Check the value is a big integer number
@@ -113,7 +113,7 @@ Is.bigInt([1n, 2n, 3n], true); // It returns: true
 Is.bigInt([1n, 2n, 3], true); // It returns: false
 ```
 
-### Is.number(value: any, each = false)
+#### Is.number(value: any, each = false)
 
 ```javascript
 // Check the value is a number
@@ -131,7 +131,7 @@ Is.uNumber([1, 2, 3], true); // It returns: true
 Is.sNumber([1, 2, 3], true); // It returns: false
 ```
 
-### Is.undefined(value: any, each = false)
+#### Is.undefined(value: any, each = false)
 
 ```javascript
 // Check the value is undefined
@@ -141,7 +141,7 @@ Is.undefined(undefined); // It returns: true
 Is.undefined([undefined, null], true); // It returns: false
 ```
 
-### Is.null(value: any, each = false)
+#### Is.null(value: any, each = false)
 
 ```javascript
 // Check the value is null
@@ -151,7 +151,7 @@ Is.null(null); // It returns: true
 Is.null([undefined, null], true); // It returns: false
 ```
 
-### Is.object(value: any, options?: { rules: ObjectCommonType; suitable?: boolean })
+#### Is.object(value: any, options?: { rules: ObjectCommonType; suitable?: boolean })
 
 ```javascript
 // Check the value is a valid object key-value pair
@@ -174,7 +174,7 @@ Is.object({ foo: 123, bar: false }, { rules: { foo: 'number', bar: 'boolean' } }
 Is.object({ foo: 123, bar: false }, { rules: { foo: 'number', bar: { number: 'number' } } }); // It returns: false
 ```
 
-### Is.array(value: any, options?: { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean })
+#### Is.array(value: any, options?: { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean })
 
 ```javascript
 // Check the value is a valid array
@@ -193,7 +193,7 @@ Is.array([{ foo: 123, bar: false }], { rules: { foo: 'number', bar: 'boolean' } 
 Is.array([{ foo: 123, bar: false }], { rules: { foo: 'number', bar: { number: 'number' } } }); // It returns: false
 ```
 
-### Is.equals(a: any, b: any)
+#### Is.equals(a: any, b: any)
 
 ```javascript
 // Compare two values are equals or not
@@ -213,7 +213,7 @@ Is.equals({ foo: 'bar', bar: 123 }, { bar: 123, foo: 'bar2' }); // It returns: f
 Is.equals({ foo: 'bar', bar: 123 }, { bar: 123 }); // It returns: false
 ```
 
-### Is.flatValue(value: any)
+#### Is.flatValue(value: any)
 
 ```javascript
 // The flat value is a primitive value
@@ -232,7 +232,7 @@ Is.flatValue(new Set()); // It returns: false
 Is.flatValue(new Map()); // It returns: false
 ```
 
-### Is.empty(value: any)
+#### Is.empty(value: any)
 
 ```javascript
 Is.empty(0); // It returns: true
@@ -251,7 +251,7 @@ Is.empty([1]); // It returns: false
 Is.empty({ foo: 'bar' }); // It returns: false
 ```
 
-### Is.nothing(value: any)
+#### Is.nothing(value: any)
 
 ```javascript
 // Check the value is null | undefined | NaN
@@ -264,7 +264,7 @@ const arr = [{ foo: 123, bar: { number: { digit: 123 } } }];
 Is.array(arr, { rules: { foo: 'number', bar: { number: { digit: 'uint' } } } }); // It returns: true
 ```
 
-### Is.strongPassword(value: string, options?: { minLength?: number; noSpaces?: boolean })
+#### Is.strongPassword(value: string, options?: { minLength?: number; noSpaces?: boolean })
 
 ```javascript
 // Check the value is a strong password, returns false if the value is not a string
@@ -276,7 +276,7 @@ Is.strongPassword(`${pwd} has space`); // It returns: false
 Is.strongPassword(`${pwd} has space`, { noSpaces: false }); // It returns: true
 ```
 
-### Is.flatObject(value: any, allowArray?: boolean | { root?: boolean; deep?: boolean })
+#### Is.flatObject(value: any, allowArray?: boolean | { root?: boolean; deep?: boolean })
 
 ```javascript
 // The flat object contains all the properties which are flat value (primitive)
