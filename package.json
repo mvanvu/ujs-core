@@ -1,7 +1,7 @@
 {
    "name": "@maivubc/ujs-core",
    "author": "Rainy",
-   "version": "0.0.3",
+   "version": "0.0.2",
    "main": "dist/index.js",
    "types": "dist/index.d.ts",
    "files": [
@@ -40,9 +40,9 @@
    },
    "description": "UMD JS work on the both browser and NodeJs",
    "bugs": {
-      "url": "https://github.com/mvanvu/ujs/issues"
+      "url": "https://github.com/mvanvu/ujs-core/issues"
    },
-   "homepage": "https://github.com/mvanvu/ujs#readme",
+   "homepage": "https://github.com/mvanvu/ujs-core#readme",
    "directories": {
       "test": "test"
    },
