@@ -3,7 +3,7 @@
 ### Usage
 
 ```javascript
-import { DateTime } from '@maivubc/ujs-core';
+import { DateTime } from '@maivubc/ujs';
 ```
 
 #### DateTime Instance

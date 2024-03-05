@@ -3,7 +3,7 @@
 ### Usage
 
 ```javascript
-import { Util, UtilRaceError } from '@maivubc/ujs-core';
+import { Util, UtilRaceError } from '@maivubc/ujs';
 ```
 
 #### clone<T>(src: T): T (any type and ignore reference pointer)

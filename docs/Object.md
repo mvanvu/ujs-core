@@ -3,7 +3,7 @@
 ### Usage
 
 ```javascript
-import { Obj } from '@maivubc/ujs-core';
+import { Obj } from '@maivubc/ujs';
 ```
 
 #### pick<T extends object>(source: T, props: string | string[])

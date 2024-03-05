@@ -6,10 +6,10 @@ UMD JS work on the both Browser and NodeJs
 
 ```
 // With yarn
-yarn add @maivubc/ujs-core
+yarn add @maivubc/ujs
 
 // With NPM
-npm install @maivubc/ujs-core
+npm install @maivubc/ujs
 ```
 
 ### Usage On Browser
@@ -24,7 +24,7 @@ npm install @maivubc/ujs-core
 ### Usage On NodeJS
 
 ```
-import { DateTime } from '@maivubc/ujs-core';
+import { DateTime } from '@maivubc/ujs';
 console.log(DateTime.now());
 ```
 

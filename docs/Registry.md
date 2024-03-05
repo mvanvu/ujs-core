@@ -3,7 +3,7 @@
 ### Usage
 
 ```javascript
-import { Registry, RegistryDataError } from '@maivubc/ujs-core';
+import { Registry, RegistryDataError } from '@maivubc/ujs';
 ```
 
 #### Create a registry instance
