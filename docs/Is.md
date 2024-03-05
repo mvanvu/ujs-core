@@ -3,7 +3,7 @@
 ### Usage
 
 ```javascript
-import { Is, DateTime } from '@maivubc/ujs';
+import { Is, DateTime } from '@mvanvu/ujs';
 ```
 
 #### Common Type

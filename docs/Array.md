@@ -3,7 +3,7 @@
 ### Usage
 
 ```javascript
-import { Arr } from '@maivubc/ujs';
+import { Arr } from '@mvanvu/ujs';
 ```
 
 #### Arr.sum<T>(source: T[], options?: { key?: string })
