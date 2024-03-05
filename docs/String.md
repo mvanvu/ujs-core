@@ -3,7 +3,7 @@
 ### Usage
 
 ```javascript
-import { Str } from '@ujs/core';
+import { Str } from '@maivubc/ujs-core';
 ```
 
 #### Common

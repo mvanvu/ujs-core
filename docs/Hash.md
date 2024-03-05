@@ -3,7 +3,7 @@
 ### Usage
 
 ```javascript
-import { Hash, JWTErrorInvalid, DateTime } from '@ujs/core';
+import { Hash, JWTErrorInvalid, DateTime } from '@maivubc/ujs-core';
 ```
 
 #### Hash.sha256(str: string): Promise<string>

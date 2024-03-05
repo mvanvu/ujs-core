@@ -3,7 +3,7 @@
 ### Usage
 
 ```javascript
-import { Transform } from '@ujs/core';
+import { Transform } from '@maivubc/ujs-core';
 ```
 
 #### Transform methods
