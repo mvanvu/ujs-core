@@ -1,7 +1,7 @@
 {
-   "name": "@maivubc/ujs",
+   "name": "@ujs/core",
    "author": "Rainy",
-   "version": "1.0.0",
+   "version": "0.0.1",
    "main": "dist/index.js",
    "types": "dist/index.d.ts",
    "files": [
@@ -10,7 +10,7 @@
    "license": "MIT",
    "repository": {
       "type": "git",
-      "url": "git+https://github.com/mvanvu/ujs.git"
+      "url": "https://github.com/mvanvu/ujs.git"
    },
    "keywords": [
       "umd-js",
