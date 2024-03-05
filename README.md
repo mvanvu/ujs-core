@@ -24,7 +24,7 @@ npm install git+https://github.com/mvanvu/ujs
 ### Usage On NodeJS
 
 ```
-import { DateTime } from '@maivubc/ujs';
+import { DateTime } from '@ujs/core';
 console.log(DateTime.now());
 ```
 
@@ -38,7 +38,7 @@ yarn test
 yarn test datetime
 ```
 
-See all the sample tests at: /test/core
+See all the sample tests at: /test/lib
 
 ### API Documentation
 
