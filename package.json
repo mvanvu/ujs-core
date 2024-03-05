@@ -10,7 +10,7 @@
    "license": "MIT",
    "repository": {
       "type": "git",
-      "url": "https://github.com/mvanvu/@maivubc/ujs.git"
+      "url": "https://github.com/mvanvu/ujs.git"
    },
    "keywords": [
       "umd-js",
