@@ -14,7 +14,11 @@
    },
    "keywords": [
       "umd-js",
-      "util-js"
+      "util-js",
+      "from-end",
+      "back-end",
+      "browser",
+      "node"
    ],
    "scripts": {
       "serve": "webpack server",
