@@ -14,17 +14,17 @@ export class Arr extends Array {
       return this.#index;
    }
 
-   private static calc<T>(source: T[], options: { type: 'sum' | 'avg' | 'min' | 'max'; key?: string }) {
-      if (!source.length) {
-         return;
-      }
-
+   static calc(source: any[], options: { type: 'sum' | 'avg' | 'min' | 'max'; key?: string }) {
       const type = options.type;
       const key = options?.key ?? '';
 
       switch (type) {
          case 'sum':
          case 'avg':
+            if (!source.length) {
+               return 0;
+            }
+
             let sum = 0;
 
             for (const rec of source) {
@@ -61,24 +61,24 @@ export class Arr extends Array {
       }
    }
 
-   static sum<T>(source: T[], options?: { key?: string }) {
+   static sum(source: any[], options?: { key?: string }): number {
       return Arr.calc(source, { ...(options || {}), type: 'sum' });
    }
 
-   static avg<T>(source: T[], options?: { key?: string }) {
+   static avg(source: any[], options?: { key?: string }): number {
       return Arr.calc(source, { ...(options || {}), type: 'avg' });
    }
 
-   static min<T>(source: T[], options?: { key?: string }) {
+   static min<T>(source: any[], options?: { key?: string }): T {
       return Arr.calc(source, { ...(options || {}), type: 'min' });
    }
 
-   static max<T>(source: T[], options?: { key?: string }) {
+   static max<T>(source: any[], options?: { key?: string }): T {
       return Arr.calc(source, { ...(options || {}), type: 'max' });
    }
 
-   private static compare<T>(a: T[], b: T[], type: 'intersect' | 'diff') {
-      const output = [];
+   static compare<T>(a: any[], b: any[], type: 'intersect' | 'diff'): T[] {
+      const output: T[] = [];
 
       for (const v of a) {
          let matched = !!b.find((val) => Is.equals(val, v));
@@ -107,11 +107,11 @@ export class Arr extends Array {
       return output;
    }
 
-   static intersect(a: any[], b: any[]) {
+   static intersect<T>(a: any[], b: any[]): T[] {
       return Arr.compare(a, b, 'intersect');
    }
 
-   static diff(a: any[], b: any[]) {
+   static diff<T>(a: any[], b: any[]): T[] {
       return Arr.compare(a, b, 'diff');
    }
 
@@ -137,60 +137,60 @@ export class Arr extends Array {
       return output;
    }
 
-   static from(elements: Iterable<any> | ArrayLike<any>) {
+   static from(elements: Iterable<any> | ArrayLike<any>): Arr {
       const arr = new Arr();
       arr.push(...Array.from(elements));
 
       return arr;
    }
 
-   sum(options?: { key?: string }) {
+   sum(options?: { key?: string }): number {
       return Arr.sum(this.elements, options);
    }
 
-   avg(options?: { key?: string }) {
+   avg(options?: { key?: string }): number {
       return Arr.avg(this.elements, options);
    }
 
-   min(options?: { key?: string }) {
+   min<T>(options?: { key?: string }): T {
       return Arr.min(this.elements, options);
    }
 
-   max(options?: { key?: string }) {
+   max<T>(options?: { key?: string }): T {
       return Arr.max(this.elements, options);
    }
 
-   intersect(target: any[]) {
+   intersect<T>(target: any[]): T[] {
       return Arr.intersect(this.elements, target);
    }
 
-   diff(target: any[]) {
+   diff<T>(target: any[]): T[] {
       return Arr.diff(this.elements, target);
    }
 
-   chunk(size = 1) {
+   chunk<T>(size = 1): Array<T[]> {
       return Arr.chunk(this.elements, size);
    }
 
-   reset() {
+   reset(): Arr {
       this.#index = 0;
 
       return this;
    }
 
-   current() {
+   current<T>(): T {
       return this.elements[this.#index];
    }
 
-   first() {
+   first<T>(): T {
       return this.elements[(this.#index = 0)];
    }
 
-   last() {
+   last<T>(): T {
       return this.elements[(this.#index = this.elements.length - 1)];
    }
 
-   prev() {
+   prev<T>(): T {
       const index = this.#index - 1;
 
       if (this.elements[index] !== undefined) {
@@ -200,7 +200,7 @@ export class Arr extends Array {
       return this.elements[index];
    }
 
-   next() {
+   next<T>(): T {
       const index = this.#index + 1;
 
       if (this.elements[index] !== undefined) {
@@ -210,7 +210,7 @@ export class Arr extends Array {
       return this.elements[index];
    }
 
-   walk(index: number | 'first' | 'last' | 'prev' | 'next', callback: Function) {
+   walk<T>(index: number | 'first' | 'last' | 'prev' | 'next', callback: Function): T | undefined {
       if (typeof callback !== 'function') {
          return;
       }
@@ -242,13 +242,13 @@ export class Arr extends Array {
       }
    }
 
-   empty() {
+   empty(): Arr {
       this.splice(0, this.elements.length);
 
       return this;
    }
 
-   update(elements: Iterable<any> | ArrayLike<any>) {
+   update(elements: Iterable<any> | ArrayLike<any>): Arr {
       this.empty().push(...Arr.from(elements));
 
       return this;

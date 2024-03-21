@@ -12,8 +12,8 @@ it('Core Object', () => {
    expect(Obj.omit({ foo: 1, bar: 2 }, ['bar'])).toMatchObject({ foo: 1 });
    expect(Obj.omit({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, ['deep'])).toMatchObject({ foo: 1, bar: 2 });
 
-   const fromObj = { foo: 1, bar: 2, deep: { foo: 123, bar: 456 } };
-   expect(Obj.omit(fromObj, ['deep.foo'])).toMatchObject({ foo: 1, bar: 2, deep: { bar: 456 } });
+   const fromObj = { foo: 1, bar: 2, deep: { foo: 123, bar: { foo2: 'foo2', baz: 456 } } };
+   expect(Obj.omit(fromObj, ['deep.foo'])).toMatchObject({ foo: 1, bar: 2, deep: { bar: { baz: 456 } } });
 
    // # contains(source: object, target: object | string)
    expect(Obj.contains({ foo: 1, bar: 2 }, { foo: 1, bar: 2 })).toBeTruthy();
@@ -36,9 +36,10 @@ it('Core Object', () => {
    expect(target).toMatchObject({ foo: 1 });
 
    // # extends(target: object, ...sources: object[])
-   const obj = Obj.extends({ foo: 1, bar: 2 }, { bar2: { num: 789 } }, { bar2: { num2: 91011 } });
-   expect(obj).toHaveProperty('bar2.num', 789);
-   expect(obj).toHaveProperty('bar2.num2', 91011);
+   const obj = Obj.extends({ foo: 1, bar: 2 }, { bar2: { num1: 1 } }, { bar2: { num2: 2 } }, { bool: true });
+   expect(obj).toHaveProperty('bar2.num1', 1);
+   expect(obj).toHaveProperty('bar2.num2', 2);
+   expect(obj).toHaveProperty('bool', true);
 
    // ## From the object instance
    const obj2 = Obj.from({ foo: 1, bar: 2 });

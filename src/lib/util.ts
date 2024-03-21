@@ -64,10 +64,18 @@ export class Util {
       } else if (Is.object(data)) {
          const keys = Object.keys(data);
          const obj = {} as typeof data;
-         keys.sort();
+         keys.sort((a, b) => {
+            const regex = /^-?\d+\.?\d*$/;
+
+            if (regex.test(a) && regex.test(b)) {
+               return compare(Number(a), Number(b));
+            }
+
+            return compare(a, b);
+         });
 
          for (const key of keys) {
-            obj[key] = Util.clone(data[key]);
+            obj[key] = data[key];
          }
 
          for (const key in data) {

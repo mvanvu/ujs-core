@@ -13,11 +13,11 @@ export class Registry {
       this.parse(data, options);
    }
 
-   static from(data?: any, options?: { validate?: boolean; clone?: boolean }) {
+   static from(data?: any, options?: { validate?: boolean; clone?: boolean }): Registry {
       return new Registry(data, options);
    }
 
-   merge(data: any, validate?: boolean) {
+   merge(data: any, validate?: boolean): Registry {
       const deepMerge = (data: any, path?: string) => {
          if (Is.array(data)) {
             for (let i = 0, n = data.length; i < n; i++) {
@@ -37,7 +37,7 @@ export class Registry {
       return this;
    }
 
-   parse(data?: any, options?: { validate?: boolean; clone?: boolean }) {
+   parse(data?: any, options?: { validate?: boolean; clone?: boolean }): Registry {
       if (data === undefined) {
          data = {};
       } else if (Is.string(data) && ['{', '['].includes(data[0])) {
@@ -67,7 +67,7 @@ export class Registry {
       return this;
    }
 
-   validate(data?: any) {
+   validate(data?: any): Registry {
       if (!this.isValidData(data)) {
          throw new RegistryDataError(
             'The object element data must be a Record<key, value> or Array<[flat] | Record<key, value>> not from any Class/Function constructor',
@@ -77,7 +77,7 @@ export class Registry {
       return this;
    }
 
-   isValidData(data?: any) {
+   isValidData(data?: any): boolean {
       data = data ?? this.data;
 
       if (Array.isArray(data)) {
@@ -95,7 +95,7 @@ export class Registry {
       return true;
    }
 
-   private isPathNum(path: string) {
+   private isPathNum(path: string): boolean {
       return /^\d+$/.test(path);
    }
 
@@ -130,7 +130,7 @@ export class Registry {
       return <T>(filter ? Transform.clean(this.cached[path], filter) : this.cached[path]);
    }
 
-   set(path: string, value: any, validate?: boolean) {
+   set(path: string, value: any, validate?: boolean): Registry {
       if (validate === true) {
          this.validate(value);
       }
@@ -212,11 +212,11 @@ export class Registry {
       return value;
    }
 
-   has(path: string) {
+   has(path: string): boolean {
       return !Is.undefined(this.get(path));
    }
 
-   is(path: string, compareValue?: any) {
+   is(path: string, compareValue?: any): boolean {
       const value = this.get(path);
 
       if (Is.undefined(compareValue)) {
@@ -231,39 +231,39 @@ export class Registry {
     * @param path
     * For test caching purpose
     */
-   isCached(path: string) {
+   isCached(path: string): boolean {
       return this.cached.hasOwnProperty(path);
    }
 
-   isPathArray(path?: string) {
+   isPathArray(path?: string): boolean {
       return Is.array(path ? this.get(path) : this.data);
    }
 
-   isPathObject(path?: string) {
+   isPathObject(path?: string): boolean {
       return Is.object(path ? this.get(path) : this.data);
    }
 
-   isPathFlat(path: string) {
+   isPathFlat(path: string): boolean {
       return Is.flatValue(this.get(path));
    }
 
-   remove(path: string) {
+   remove(path: string): Registry {
       return this.set(path, undefined);
    }
 
-   toString() {
+   toString(): string {
       return JSON.stringify(this.data);
    }
 
-   valueOf() {
-      return this.data;
+   valueOf<T extends RegistryDataType>(): T {
+      return <T>this.data;
    }
 
-   clone() {
-      return new Registry(JSON.stringify(this.data));
+   clone(): Registry {
+      return Registry.from(this.data, { clone: true });
    }
 
-   pick(paths: string[] | string) {
+   pick(paths: string[] | string): Registry {
       const registry = Registry.from();
 
       for (const path of Array.isArray(paths) ? paths : [paths]) {
@@ -273,7 +273,7 @@ export class Registry {
       return registry;
    }
 
-   omit(paths: string[] | string) {
+   omit(paths: string[] | string): Registry {
       const registry = this.clone();
 
       for (const path of Array.isArray(paths) ? paths : [paths]) {

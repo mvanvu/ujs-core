@@ -28,11 +28,11 @@ it('Util DateTime', () => {
    expect(dt.gte('2024-02-28')).toBeTruthy();
 
    // # Start/End Of
-   // ## startOf(): move to the start of date
+   // ## startOf(): DateTime -> move to the start of date
    expect(DateTime.from('2024-02-28 13:00:00').startOf().format('YYYY-MM-DD HH:mm:ss')).toEqual('2024-02-28 00:00:00');
    expect(DateTime.now().startOf().eq(DateTime.yesterday().addDate(1).startOf())).toBeTruthy();
 
-   // ## endOf(): move to the end of date
+   // ## endOf(): DateTime -> move to the end of date
    expect(DateTime.from('2024-02-28 13:00:00').endOf().format('YYYY-MM-DD HH:mm:ss')).toEqual('2024-02-28 23:59:59');
    expect(DateTime.now().endOf().eq(DateTime.yesterday().addDate(1).endOf())).toBeTruthy();
 

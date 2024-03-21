@@ -8,7 +8,7 @@ export class Hash {
       return typeof crypto !== 'undefined' ? crypto : typeof window !== 'undefined' ? window.crypto || window['msCrypto'] : void 0;
    }
 
-   static randomBytes(size: number) {
+   static randomBytes(size: number): Uint8Array | number[] {
       const crypto = Hash.getCrypto();
 
       if (crypto !== void 0) {
@@ -34,7 +34,7 @@ export class Hash {
       return r;
    }
 
-   static uuid() {
+   static uuid(): string {
       const crypto = Hash.getCrypto();
 
       if (typeof crypto?.randomUUID === 'function') {
@@ -108,19 +108,19 @@ export class Hash {
       throw new Error('Crypto not available in your environment');
    }
 
-   static encodeBase64(str: string) {
+   static encodeBase64(str: string): string {
       return btoa(str);
    }
 
-   static decodeBase64(str: string) {
+   static decodeBase64(str: string): string {
       return atob(str);
    }
 
-   static base64UrlEncode(str: string) {
+   static base64UrlEncode(str: string): string {
       return Hash.encodeBase64(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
    }
 
-   static base64UrlDecode(str: string) {
+   static base64UrlDecode(str: string): string {
       str = str.replace(/-/g, '+').replace(/_/g, '/');
       const padLength = str.length % 4;
 
@@ -131,7 +131,7 @@ export class Hash {
       return Hash.decodeBase64(str);
    }
 
-   static jwt() {
+   static jwt(): JWT {
       return new JWT();
    }
 }
@@ -153,7 +153,7 @@ export class JWT {
    static readonly EXPIRED_TOKEN = 'INVALID_IAT';
    static readonly EXPIRED = 'EXPIRED_TOKEN';
 
-   async sign(data: any, options: { iat: DateTimeLike; secret: string }) {
+   async sign(data: any, options: { iat: DateTimeLike; secret: string }): Promise<string> {
       const iat = DateTime.from(options.iat);
 
       if (!iat.valid) {
@@ -167,7 +167,7 @@ export class JWT {
       return `${header}.${payload}.${signature}`;
    }
 
-   async verify(token: string, options: { secret: string }) {
+   async verify<T>(token: string, options: { secret: string }): Promise<T> {
       const parts = token.split('.');
 
       if (parts.length !== 3) {

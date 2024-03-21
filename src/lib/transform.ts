@@ -73,19 +73,16 @@ export class Transform {
    }
 
    // Convert to JSON
-   static toJsonObject<T = any[] | Record<string, any>>(value: any, defaultJson?: T): T {
-      if (Array.isArray(value)) {
-         return <T>value;
+   static toJsonObject<T extends any[] | Record<string, any>>(value: any, defaultJson?: T): T {
+      if (Is.objectOrArray(value)) {
+         // The Json object must be a flat key-pair value
+         value = JSON.stringify(value);
       }
 
       if (Is.string(value) && ['{', '['].includes(value[0])) {
          try {
             return JSON.parse(value);
          } catch {}
-      }
-
-      if (Is.object(value)) {
-         return value;
       }
 
       return <T>(Is.object(defaultJson) ? defaultJson : Is.nothing(value) ? {} : [value]);

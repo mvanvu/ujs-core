@@ -4,7 +4,7 @@ import { CommonType, ObjectCommonType } from '../type';
 export type ObjectRulesOptions = { rules: ObjectCommonType; suitable?: boolean };
 export class IsError extends Error {}
 export class Is {
-   static typeOf(value: any, type: CommonType, each = false) {
+   static typeOf(value: any, type: CommonType, each = false): boolean {
       value = each ? (Array.isArray(value) ? value : [value]) : value;
 
       for (const val of each ? value : [value]) {
@@ -50,7 +50,7 @@ export class Is {
                break;
 
             case 'object':
-               if (!val || Array.isArray(val) || typeValue !== 'object') {
+               if (!Is.object(val)) {
                   return false;
                }
 
@@ -127,7 +127,7 @@ export class Is {
       return true;
    }
 
-   static equals(a: any, b: any) {
+   static equals(a: any, b: any): boolean {
       if (a === b) {
          return true;
       }
@@ -254,27 +254,57 @@ export class Is {
       return a !== a && b !== b; // eslint-disable-line no-self-compare
    }
 
-   static emptyObject(obj: any) {
+   static emptyObject(obj: any, each = false): boolean {
+      if (each && Is.array(obj)) {
+         for (const val of obj) {
+            if (!Is.emptyObject(val)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
       return Is.object(obj) && !Object.keys(obj).length;
    }
 
-   static date(d: any) {
-      return Is.typeOf(d, 'date');
+   static date(d: any, each = false): boolean {
+      return Is.typeOf(d, 'date', each);
    }
 
-   static datetime(d: any) {
-      return Is.typeOf(d, 'datetime');
+   static datetime(d: any, each = false): boolean {
+      return Is.typeOf(d, 'datetime', each);
    }
 
-   static dateString(d: any) {
-      return Is.typeOf(d, 'datestring');
+   static dateString(d: any, each = false): boolean {
+      return Is.typeOf(d, 'datestring', each);
    }
 
-   static flatValue(value: any) {
-      return (typeof value !== 'object' && typeof value !== 'function') || value === null;
+   static flatValue(value: any, each = false): boolean {
+      if (each && Is.array(value)) {
+         for (const val of value) {
+            if (!Is.flatValue(val)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
+      return value === null || ['string', 'number', 'bigint', 'boolean', 'symbol', 'undefined'].includes(typeof value);
    }
 
-   static empty(value: any) {
+   static empty(value: any, each = false): boolean {
+      if (each && Is.array(value)) {
+         for (const val of value) {
+            if (!Is.empty(val)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
       switch (typeof value) {
          case 'boolean':
             return value === false;
@@ -306,11 +336,11 @@ export class Is {
       return !Boolean(value);
    }
 
-   static nothing(value: any) {
+   static nothing(value: any): boolean {
       return [null, undefined, NaN].includes(value);
    }
 
-   static object(value: any, options?: ObjectRulesOptions) {
+   static object(value: any, options?: ObjectRulesOptions): boolean {
       const isObject = (o: any) => o !== null && !Array.isArray(o) && typeof o === 'object';
 
       if (!isObject(value)) {
@@ -343,7 +373,7 @@ export class Is {
       return true;
    }
 
-   static flatObject(value: any, allowArray?: boolean | { root?: boolean; deep?: boolean }) {
+   static flatObject(value: any, allowArray?: boolean | { root?: boolean; deep?: boolean }): boolean {
       if (!Is.object(value)) {
          return false;
       }
@@ -395,11 +425,11 @@ export class Is {
       return true;
    }
 
-   static objectOrArray(value: any) {
+   static objectOrArray(value: any): boolean {
       return Is.object(value) || Is.array(value);
    }
 
-   static array(value: any, options?: { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean }) {
+   static array(value: any, options?: { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean }): boolean {
       if (!Array.isArray(value) || (options?.notEmpty && !value.length)) {
          return false;
       }
@@ -420,92 +450,112 @@ export class Is {
       return true;
    }
 
-   static asyncFunc(value: any) {
+   static asyncFunc(value: any, each = false): boolean {
+      if (each && Is.array(value)) {
+         for (const val of value) {
+            if (!Is.asyncFunc(val)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       return value instanceof (async () => {}).constructor;
    }
 
-   static func(value: any, each = false) {
+   static func(value: any, each = false): boolean {
       return Is.typeOf(value, 'function', each);
    }
 
-   static callable(value: any) {
+   static callable(value: any, each = false): boolean {
+      if (each && Is.array(value)) {
+         for (const val of value) {
+            if (!Is.callable(val)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
       return Is.func(value) || Is.asyncFunc(value) || value instanceof Promise;
    }
 
-   static number(value: any, each = false) {
+   static number(value: any, each = false): boolean {
       return Is.typeOf(value, 'number', each);
    }
 
-   static sNumber(value: any, each = false) {
+   static sNumber(value: any, each = false): boolean {
       return Is.typeOf(value, 'snumber', each);
    }
 
-   static uNumber(value: any, each = false) {
+   static uNumber(value: any, each = false): boolean {
       return Is.typeOf(value, 'unumber', each);
    }
 
-   static int(value: any, each = false) {
+   static int(value: any, each = false): boolean {
       return Is.typeOf(value, 'int', each);
    }
 
-   static sInt(value: any, each = false) {
+   static sInt(value: any, each = false): boolean {
       return Is.typeOf(value, 'sint', each);
    }
 
-   static uInt(value: any, each = false) {
+   static uInt(value: any, each = false): boolean {
       return Is.typeOf(value, 'uint', each);
    }
 
-   static bigInt(value: any, each = false) {
+   static bigInt(value: any, each = false): boolean {
       return Is.typeOf(value, 'bigint', each);
    }
 
-   static sBigInt(value: any, each = false) {
+   static sBigInt(value: any, each = false): boolean {
       return Is.typeOf(value, 'sbigint', each);
    }
 
-   static uBigInt(value: any, each = false) {
+   static uBigInt(value: any, each = false): boolean {
       return Is.typeOf(value, 'ubigint', each);
    }
 
-   static boolean(value: any, each = false) {
+   static boolean(value: any, each = false): boolean {
       return Is.typeOf(value, 'boolean', each);
    }
 
-   static string(value: any, each = false) {
+   static string(value: any, each = false): boolean {
       return Is.typeOf(value, 'string', each);
    }
 
-   static null(value: any, each = false) {
+   static null(value: any, each = false): boolean {
       return Is.typeOf(value, 'null', each);
    }
 
-   static undefined(value: any, each = false) {
+   static undefined(value: any, each = false): boolean {
       return Is.typeOf(value, 'undefined', each);
    }
 
-   static nan(value: any, each = false) {
+   static nan(value: any, each = false): boolean {
       return Is.typeOf(value, 'NaN', each);
    }
 
-   static symbol(value: any, each = false) {
+   static symbol(value: any, each = false): boolean {
       return Is.typeOf(value, 'symbol', each);
    }
 
-   static map(value: any, each = false) {
+   static map(value: any, each = false): boolean {
       return Is.typeOf(value, 'map', each);
    }
 
-   static set(value: any, each = false) {
+   static set(value: any, each = false): boolean {
       return Is.typeOf(value, 'set', each);
    }
 
-   static regex(value: any, each = false) {
+   static regex(value: any, each = false): boolean {
       return Is.typeOf(value, 'regex', each);
    }
 
-   static nodeJs() {
+   static nodeJs(): boolean {
       return (
          typeof global !== 'undefined' &&
          global &&
@@ -515,11 +565,31 @@ export class Is {
       );
    }
 
-   static nullOrUndefined(value: any) {
+   static nullOrUndefined(value: any, each = false): boolean {
+      if (each && Is.array(value)) {
+         for (const val of value) {
+            if (!Is.nullOrUndefined(val)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
       return value === undefined || value === null;
    }
 
-   static strongPassword(value: any, options?: { minLength?: number; noSpaces?: boolean }) {
+   static strongPassword(value: any, options?: { minLength?: number; noSpaces?: boolean }, each = false): boolean {
+      if (each && Is.array(value)) {
+         for (const val of value) {
+            if (!Is.strongPassword(val, options)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
       if (typeof value !== 'string') {
          return false;
       }

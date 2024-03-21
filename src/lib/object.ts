@@ -2,40 +2,33 @@
 import { Registry } from './registry';
 import { Is } from './is';
 import { Util } from './util';
+import { Path, NestedPick, NestedOmit, ExtendsObject, ObjectKey, ExtendsObjects, UnionToIntersection, ResetObject } from '../type';
 
 export class Obj {
-   constructor(private objects: Record<string, any>) {}
+   constructor(private objects: object) {}
 
-   static pick<T extends object>(source: T, props: string | string[]) {
+   static pick<T extends object, K extends Path<T>>(source: T, props: K | K[]): NestedPick<T, K> {
       const src = Registry.from(source);
       const dest = Registry.from();
 
-      if (!Array.isArray(props)) {
-         props = [props];
-      }
-
-      for (const prop of props) {
+      for (const prop of Array.isArray(props) ? props : [props]) {
          dest.set(prop, src.get(prop));
       }
 
       return dest.valueOf();
    }
 
-   static omit<T extends object>(source: T, props: string | string[]) {
+   static omit<T extends object, K extends Path<T>>(source: T, props: K | K[]): NestedOmit<T, K> {
       const dest = Registry.from(source);
 
-      if (!Array.isArray(props)) {
-         props = [props];
-      }
-
-      for (const prop in props) {
+      for (const prop of Array.isArray(props) ? props : [props]) {
          dest.remove(prop);
       }
 
       return dest.valueOf();
    }
 
-   static contains(source: object, target: object | string) {
+   static contains(source: object, target: object | string): boolean {
       if (typeof target === 'string') {
          const paths = target.split('.');
          let o = source;
@@ -68,36 +61,42 @@ export class Obj {
       return target;
    }
 
-   static extends(target: object, ...sources: object[]) {
-      for (const source of sources) {
-         for (const key in source) {
-            const data = source[key];
+   static #extendsOne<T extends object, O extends object>(target: T, source: O): ExtendsObject<T, O> {
+      const result = target as ExtendsObject<T, O>;
 
-            if (Is.object(target[key]) && Is.object(data)) {
-               Obj.extends(target[key], data);
-            } else {
-               Object.assign(target, { [key]: Is.flatValue(data) ? data : Util.clone(data) });
-            }
+      for (const key in source) {
+         const k = <ObjectKey>key;
+         const targetData = result[k];
+         const sourceData = source[k];
+
+         if (Is.object(targetData) && Is.object(sourceData)) {
+            Obj.#extendsOne(targetData, sourceData);
+         } else {
+            Object.assign(result, { [k]: Util.clone(sourceData) });
          }
       }
 
-      return target;
+      return result;
    }
 
-   static reset<T extends object>(obj: object, newData?: T): T | {} {
+   static extends<T extends object, O extends object[]>(target: T, ...sources: O): ExtendsObjects<T, O> {
+      return (!sources.length ? target : Obj.extends(Obj.#extendsOne(target, sources.shift()), ...sources)) as ExtendsObjects<T, O>;
+   }
+
+   static reset<T extends undefined | null | object>(obj: object, newData?: T): ResetObject<T> {
       // Clean the object first
       for (const k in obj) {
          delete obj[k];
       }
 
-      if (newData) {
+      if (Is.object(newData)) {
          Object.assign(obj, newData);
       }
 
-      return obj;
+      return obj as ResetObject<T>;
    }
 
-   static from(o: Record<string, any>) {
+   static from(o: Record<string, any>): Obj {
       return new Obj(o);
    }
 
@@ -105,11 +104,11 @@ export class Obj {
       return Registry.from(o, { clone: false }).initPathValue(prop, value);
    }
 
-   contains(target: Record<string, any> | string) {
+   contains(target: Record<string, any> | string): boolean {
       return Obj.contains(this.objects, target);
    }
 
-   extends(...sources: Record<string, any>[]) {
+   extends(...sources: object[]) {
       return Obj.extends(this.objects, ...sources);
    }
 
@@ -121,11 +120,11 @@ export class Obj {
       return Obj.initPropValue(this.objects, prop, value);
    }
 
-   valueOf() {
+   valueOf(): object {
       return this.objects;
    }
 
-   toString() {
+   toString(): string {
       return JSON.stringify(this.objects);
    }
 }

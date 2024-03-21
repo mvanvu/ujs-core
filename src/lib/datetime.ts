@@ -23,19 +23,19 @@ export class DateTime {
       }
    }
 
-   public get valid() {
+   public get valid(): boolean {
       return this.isValid;
    }
 
-   public get iso() {
+   public get iso(): string {
       return this.date.toISOString();
    }
 
-   public get native() {
+   public get native(): Date {
       return this.date;
    }
 
-   public get tzOffset() {
+   public get tzOffset(): string {
       const hours = Math.floor(this.offset / 60);
       const minutes = Math.abs(this.offset) % 60;
       const prefix = hours <= 0 ? '+' : '-';
@@ -43,7 +43,7 @@ export class DateTime {
       return `${prefix}${String(Math.abs(hours)).padStart(2, '0')}:${String(Math.abs(minutes)).padStart(2, '0')}`;
    }
 
-   static parseOffset(offset: number | string) {
+   static parseOffset(offset: number | string): number {
       if (typeof offset === 'number') {
          return offset;
       }
@@ -68,27 +68,27 @@ export class DateTime {
       throw new DateTimeError(`Invalid offset ${offset}, the offset format must be a number or the string like: +07:00`);
    }
 
-   static from(datetimeLike?: DateTimeLike, offset?: number | string) {
+   static from(datetimeLike?: DateTimeLike, offset?: number | string): DateTime {
       return new DateTime(datetimeLike, offset);
    }
 
-   static now(offset?: number | string) {
+   static now(offset?: number | string): DateTime {
       return DateTime.from('now', offset);
    }
 
-   static utc() {
+   static utc(): DateTime {
       return DateTime.now().utc();
    }
 
-   static yesterday(offset?: number | string) {
+   static yesterday(offset?: number | string): DateTime {
       return DateTime.now(offset).prevDate().startOf();
    }
 
-   static tomorrow(offset?: number | string) {
+   static tomorrow(offset?: number | string): DateTime {
       return DateTime.now(offset).nextDate().startOf();
    }
 
-   static parse(datetimeLike?: DateTimeLike) {
+   static parse(datetimeLike?: DateTimeLike): Date | false {
       if (datetimeLike instanceof DateTime) {
          datetimeLike = datetimeLike.valueOf();
       } else if (datetimeLike === 'now' || datetimeLike === undefined) {
@@ -104,7 +104,7 @@ export class DateTime {
       return Number.isNaN(date.getTime()) ? false : date;
    }
 
-   static daysInMonth(month: number, year?: number) {
+   static daysInMonth(month: number, year?: number): number {
       const date = new Date(year || new Date().getFullYear(), month - 1, 27);
       const mon = date.getMonth();
 
@@ -117,16 +117,16 @@ export class DateTime {
       return date.getDate();
    }
 
-   static pad(value: number, number = 2) {
+   static pad(value: number, number = 2): string {
       return String(Math.abs(value)).padStart(number, '0');
    }
 
-   daysInMonth() {
+   daysInMonth(): number {
       return DateTime.daysInMonth(this.date.getMonth() + 1, this.date.getFullYear());
    }
 
-   setOffset(offset: string | number) {
-      offset = DateTime.parseOffset(offset);
+   setOffset(offset: string | number): DateTime {
+      offset = <number>DateTime.parseOffset(offset);
       const offsetDifference = this.offset - offset;
       this.date.setTime(this.date.getTime() + offsetDifference * 60000);
       this.offset = offset;
@@ -134,7 +134,7 @@ export class DateTime {
       return this;
    }
 
-   utc() {
+   utc(): DateTime {
       if (this.offset !== 0) {
          const utcTimeInMilliseconds = this.date.getTime() - -this.offset * 60000;
          this.date.setTime(utcTimeInMilliseconds);
@@ -144,14 +144,14 @@ export class DateTime {
       return this;
    }
 
-   clone() {
+   clone(): DateTime {
       const dt = DateTime.from(this.valueOf());
       dt.offset = this.offset;
 
       return dt;
    }
 
-   add(interval: number, unit: DateTimeUnit = 'millisecond') {
+   add(interval: number, unit: DateTimeUnit = 'millisecond'): DateTime {
       switch (unit) {
          case 'millisecond':
             this.date.setMilliseconds(this.date.getMilliseconds() + interval);
@@ -189,83 +189,83 @@ export class DateTime {
       return this;
    }
 
-   addYear(year: number) {
+   addYear(year: number): DateTime {
       return this.add(year, 'year');
    }
 
-   addMonth(month: number) {
+   addMonth(month: number): DateTime {
       return this.add(month, 'month');
    }
 
-   addWeek(week: number) {
+   addWeek(week: number): DateTime {
       return this.add(week, 'week');
    }
 
-   addDate(date: number) {
+   addDate(date: number): DateTime {
       return this.add(date, 'date');
    }
 
-   addHour(hour: number) {
+   addHour(hour: number): DateTime {
       return this.add(hour, 'hour');
    }
 
-   addMinute(minute: number) {
+   addMinute(minute: number): DateTime {
       return this.add(minute, 'minute');
    }
 
-   addSecond(second: number) {
+   addSecond(second: number): DateTime {
       return this.add(second, 'second');
    }
 
-   addMillisecond(millisecond: number) {
+   addMillisecond(millisecond: number): DateTime {
       return this.add(millisecond, 'millisecond');
    }
 
-   nextDate() {
+   nextDate(): DateTime {
       return this.addDate(1);
    }
 
-   prevDate() {
+   prevDate(): DateTime {
       return this.addDate(-1);
    }
 
-   nextWeek() {
+   nextWeek(): DateTime {
       return this.addWeek(1);
    }
 
-   prevWeek() {
+   prevWeek(): DateTime {
       return this.addWeek(-1);
    }
 
-   nextMonth() {
+   nextMonth(): DateTime {
       return this.addMonth(1);
    }
 
-   prevMonth() {
+   prevMonth(): DateTime {
       return this.addMonth(-1);
    }
 
-   nextYear() {
+   nextYear(): DateTime {
       return this.addYear(1);
    }
 
-   prevYear() {
+   prevYear(): DateTime {
       return this.addYear(-1);
    }
 
-   startOf() {
+   startOf(): DateTime {
       this.date.setHours(0, 0, 0, 0);
 
       return this;
    }
 
-   endOf() {
+   endOf(): DateTime {
       this.date.setHours(23, 59, 59, 999);
 
       return this;
    }
 
-   format(pattern = 'YYYY-MM-DD HH:mm:ss Z', locale?: string) {
+   format(pattern = 'YYYY-MM-DD HH:mm:ss Z', locale?: string): string {
       const { date, tzOffset } = this;
       const { pad } = DateTime;
       const year = date.getFullYear().toString();
@@ -305,7 +305,7 @@ export class DateTime {
       return output;
    }
 
-   diff(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
+   diff(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond'): number {
       if (datetime instanceof DateTime) {
          datetime = datetime.clone();
       } else {
@@ -335,32 +335,32 @@ export class DateTime {
       }
    }
 
-   gt(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
+   gt(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond'): boolean {
       return this.diff(datetime, unit) > 0;
    }
 
-   gte(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
+   gte(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond'): boolean {
       return this.diff(datetime, unit) >= 0;
    }
 
-   lt(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
+   lt(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond'): boolean {
       return this.diff(datetime, unit) < 0;
    }
 
-   lte(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
+   lte(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond'): boolean {
       return this.diff(datetime, unit) <= 0;
    }
 
-   eq(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond') {
+   eq(datetime?: DateTimeLike, unit: DateTimeUnit = 'millisecond'): boolean {
       return this.diff(datetime, unit) === 0;
    }
 
    // Primitive methods: toString => `${DateTime.now()}`, valueOf => +DateTime.now()
-   toString() {
+   toString(): string {
       return this.iso;
    }
 
-   valueOf() {
+   valueOf(): number {
       return this.date.getTime();
    }
 

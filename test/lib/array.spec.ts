@@ -1,7 +1,7 @@
 import { Arr } from '../../src';
 
 it('Core Array', () => {
-   // # Arr.sum<T>(source: T[], options?: { key?: string })
+   // # Arr.sum(source: any[], options?: { key?: string }): number
    // ## Calc sum of all number elements
    expect(Arr.sum([1, 2, 3])).toEqual(6);
 
@@ -12,7 +12,7 @@ it('Core Array', () => {
    expect(Arr.sum([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'foo' })).toEqual(4);
    expect(Arr.sum([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'bar' })).toEqual(2);
 
-   // # Arr.avg<T>(source: T[], options?: { key?: string })
+   // # Arr.avg(source: T[], options?: { key?: string }): number
    // ## Calc average of all number elements
    expect(Arr.avg([1, 2, 3])).toEqual(2);
 
@@ -23,7 +23,7 @@ it('Core Array', () => {
    expect(Arr.avg([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'foo' })).toEqual(4 / 3);
    expect(Arr.avg([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'bar' })).toEqual(2 / 3);
 
-   // # Arr.min<T>(source: T[], options?: { key?: string })
+   // # Arr.min<T>(source: T[], options?: { key?: string }): T
    // ## Calc minimum of all number elements
    expect(Arr.min([1, 2, 3])).toEqual(1);
 
@@ -34,7 +34,7 @@ it('Core Array', () => {
    expect(Arr.min([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'foo' })).toEqual({ foo: 1 });
    expect(Arr.min([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'bar' })).toEqual({ bar: 2 });
 
-   // # Arr.max<T>(source: T[], options?: { key?: string })
+   // # Arr.max<T>(source: T[], options?: { key?: string }): T
    // ## Calc maximum of all number elements
    expect(Arr.max([1, 2, 3])).toEqual(3);
 
@@ -45,7 +45,7 @@ it('Core Array', () => {
    expect(Arr.max([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'foo' })).toEqual({ foo: 3 });
    expect(Arr.max([{ foo: 1 }, { bar: 2 }, { bar: 3 }], { key: 'bar' })).toEqual({ bar: 3 });
 
-   // # Arr.intersect(a: any[], b: any[])
+   // # Arr.intersect<T>(a: any[], b: any[]): T[]
    // ## Found the intersect of two number arrays
    expect(Arr.intersect([2, 1], [2, 3])).toEqual([2]);
    expect(Arr.intersect([2, 1], [1, 2, 3])).toEqual([2, 1]);
@@ -54,7 +54,7 @@ it('Core Array', () => {
    // ## Find the intersect of two arrays by key-value pair
    expect(Arr.intersect([{ foo: 1 }, { bar: 2 }], [{ foo: '1' }, { bar: 2 }])).toEqual([{ bar: 2 }]);
 
-   // # Arr.diff(a: any[], b: any[])
+   // # Arr.diff<T>(a: any[], b: any[]): T[]
    // ## Find the difference of two arrays
    // ## 1 belongs to ARRAY 1 but not in ARRAY 2, 3 belongs to ARRAY 2 but not in ARRAY 1
    expect(Arr.diff([2, 1], [2, 3])).toEqual([1, 3]);
@@ -105,7 +105,7 @@ it('Core Array', () => {
    expect(arr.update([4, 5, 6])).toEqual([4, 5, 6]);
    expect(arr.current()).toEqual(4);
 
-   // # Arr.walk(index: number | 'first' | 'last' | 'prev' | 'next', callback: Function)
+   // # Arr.walk<T>(index: number | 'first' | 'last' | 'prev' | 'next', callback: (index?: number, elements?: any[]) => T): T | undefined
    // ## Walk to end of element and update its values
    arr.walk('last', (index: number) => (arr[index] *= 2));
    expect(arr.current()).toEqual(12);

@@ -28,33 +28,33 @@ it('Core Is', () => {
    -- 'datetime'     -> [DateTime](/Datetime.md)
    -- 'datestring'   -> String date
     */
-   // # Is.emptyObject(obj: any)
+   // # Is.emptyObject(obj: any): boolean
    // ## Check the object is empty, returns false if the value is not an object
    expect(Is.emptyObject(null)).toBeFalsy();
    expect(Is.emptyObject([])).toBeFalsy();
    expect(Is.emptyObject({ foo: 'bar' })).toBeFalsy();
    expect(Is.emptyObject({})).toBeTruthy();
 
-   // # Is.date(d: any)
+   // # Is.date(d: any): boolean
    // ## Check the value is instance of Date
    expect(Is.date(new Date())).toBeTruthy();
    expect(Is.date('')).toBeFalsy();
 
-   // # Is.datetime(d: any)
+   // # Is.datetime(d: any): boolean
    // ## Check the value is instance of [DateTime](Datetime.md)
    expect(Is.datetime(DateTime.now())).toBeTruthy();
 
-   // # Is.dateString(d: any)
+   // # Is.dateString(d: any): boolean
    // ## Check the value is a valid string date, returns false if the value is not a string
    expect(Is.dateString('2024-02-28')).toBeTruthy();
 
-   // # Is.asyncFunc(value: any)
+   // # Is.asyncFunc(value: any): boolean
    // ## Check the value is an async function
    expect(Is.asyncFunc(null)).toBeFalsy();
    expect(Is.asyncFunc(() => {})).toBeFalsy();
    expect(Is.asyncFunc(async () => {})).toBeTruthy();
 
-   // # Is.int(value: any, each = false)
+   // # Is.int(value: any, each = false): boolean
    // ## Check the value is an integer number
    expect(Is.int(123)).toBeTruthy();
 
@@ -68,7 +68,7 @@ it('Core Is', () => {
    expect(Is.int([123, 456, 789], true)).toBeTruthy();
    expect(Is.int([123, '456', 789], true)).toBeFalsy();
 
-   // # Is.bigInt(value: any, each = false)
+   // # Is.bigInt(value: any, each = false): boolean
    // ## Check the value is a big integer number
    expect(Is.bigInt(1)).toBeFalsy();
    expect(Is.bigInt(1n)).toBeTruthy();
@@ -83,7 +83,7 @@ it('Core Is', () => {
    expect(Is.bigInt([1n, 2n, 3n], true)).toBeTruthy();
    expect(Is.bigInt([1n, 2n, 3], true)).toBeFalsy();
 
-   // # Is.number(value: any, each = false)
+   // # Is.number(value: any, each = false): boolean
    // ## Check the value is a number
    expect(Is.number(-123)).toBeTruthy();
 
@@ -98,21 +98,21 @@ it('Core Is', () => {
    expect(Is.uNumber([1, 2, 3], true)).toBeTruthy();
    expect(Is.sNumber([1, 2, 3], true)).toBeFalsy();
 
-   // # Is.undefined(value: any, each = false)
+   // # Is.undefined(value: any, each = false): boolean
    // ## Check the value is undefined
    expect(Is.undefined(undefined)).toBeTruthy();
 
    // ## Check for each element of the array
    expect(Is.undefined([undefined, null], true)).toBeFalsy();
 
-   // # Is.null(value: any, each = false)
+   // # Is.null(value: any, each = false): boolean
    // ## Check the value is null
    expect(Is.null(null)).toBeTruthy();
 
    // ## Check for each element of the array
    expect(Is.null([undefined, null], true)).toBeFalsy();
 
-   // # Is.object(value: any, options?: { rules: ObjectCommonType; suitable?: boolean })
+   // # Is.object(value: any, options?: { rules: ObjectCommonType; suitable?: boolean }): boolean
    // ## Check the value is a valid object key-value pair
    expect(Is.object(null)).toBeFalsy();
    expect(Is.object({})).toBeTruthy();
@@ -131,7 +131,7 @@ it('Core Is', () => {
    // ## Deep check
    expect(Is.object({ foo: 123, bar: false }, { rules: { foo: 'number', bar: { number: 'number' } } })).toBeFalsy();
 
-   // # Is.array(value: any, options?: { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean })
+   // # Is.array(value: any, options?: { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean }): boolean
    // ## Check the value is a valid array
    expect(Is.array({})).toBeFalsy();
    expect(Is.array([1, 2, 3])).toBeTruthy();
@@ -147,7 +147,7 @@ it('Core Is', () => {
    expect(Is.array([{ foo: 123, bar: false }], { rules: { foo: 'number', bar: 'boolean' } })).toBeTruthy();
    expect(Is.array([{ foo: 123, bar: false }], { rules: { foo: 'number', bar: { number: 'number' } } })).toBeFalsy();
 
-   // # Is.equals(a: any, b: any)
+   // # Is.equals(a: any, b: any): boolean
    // ## Compare two values are equals or not
    expect(Is.equals(123, '123')).toBeFalsy();
    expect(Is.equals(undefined, null)).toBeFalsy();
@@ -164,7 +164,7 @@ it('Core Is', () => {
    expect(Is.equals({ foo: 'bar', bar: 123 }, { bar: 123, foo: 'bar2' })).toBeFalsy();
    expect(Is.equals({ foo: 'bar', bar: 123 }, { bar: 123 })).toBeFalsy();
 
-   // # Is.flatValue(value: any)
+   // # Is.flatValue(value: any): boolean
    // ## The flat value is a primitive value
    expect(Is.flatValue(123)).toBeTruthy();
    expect(Is.flatValue(-123)).toBeTruthy();
@@ -180,7 +180,7 @@ it('Core Is', () => {
    expect(Is.flatValue(new Set())).toBeFalsy();
    expect(Is.flatValue(new Map())).toBeFalsy();
 
-   // # Is.empty(value: any)
+   // # Is.empty(value: any): boolean
    expect(Is.empty(0)).toBeTruthy();
    expect(Is.empty(0.0)).toBeTruthy();
    expect(Is.empty(false)).toBeTruthy();
@@ -196,7 +196,7 @@ it('Core Is', () => {
    expect(Is.empty([1])).toBeFalsy();
    expect(Is.empty({ foo: 'bar' })).toBeFalsy();
 
-   // # Is.nothing(value: any)
+   // # Is.nothing(value: any): boolean
    // ## Check the value is null | undefined | NaN
    expect(Is.nothing(null)).toBeTruthy();
    expect(Is.nothing(undefined)).toBeTruthy();
@@ -206,7 +206,7 @@ it('Core Is', () => {
    const arr = [{ foo: 123, bar: { number: { digit: 123 } } }];
    expect(Is.array(arr, { rules: { foo: 'number', bar: { number: { digit: 'uint' } } } })).toBeTruthy();
 
-   // # Is.strongPassword(value: string, options?: { minLength?: number; noSpaces?: boolean })
+   // # Is.strongPassword(value: string, options?: { minLength?: number; noSpaces?: boolean }): boolean
    // ## Check the value is a strong password, returns false if the value is not a string
    const pwd = 'MyStrongPwd@123';
    expect(Is.strongPassword(pwd)).toBeTruthy();
@@ -215,7 +215,7 @@ it('Core Is', () => {
    expect(Is.strongPassword(`${pwd} has space`)).toBeFalsy();
    expect(Is.strongPassword(`${pwd} has space`, { noSpaces: false })).toBeTruthy();
 
-   // # Is.flatObject(value: any, allowArray?: boolean | { root?: boolean; deep?: boolean })
+   // # Is.flatObject(value: any, allowArray?: boolean | { root?: boolean; deep?: boolean }): boolean
    // ##  The flat object contains all the properties which are flat value (primitive)
    expect(Is.flatObject({ foo: new Map(), bar: new Set() })).toBeFalsy();
 
