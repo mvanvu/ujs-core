@@ -1,8 +1,8 @@
 import { DateTimeLike } from './datetime';
 export declare class Hash {
     static getCrypto(): any;
-    static randomBytes(size: number): any;
-    static uuid(): any;
+    static randomBytes(size: number): Uint8Array | number[];
+    static uuid(): string;
     static sha256(str: string): Promise<string>;
     static encodeBase64(str: string): string;
     static decodeBase64(str: string): string;
@@ -30,7 +30,7 @@ export declare class JWT {
         iat: DateTimeLike;
         secret: string;
     }): Promise<string>;
-    verify(token: string, options: {
+    verify<T>(token: string, options: {
         secret: string;
-    }): Promise<any>;
+    }): Promise<T>;
 }

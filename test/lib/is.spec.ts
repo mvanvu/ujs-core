@@ -87,6 +87,8 @@ it('Core Is', () => {
    // ## Check the value is a number
    expect(Is.number(-123)).toBeTruthy();
 
+   const n = Is.number('123');
+
    // ## Check the value is a signed number
    expect(Is.sNumber(123)).toBeFalsy();
 

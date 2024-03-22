@@ -17,7 +17,7 @@ it('Core String', () => {
    expect(Str.from('HelloWorld').lFirst()).toEqual('helloWorld');
    expect(Str.from('helloWorld').uFirst()).toEqual('HelloWorld');
 
-   // # Str.truncate(str: string, options?: { maxLength?: number; wordCount?: boolean; pad?: string })
+   // # truncate(str: string, options?: { maxLength?: number; wordCount?: boolean; pad?: string }): string
    expect(Str.truncate('hi-diddly-ho there, neighborino', { maxLength: 19 })).toEqual('hi-diddly-ho there,...');
    expect(Str.from('hi-diddly-ho there, neighborino').truncate({ maxLength: 19 })).toEqual('hi-diddly-ho there,...');
 
@@ -27,7 +27,7 @@ it('Core String', () => {
    // ## Custom three dots
    expect(Str.from('hi-diddly-ho there, neighborino').truncate({ maxLength: 19, pad: '$$$' })).toEqual('hi-diddly-ho there,$$$');
 
-   // # Str.repeat(char: string, level = 0)
+   // # repeat(char: string, level = 0: string
    expect(Str.repeat('-', 0.4)).toEqual('');
    expect(Str.repeat('-', -1)).toEqual('');
    expect(Str.repeat('-', 0)).toEqual('');

@@ -1,11 +1,11 @@
-import { CommonType } from '../type';
+import { CommonType, LastElement, ObjectRecord, DefaultObject } from '../type';
 export declare class Transform {
     static trim(value: any, options?: {
         specialChars?: string;
         pos?: 'left' | 'right' | 'both';
     }): string;
     static toString(value: any): string;
-    static toJsonObject<T = any[] | Record<string, any>>(value: any, defaultJson?: T): T;
+    static toJsonObject<T extends any[] | ObjectRecord>(value: any, defaultJson?: T): DefaultObject<T>;
     static toBoolean(value: any): boolean;
     static toNumber(value: any): number;
     static toUNumber(value: any): number;
@@ -16,9 +16,9 @@ export declare class Transform {
     static toAlnum(value: any): string;
     static toNoneDiacritics(value: any): string;
     static toNonAccentVietnamese(value: any): string;
-    static toASCIIString(value: any): any;
+    static toASCIIString(value: any): string;
     static toSafeFileName(value: any): string;
-    static toDefault(value: any, ...defValues: any[]): any;
+    static toDefault<T extends any[]>(value: any, ...defValues: T): LastElement<T>;
     static toStripTags(value: any, allowedTags?: string): string;
     static toSafeHtml(value: any, options?: {
         allowedTags?: string[];

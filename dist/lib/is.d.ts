@@ -8,28 +8,28 @@ export declare class IsError extends Error {
 export declare class Is {
     static typeOf(value: any, type: CommonType, each?: boolean): boolean;
     static equals(a: any, b: any): boolean;
-    static emptyObject(obj: any): boolean;
-    static date(d: any): boolean;
-    static datetime(d: any): boolean;
-    static dateString(d: any): boolean;
-    static flatValue(value: any): boolean;
-    static empty(value: any): boolean;
+    static emptyObject(obj: any, each?: boolean): boolean;
+    static date(d: any, each?: boolean): boolean;
+    static datetime(d: any, each?: boolean): boolean;
+    static dateString(d: any, each?: boolean): boolean;
+    static flatValue(value: any, each?: boolean): boolean;
+    static empty(value: any, each?: boolean): boolean;
     static nothing(value: any): boolean;
     static object(value: any, options?: ObjectRulesOptions): boolean;
     static flatObject(value: any, allowArray?: boolean | {
         root?: boolean;
         deep?: boolean;
     }): boolean;
-    static objectOrArray(value: any): boolean;
+    static objectOrArray<T>(value: T): boolean;
     static array(value: any, options?: {
         rules: CommonType | ObjectCommonType;
         suitable?: boolean;
         notEmpty?: boolean;
     }): boolean;
-    static asyncFunc(value: any): boolean;
+    static asyncFunc(value: any, each?: boolean): boolean;
     static func(value: any, each?: boolean): boolean;
-    static callable(value: any): boolean;
-    static number(value: any, each?: boolean): boolean;
+    static callable(value: any, each?: boolean): boolean;
+    static number<T>(value: T, each?: boolean): boolean;
     static sNumber(value: any, each?: boolean): boolean;
     static uNumber(value: any, each?: boolean): boolean;
     static int(value: any, each?: boolean): boolean;
@@ -48,9 +48,9 @@ export declare class Is {
     static set(value: any, each?: boolean): boolean;
     static regex(value: any, each?: boolean): boolean;
     static nodeJs(): boolean;
-    static nullOrUndefined(value: any): boolean;
+    static nullOrUndefined(value: any, each?: boolean): boolean;
     static strongPassword(value: any, options?: {
         minLength?: number;
         noSpaces?: boolean;
-    }): boolean;
+    }, each?: boolean): boolean;
 }

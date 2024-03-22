@@ -425,7 +425,7 @@ export class Is {
       return true;
    }
 
-   static objectOrArray(value: any): boolean {
+   static objectOrArray<T>(value: T): boolean {
       return Is.object(value) || Is.array(value);
    }
 
@@ -483,7 +483,7 @@ export class Is {
       return Is.func(value) || Is.asyncFunc(value) || value instanceof Promise;
    }
 
-   static number(value: any, each = false): boolean {
+   static number<T>(value: T, each = false): boolean {
       return Is.typeOf(value, 'number', each);
    }
 

@@ -28,7 +28,7 @@ Str.from('HelloWorld').lFirst(); // It returns: 'helloWorld'
 Str.from('helloWorld').uFirst(); // It returns: 'HelloWorld'
 ```
 
-#### Str.truncate(str: string, options?: { maxLength?: number; wordCount?: boolean; pad?: string })
+#### truncate(str: string, options?: { maxLength?: number; wordCount?: boolean; pad?: string }): string
 
 ```javascript
 Str.truncate('hi-diddly-ho there, neighborino', { maxLength: 19 }); // It returns: 'hi-diddly-ho there,...'
@@ -41,7 +41,7 @@ Str.truncate('Hello world, Im new guy', { maxLength: 3, wordCount: true }); // I
 Str.from('hi-diddly-ho there, neighborino').truncate({ maxLength: 19, pad: '$$$' }); // It returns: 'hi-diddly-ho there,$$$'
 ```
 
-#### Str.repeat(char: string, level = 0)
+#### repeat(char: string, level = 0: string
 
 ```javascript
 Str.repeat('-', 0.4); // It returns: ''

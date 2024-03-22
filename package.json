@@ -1,7 +1,7 @@
 {
    "name": "@mvanvu/ujs",
    "author": "Rainy",
-   "version": "0.0.1",
+   "version": "0.0.2",
    "main": "dist/index.js",
    "types": "dist/index.d.ts",
    "files": [
@@ -22,7 +22,7 @@
    ],
    "scripts": {
       "serve": "webpack server",
-      "build": "webpack build",
+      "build": "rm -R dist && webpack build",
       "test": "jest",
       "docs": "ts-node scripts/docs.ts && prettier --parser markdown --write \"docs/*.md\"",
       "npm-publish": "yarn publish --access=public"

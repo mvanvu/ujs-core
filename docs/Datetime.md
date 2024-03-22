@@ -41,11 +41,11 @@ dt.gte('2024-02-28'); // It returns: true
 #### Start/End Of
 
 ```javascript
-// startOf(): move to the start of date
+// startOf(): DateTime -> move to the start of date
 DateTime.from('2024-02-28 13:00:00').startOf().format('YYYY-MM-DD HH:mm:ss'); // It returns: '2024-02-28 00:00:00'
 DateTime.now().startOf().eq(DateTime.yesterday().addDate(1).startOf()); // It returns: true
 
-// endOf(): move to the end of date
+// endOf(): DateTime -> move to the end of date
 DateTime.from('2024-02-28 13:00:00').endOf().format('YYYY-MM-DD HH:mm:ss'); // It returns: '2024-02-28 23:59:59'
 DateTime.now().endOf().eq(DateTime.yesterday().addDate(1).endOf()); // It returns: true
 ```

@@ -1,18 +1,19 @@
+import { Path, NestedPick, NestedOmit, ExtendsObject, ExtendsObjects, DefaultObject, ObjectRecord } from '../type';
 export declare class Obj {
-    private objects;
-    constructor(objects: Record<string, any>);
-    static pick<T extends object>(source: T, props: string | string[]): import("./registry").RegistryDataType;
-    static omit<T extends object>(source: T, props: string | string[]): import("./registry").RegistryDataType;
-    static contains(source: object, target: object | string): boolean;
-    static excludes<T extends object, K extends keyof T>(target: T, props: K[] | K): Omit<T, K>;
-    static extends(target: object, ...sources: object[]): object;
-    static reset<T extends object>(obj: object, newData?: T): T | {};
-    static from(o: Record<string, any>): Obj;
-    static initPropValue<T>(o: Record<string, any>, prop: string, value: T): T;
-    contains(target: Record<string, any> | string): boolean;
-    extends(...sources: Record<string, any>[]): object;
-    reset<T extends Record<string, any>>(newData?: T): {} | T;
+    #private;
+    constructor(objects: ObjectRecord);
+    static pick<T extends ObjectRecord, K extends Path<T>>(source: T, props: K | K[]): NestedPick<T, K>;
+    static omit<T extends ObjectRecord, K extends Path<T>>(source: T, props: K | K[]): NestedOmit<T, K>;
+    static excludes<T extends ObjectRecord, K extends Path<T>>(source: T, props: K | K[]): NestedOmit<T, K>;
+    static contains(source: ObjectRecord, target: ObjectRecord | string): boolean;
+    static extends<T extends ObjectRecord, O extends ObjectRecord[]>(target: T, ...sources: O): ExtendsObjects<T, O>;
+    static reset<T extends undefined | null | ObjectRecord>(obj: ObjectRecord, newData?: T): DefaultObject<T>;
+    static from(o: ObjectRecord): Obj;
+    static initPropValue<T>(o: ObjectRecord, prop: string, value: T): T;
+    contains(target: ObjectRecord | string): boolean;
+    extends(...sources: ObjectRecord[]): ExtendsObject<ObjectRecord, {}>;
+    reset<T extends ObjectRecord>(newData?: T): DefaultObject<T>;
     initPropValue<T>(prop: string, value: T): T;
-    valueOf(): Record<string, any>;
+    valueOf(): ObjectRecord;
     toString(): string;
 }

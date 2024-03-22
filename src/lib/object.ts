@@ -2,12 +2,16 @@
 import { Registry } from './registry';
 import { Is } from './is';
 import { Util } from './util';
-import { Path, NestedPick, NestedOmit, ExtendsObject, ObjectKey, ExtendsObjects, UnionToIntersection, ResetObject } from '../type';
+import { Path, NestedPick, NestedOmit, ExtendsObject, ObjectKey, ExtendsObjects, DefaultObject, ObjectRecord } from '../type';
 
 export class Obj {
-   constructor(private objects: object) {}
+   #objects: ObjectRecord;
 
-   static pick<T extends object, K extends Path<T>>(source: T, props: K | K[]): NestedPick<T, K> {
+   constructor(objects: ObjectRecord) {
+      this.#objects = objects;
+   }
+
+   static pick<T extends ObjectRecord, K extends Path<T>>(source: T, props: K | K[]): NestedPick<T, K> {
       const src = Registry.from(source);
       const dest = Registry.from();
 
@@ -18,7 +22,7 @@ export class Obj {
       return dest.valueOf();
    }
 
-   static omit<T extends object, K extends Path<T>>(source: T, props: K | K[]): NestedOmit<T, K> {
+   static omit<T extends ObjectRecord, K extends Path<T>>(source: T, props: K | K[]): NestedOmit<T, K> {
       const dest = Registry.from(source);
 
       for (const prop of Array.isArray(props) ? props : [props]) {
@@ -28,7 +32,12 @@ export class Obj {
       return dest.valueOf();
    }
 
-   static contains(source: object, target: object | string): boolean {
+   /** @deprecated Use Obj.omit instead, will remove in 0.1.x */
+   static excludes<T extends ObjectRecord, K extends Path<T>>(source: T, props: K | K[]): NestedOmit<T, K> {
+      return Obj.omit(source, props);
+   }
+
+   static contains(source: ObjectRecord, target: ObjectRecord | string): boolean {
       if (typeof target === 'string') {
          const paths = target.split('.');
          let o = source;
@@ -53,15 +62,7 @@ export class Obj {
       return true;
    }
 
-   static excludes<T extends object, K extends keyof T>(target: T, props: K[] | K): Omit<T, K> {
-      for (const prop of Array.isArray(props) ? props : [props]) {
-         delete target[prop];
-      }
-
-      return target;
-   }
-
-   static #extendsOne<T extends object, O extends object>(target: T, source: O): ExtendsObject<T, O> {
+   static #extendsOne<T extends ObjectRecord, O extends ObjectRecord>(target: T, source: O): ExtendsObject<T, O> {
       const result = target as ExtendsObject<T, O>;
 
       for (const key in source) {
@@ -79,11 +80,11 @@ export class Obj {
       return result;
    }
 
-   static extends<T extends object, O extends object[]>(target: T, ...sources: O): ExtendsObjects<T, O> {
+   static extends<T extends ObjectRecord, O extends ObjectRecord[]>(target: T, ...sources: O): ExtendsObjects<T, O> {
       return (!sources.length ? target : Obj.extends(Obj.#extendsOne(target, sources.shift()), ...sources)) as ExtendsObjects<T, O>;
    }
 
-   static reset<T extends undefined | null | object>(obj: object, newData?: T): ResetObject<T> {
+   static reset<T extends undefined | null | ObjectRecord>(obj: ObjectRecord, newData?: T): DefaultObject<T> {
       // Clean the object first
       for (const k in obj) {
          delete obj[k];
@@ -93,38 +94,38 @@ export class Obj {
          Object.assign(obj, newData);
       }
 
-      return obj as ResetObject<T>;
+      return obj;
    }
 
-   static from(o: Record<string, any>): Obj {
+   static from(o: ObjectRecord): Obj {
       return new Obj(o);
    }
 
-   static initPropValue<T>(o: Record<string, any>, prop: string, value: T): T {
+   static initPropValue<T>(o: ObjectRecord, prop: string, value: T): T {
       return Registry.from(o, { clone: false }).initPathValue(prop, value);
    }
 
-   contains(target: Record<string, any> | string): boolean {
-      return Obj.contains(this.objects, target);
+   contains(target: ObjectRecord | string): boolean {
+      return Obj.contains(this.#objects, target);
    }
 
-   extends(...sources: object[]) {
-      return Obj.extends(this.objects, ...sources);
+   extends(...sources: ObjectRecord[]) {
+      return Obj.extends(this.#objects, ...sources);
    }
 
-   reset<T extends Record<string, any>>(newData?: T) {
-      return Obj.reset(this.objects, newData);
+   reset<T extends ObjectRecord>(newData?: T) {
+      return Obj.reset(this.#objects, newData);
    }
 
    initPropValue<T>(prop: string, value: T): T {
-      return Obj.initPropValue(this.objects, prop, value);
+      return Obj.initPropValue(this.#objects, prop, value);
    }
 
-   valueOf(): object {
-      return this.objects;
+   valueOf(): ObjectRecord {
+      return this.#objects;
    }
 
    toString(): string {
-      return JSON.stringify(this.objects);
+      return JSON.stringify(this.#objects);
    }
 }

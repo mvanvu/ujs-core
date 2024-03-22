@@ -20,7 +20,7 @@ it('Util Registry', () => {
    // ## The transform will be ignored if has any default value
    expect(registry.get('bar.foo3', 1, 'string')).toEqual(1);
 
-   // # registry.set(path: string, value: any)
+   // # set(path: string, value: any, validate?: boolean): Registry
    registry.set('animal.list', ['dog', 'cat']);
    expect(registry.get('animal.list')).toEqual(['dog', 'cat']);
    expect(registry.get('animal.list.0')).toEqual('dog');
@@ -32,12 +32,12 @@ it('Util Registry', () => {
    expect(registry.get('animal')).toEqual(['dog', 'cat', 'tiger']);
    expect(registry.get('animal.2')).toEqual('tiger');
 
-   // # registry.has(path: string)
+   // # has(path: string): boolean
    expect(registry.has('animal')).toBeTruthy();
    expect(registry.has('animal.list')).toBeFalsy();
    expect(registry.has('animal.2')).toBeTruthy();
 
-   // # registry.is(path: string, compareValue?: any)
+   // # is(path: string, compareValue?: any): boolean
    expect(registry.is('animal.2', 'cat')).toBeFalsy();
    expect(registry.is('animal.2', 'tiger')).toBeTruthy();
 
@@ -51,21 +51,21 @@ it('Util Registry', () => {
    // ## Return the object data
    registry.valueOf();
 
-   // # registry.pick(paths: string[] | string)
+   // # pick(paths: string[] | string): Registry
    expect(registry.pick('bar.foo2').has('foo')).toBeFalsy();
    expect(registry.pick('bar.foo2').has('bar.foo1')).toBeFalsy();
    expect(registry.pick('bar.foo2').has('bar.foo2')).toBeTruthy();
 
-   // # registry.omit(paths: string[] | string)
+   // # omit(paths: string[] | string): Registry
    expect(registry.omit('bar.foo2').has('bar.foo2')).toBeFalsy();
 
-   // # registry.clone()
+   // # clone(): Registry
    const clone = registry.clone();
    clone.set('foo', 456);
    expect(clone.get('foo')).toEqual(456);
    expect(registry.get('foo')).toEqual(123);
 
-   // # registry.merge(data: any)
+   // # merge(data: any, validate?: boolean): Registry
    registry.merge({ bar: { foo3: 'bar3' }, foo2: 456 });
    expect(registry.get('foo2')).toEqual(456);
    expect(registry.get('bar.foo1')).toEqual('bar1');
@@ -74,7 +74,7 @@ it('Util Registry', () => {
    expect(registry.get('bar')).toEqual(456);
    expect(registry.isValidData()).toBeFalsy();
 
-   // # registry.parse(data?: any, options?: { validate?: boolean; clone?: boolean })
+   // # parse(data?: any, options?: { validate?: boolean; clone?: boolean }): Registry
    // ## Parse the data to Array or Flat Object and override the current data
    registry.parse([1, 'foo', 2, 'bar', { foo: 'bar' }]);
    expect(registry.get('0')).toEqual(1);
@@ -90,7 +90,7 @@ it('Util Registry', () => {
    registry.remove('array.4.foo');
    expect(registry.has('array.4.foo')).toBeFalsy();
 
-   // # Caching (testing purpose)
+   // # isCached(path: string): boolean
    registry.set('array.4.foo', 456);
    registry.get('array.4.foo');
    expect(registry.isCached('array.4.foo')).toBeTruthy();
@@ -98,17 +98,17 @@ it('Util Registry', () => {
    registry.set('array.4', 456);
    expect(registry.isCached('array.4.foo')).toBeFalsy();
 
-   // # registry.initPathValue<T>(o: Record<string, any>, prop: string, value: T) : T
+   // # initPathValue<T>(path: string, value: T, validate?: boolean): T
    // ## Init and returns the property value if it isn't set yet
    registry.parse({});
    registry.initPathValue('foo', 'bar');
    expect(registry.get('foo')).toEqual('bar');
 
-   // # The value will not change because the property has already init
+   // ## The value will not change because the property has already init
    registry.initPathValue('foo', 'bar2');
    expect(registry.get('foo')).toEqual('bar');
 
-   // # Init deep property
+   // ## Init deep property
    registry.initPathValue('animal.list', ['dog', 'cat']);
    expect(registry.get('animal.list')).toEqual(['dog', 'cat']);
 
@@ -116,7 +116,7 @@ it('Util Registry', () => {
    registry.initPathValue('animal.list', ['tiger']);
    expect(registry.get('animal.list')).toEqual(['dog', 'cat']);
 
-   // # registry.validate() -> validate data
+   // # validate(data?: any): Registry | throw RegistryDataError
    // ## No function value
    expect(() => registry.parse({ foo: () => {} }).validate()).toThrow(RegistryDataError);
 
@@ -127,7 +127,7 @@ it('Util Registry', () => {
    expect(() => Registry.from({ foo: new Map(), bar: new Set() }).validate()).toThrow(RegistryDataError);
    expect(() => Registry.from([{ foo: 1 }, { bar: { func: () => {} } }]).validate()).toThrow(RegistryDataError);
 
-   // ## registry.isValidData() -> check the data is valid
+   // ## isValidData(data?: any): boolean
    expect(Registry.from([{ foo: 1 }, { bar: { bar2: 123 } }]).isValidData()).toBeTruthy();
    expect(Registry.from([{ foo: 1 }, { bar: { func: () => {} } }]).isValidData()).toBeFalsy();
 });

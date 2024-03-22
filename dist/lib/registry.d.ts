@@ -1,4 +1,5 @@
-export type RegistryDataType = Record<string, any> | any[];
+import { ObjectRecord } from 'src/type';
+export type RegistryDataType = ObjectRecord | any[];
 export declare class RegistryDataError extends Error {
 }
 export declare class Registry {
@@ -12,16 +13,16 @@ export declare class Registry {
         validate?: boolean;
         clone?: boolean;
     }): Registry;
-    merge(data: any, validate?: boolean): this;
+    merge(data: any, validate?: boolean): Registry;
     parse(data?: any, options?: {
         validate?: boolean;
         clone?: boolean;
-    }): this;
-    validate(data?: any): this;
+    }): Registry;
+    validate(data?: any): Registry;
     isValidData(data?: any): boolean;
     private isPathNum;
     get<T>(path: string, defaultValue?: any, filter?: string | string[]): T;
-    set(path: string, value: any, validate?: boolean): this;
+    set(path: string, value: any, validate?: boolean): Registry;
     initPathValue<T>(path: string, value: T, validate?: boolean): T;
     has(path: string): boolean;
     is(path: string, compareValue?: any): boolean;
@@ -29,9 +30,9 @@ export declare class Registry {
     isPathArray(path?: string): boolean;
     isPathObject(path?: string): boolean;
     isPathFlat(path: string): boolean;
-    remove(path: string): this;
+    remove(path: string): Registry;
     toString(): string;
-    valueOf(): RegistryDataType;
+    valueOf<T extends RegistryDataType>(): T;
     clone(): Registry;
     pick(paths: string[] | string): Registry;
     omit(paths: string[] | string): Registry;

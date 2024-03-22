@@ -1,7 +1,7 @@
 import { Util, UtilRaceError } from '../../src';
 
 it('Core Util', async () => {
-   // # clone<T>(src: T): T (any type and ignore reference pointer)
+   // # clone<T>(src: T): T => (any type and ignore reference pointer)
    const foo = { bar: 123 };
    const foo2 = Util.clone(foo);
    foo2.bar = 456;
@@ -10,7 +10,7 @@ it('Core Util', async () => {
    const fn = () => 1;
    expect(Util.clone(fn)).toEqual(fn);
 
-   // # Callback(fn, params: any[], instanceThis?: any): an async function to call if the value is callable
+   // # async callback<T>(fn: any, params: any[] = [], inst?: any): Promise<T> => an async function to call if the value is callable
    // ## Call a none function, just do nothing and return it
    expect(await Util.callback('Im not callable')).toEqual('Im not callable');
 
@@ -31,7 +31,7 @@ it('Core Util', async () => {
    // ## When the callback is an instance of Promise, then the arguments and this instance will be ignored
    expect(await Util.callback(new Promise((resolve) => resolve('Im here')))).toEqual('Im here');
 
-   // # sort(data: any[] | object, options?: { key?: string })
+   // # sort<T extends any[] | ObjectRecord>(data: T, options?: { key?: string }): T
    expect(Util.sort(['March', 'Jan', 'Feb', 'Dec'])).toEqual(['Dec', 'Feb', 'Jan', 'March']);
    expect(Util.sort([1, 30, 4, 21, 100000])).toEqual([1, 4, 21, 30, 100000]);
    expect(Object.keys(Util.sort({ foo: 10, bar: 20 }))).toEqual(['bar', 'foo']);
@@ -39,7 +39,7 @@ it('Core Util', async () => {
    const sorted = Util.sort(Array({ foo: 10, bar: 20 }, { foo: 5, bar: 10 }), { key: 'foo' });
    expect(sorted).toEqual(Array({ foo: 5, bar: 10 }, { foo: 10, bar: 20 }));
 
-   // # baseName(path: string, suffix?: string)
+   // # baseName(path: string, suffix?: string): string
    expect(Util.baseName('/www/site/home.html')).toEqual('home.html');
    expect(Util.baseName('/www/site/home.html', '.html')).toEqual('home');
    expect(Util.baseName('/some/path/')).toEqual('path');
@@ -48,7 +48,7 @@ it('Core Util', async () => {
    expect(Util.dirName('/etc/passwd')).toEqual('/etc');
    expect(Util.dirName('/some/path/to/')).toEqual('/some/path');
 
-   // # async race(callback: any, maxMiliseconds: number) -> Run a callback in the limited time (miliseconds)
+   // # race<T>(callback: any, maxMiliseconds: number): Promise<T> => Run a callback in the limited time (miliseconds)
    // ## Run the callback in around of maximum seconds otherwise it will be thrown an instance of UtilRaceError
    expect(await Util.race('Im not callable', 1)).toEqual('Im not callable');
 
@@ -63,10 +63,10 @@ it('Core Util', async () => {
 
    expect((await timeout()) instanceof UtilRaceError).toBeTruthy();
 
-   // # Util.debug(...entries: any[])
+   // # Util.debug(...entries: any[]): void
    // ## Log the variable with deep properties and color
    Util.debug({ user: { id: 1, ua: 'admin', age: 30, major: ['Full stack developer'] } });
 
-   // # Util.debugDev(...entries: any[])
+   // # Util.debugDev(...entries: any[]): void
    // ## The same Util.debug but only log in NodeJS and process?.env?.NODE_ENV === 'development'
 });

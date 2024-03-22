@@ -34,9 +34,39 @@ export type IsEqual<T1, T2> = T1 extends T2 ? ((<G>() => G extends T1 ? 1 : 2) e
 
 export type IsTuple<T extends ReadonlyArray<any>> = number extends T['length'] ? false : true;
 
+export type IsTruthy<T> = T extends boolean ? (T extends true ? true : false) : false;
+
+export type IsFalsy<T> = T extends boolean ? (T extends false ? true : false) : false;
+
 export type IsArray<T> = T extends any[] ? true : false;
 
 export type IsObject<T> = T extends object ? (T extends any[] ? false : true) : false;
+
+export type IsNumber<T> = T extends number | bigint ? true : false;
+
+export type IsUnsignedNumber<T> = T extends number | bigint ? (`${T}` extends `-${number}` ? false : true) : false;
+
+export type IsSignedNumber<T> = T extends number | bigint ? (`${T}` extends `-${number}` ? true : false) : false;
+
+export type IsInt<T> = T extends number | bigint ? (`${T}` extends `${number}.${number}` ? false : true) : false;
+
+export type IsUnsignedInt<T> = IsUnsignedNumber<T> extends true ? IsInt<T> : false;
+
+export type IsSignedInt<T> = IsInt<T> extends true ? IsSignedNumber<T> : false;
+
+export type IsBigInt<T> = T extends bigint ? (`${T}` extends `${number}.${number}` ? false : true) : false;
+
+export type IsUnsignedBigInt<T> = IsUnsignedNumber<T> extends true ? IsBigInt<T> : false;
+
+export type IsSignedBigInt<T> = IsBigInt<T> extends true ? IsSignedNumber<T> : false;
+
+export type IsString<T> = T extends string ? true : false;
+
+export type IsBoolean<T> = T extends boolean ? true : false;
+
+export type IsNull<T> = T extends null ? true : false;
+
+export type IsUndefined<T> = T extends undefined ? true : false;
 
 export type TupleKeys<T extends ReadonlyArray<any>> = Exclude<keyof T, keyof any[]>;
 
@@ -95,6 +125,8 @@ export type NestedPick<T extends object, K extends Path<T>> = UnionToIntersectio
 
 export type ObjectKey = string | number | symbol;
 
+export type ObjectRecord = Record<ObjectKey, any>;
+
 export type NonNeverProps<T extends object> = { [K in keyof T as T[K] extends never ? never : K]: T[K] };
 
 export type DeepPropsOmit<T, P, K> = T extends object
@@ -141,4 +173,8 @@ export type MergeObjects<T extends object[]> = T extends [infer First, ...infer 
 
 export type ExtendsObjects<T extends object, O extends object[]> = MergeObjects<[T, ...O]>;
 
-export type ResetObject<T> = IsObject<T> extends true ? T : {};
+export type DefaultObject<T> = IsObject<T> extends true ? T : {};
+
+export type FirstElement<T extends any[]> = T extends [infer First, ...infer _] ? First : undefined;
+
+export type LastElement<T extends any[]> = T extends [...infer _, infer Last] ? Last : undefined;

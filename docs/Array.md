@@ -6,7 +6,7 @@
 import { Arr } from '@mvanvu/ujs';
 ```
 
-#### Arr.sum<T>(source: T[], options?: { key?: string })
+#### Arr.sum(source: any[], options?: { key?: string }): number
 
 ```javascript
 // Calc sum of all number elements
@@ -20,7 +20,7 @@ Arr.sum([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'foo' }); // It returns: 4
 Arr.sum([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'bar' }); // It returns: 2
 ```
 
-#### Arr.avg<T>(source: T[], options?: { key?: string })
+#### Arr.avg(source: T[], options?: { key?: string }): number
 
 ```javascript
 // Calc average of all number elements
@@ -34,7 +34,7 @@ Arr.avg([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'foo' }); // It returns: 4 
 Arr.avg([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'bar' }); // It returns: 2 / 3
 ```
 
-#### Arr.min<T>(source: T[], options?: { key?: string })
+#### Arr.min<T>(source: T[], options?: { key?: string }): T
 
 ```javascript
 // Calc minimum of all number elements
@@ -48,7 +48,7 @@ Arr.min([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'foo' }); // It returns: { 
 Arr.min([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'bar' }); // It returns: { bar: 2 }
 ```
 
-#### Arr.max<T>(source: T[], options?: { key?: string })
+#### Arr.max<T>(source: T[], options?: { key?: string }): T
 
 ```javascript
 // Calc maximum of all number elements
@@ -62,7 +62,7 @@ Arr.max([{ foo: 1 }, { bar: 2 }, { foo: 3 }], { key: 'foo' }); // It returns: { 
 Arr.max([{ foo: 1 }, { bar: 2 }, { bar: 3 }], { key: 'bar' }); // It returns: { bar: 3 }
 ```
 
-#### Arr.intersect(a: any[], b: any[])
+#### Arr.intersect<T>(a: any[], b: any[]): T[]
 
 ```javascript
 // Found the intersect of two number arrays
@@ -74,7 +74,7 @@ Arr.intersect([2, 1, 4, 5], [1, 2, 3]); // It returns: [2, 1]
 Arr.intersect([{ foo: 1 }, { bar: 2 }], [{ foo: '1' }, { bar: 2 }]); // It returns: [{ bar: 2 }]
 ```
 
-#### Arr.diff(a: any[], b: any[])
+#### Arr.diff<T>(a: any[], b: any[]): T[]
 
 ```javascript
 // Find the difference of two arrays
@@ -133,7 +133,7 @@ arr.update([4, 5, 6]); // It returns: [4, 5, 6]
 arr.current(); // It returns: 4
 ```
 
-#### Arr.walk(index: number | 'first' | 'last' | 'prev' | 'next', callback: Function)
+#### Arr.walk<T>(index: number | 'first' | 'last' | 'prev' | 'next', callback: (index?: number, elements?: any[]) => T): T | undefined
 
 ```javascript
 // Walk to end of element and update its values

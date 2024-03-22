@@ -30,7 +30,7 @@ import { Arr, Str } from '../src';
                const code = matched[2];
                let subComment = code.indexOf('#') === 0 ? code.substring(1).trim() : `// ${code}`;
 
-               if (!docFile.last().includes('javascript')) {
+               if (!docFile.last<string[]>().includes('javascript')) {
                   subComment = `\n${subComment}`;
                }
 

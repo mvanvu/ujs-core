@@ -6,7 +6,7 @@
 import { Obj } from '@mvanvu/ujs';
 ```
 
-#### pick<T extends object>(source: T, props: string | string[])
+#### pick<T extends object, K extends Path<T>>(source: T, props: K | K[]): NestedPick<T, K>
 
 ```javascript
 Obj.pick({ foo: 1, bar: 2 }, ['foo']); // It returns: { foo: 1 }
@@ -15,18 +15,18 @@ Obj.pick({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, ['deep']); // It retu
 Obj.pick({ foo: 1, bar: 2, deep: { foo: 123 } }, ['deep.foo']); // It returns: { deep: { foo: 123 } }
 ```
 
-#### omit<T extends object>(source: T, props: string | string[])
+#### omit<T extends object, K extends Path<T>>(source: T, props: K | K[]): NestedOmit<T, K>
 
 ```javascript
 Obj.omit({ foo: 1, bar: 2 }, ['foo']); // It returns: { bar: 2 }
 Obj.omit({ foo: 1, bar: 2 }, ['bar']); // It returns: { foo: 1 }
 Obj.omit({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, ['deep']); // It returns: { foo: 1, bar: 2 }
 
-const fromObj = { foo: 1, bar: 2, deep: { foo: 123, bar: 456 } };
-Obj.omit(fromObj, ['deep.foo']); // It returns: { foo: 1, bar: 2, deep: { bar: 456 } }
+const fromObj = { foo: 1, bar: 2, deep: { foo: 123, bar: { foo2: 'foo2', baz: 456 } } };
+Obj.omit(fromObj, ['deep.foo']); // It returns: { foo: 1, bar: 2, deep: { bar: { baz: 456 } } }
 ```
 
-#### contains(source: object, target: object | string)
+#### contains(source: object, target: object | string): boolean
 
 ```javascript
 Obj.contains({ foo: 1, bar: 2 }, { foo: 1, bar: 2 }); // It returns: true
@@ -41,30 +41,20 @@ Obj.from({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }).contains({ deep: { fo
 Obj.from({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }).contains('deep.bar'); // It returns: true
 ```
 
-#### excludes<T extends object, K extends keyof T>(target: T, props: K[] | K): Omit<T, K>
+#### extends<T extends object, O extends object[]>(target: T, ...sources: O): ExtendsObjects<T, O>
 
 ```javascript
-const target = { foo: 1, bar: 2, deep: { foo: 123, bar: 456 } };
-Obj.excludes(target, 'bar');
-target; // It returns: [ROOT].'bar' === undefined
-
-Obj.excludes(target, ['deep']);
-target; // It returns: { foo: 1 }
-```
-
-#### extends(target: object, ...sources: object[])
-
-```javascript
-const obj = Obj.extends({ foo: 1, bar: 2 }, { bar2: { num: 789 } }, { bar2: { num2: 91011 } });
-obj; // It returns: [ROOT].'bar2.num' ===  789
-obj; // It returns: [ROOT].'bar2.num2' ===  91011
+const obj = Obj.extends({ foo: 1, bar: 2 }, { bar2: { num1: 1 } }, { bar2: { num2: 2 } }, { bool: true });
+obj; // It returns: [ROOT].'bar2.num1' ===  1
+obj; // It returns: [ROOT].'bar2.num2' ===  2
+obj; // It returns: [ROOT].'bool' ===  true
 
 // From the object instance
 const obj2 = Obj.from({ foo: 1, bar: 2 });
 obj2.extends({ bar2: { num: 789 } }, { bar2: { num2: 91011 } }); // It returns: [ROOT].'bar2.num2' ===  91011
 ```
 
-#### reset<T extends Record<string, any>>(newData?: T)
+#### reset<T extends undefined | null | object>(obj: object, newData?: T): ResetObject<T>
 
 ```javascript
 Obj.reset({ foo: 1, bar: 2 }); // It returns: {}
@@ -74,7 +64,7 @@ Obj.reset({ foo: 1, bar: 2 }, { new: 'Year' }); // It returns: { new: 'Year' }
 Obj.from({ foo: 1, bar: 2 }).reset({ new: 'Year' }); // It returns: { new: 'Year' }
 ```
 
-#### initPropValue<T>(o: Record<string, any>, prop: string, value: T) : T
+#### InitPropValue<T>(o: Record<ObjectKey, any>, prop: string, value: T): T
 
 ```javascript
 // Init and returns the property value if it isn't set yet

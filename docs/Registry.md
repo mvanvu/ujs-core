@@ -35,7 +35,7 @@ registry.get('foo', undefined, ['boolean', 'string']); // It returns: 'true'
 registry.get('bar.foo3', 1, 'string'); // It returns: 1
 ```
 
-#### registry.set(path: string, value: any)
+#### set(path: string, value: any, validate?: boolean): Registry
 
 ```javascript
 registry.set('animal.list', ['dog', 'cat']);
@@ -50,7 +50,7 @@ registry.get('animal'); // It returns: ['dog', 'cat', 'tiger']
 registry.get('animal.2'); // It returns: 'tiger'
 ```
 
-#### registry.has(path: string)
+#### has(path: string): boolean
 
 ```javascript
 registry.has('animal'); // It returns: true
@@ -58,7 +58,7 @@ registry.has('animal.list'); // It returns: false
 registry.has('animal.2'); // It returns: true
 ```
 
-#### registry.is(path: string, compareValue?: any)
+#### is(path: string, compareValue?: any): boolean
 
 ```javascript
 registry.is('animal.2', 'cat'); // It returns: false
@@ -78,7 +78,7 @@ registry.is('animal.3'); // It returns: false
 registry.valueOf();
 ```
 
-#### registry.pick(paths: string[] | string)
+#### pick(paths: string[] | string): Registry
 
 ```javascript
 registry.pick('bar.foo2').has('foo'); // It returns: false
@@ -86,13 +86,13 @@ registry.pick('bar.foo2').has('bar.foo1'); // It returns: false
 registry.pick('bar.foo2').has('bar.foo2'); // It returns: true
 ```
 
-#### registry.omit(paths: string[] | string)
+#### omit(paths: string[] | string): Registry
 
 ```javascript
 registry.omit('bar.foo2').has('bar.foo2'); // It returns: false
 ```
 
-#### registry.clone()
+#### clone(): Registry
 
 ```javascript
 const clone = registry.clone();
@@ -101,7 +101,7 @@ clone.get('foo'); // It returns: 456
 registry.get('foo'); // It returns: 123
 ```
 
-#### registry.merge(data: any)
+#### merge(data: any, validate?: boolean): Registry
 
 ```javascript
 registry.merge({ bar: { foo3: 'bar3' }, foo2: 456 });
@@ -113,7 +113,7 @@ registry.get('bar'); // It returns: 456
 registry.isValidData(); // It returns: false
 ```
 
-#### registry.parse(data?: any, options?: { validate?: boolean; clone?: boolean })
+#### parse(data?: any, options?: { validate?: boolean; clone?: boolean }): Registry
 
 ```javascript
 // Parse the data to Array or Flat Object and override the current data
@@ -132,7 +132,7 @@ registry.remove('array.4.foo');
 registry.has('array.4.foo'); // It returns: false
 ```
 
-#### Caching (testing purpose)
+#### isCached(path: string): boolean
 
 ```javascript
 registry.set('array.4.foo', 456);
@@ -143,25 +143,19 @@ registry.set('array.4', 456);
 registry.isCached('array.4.foo'); // It returns: false
 ```
 
-#### registry.initPathValue<T>(o: Record<string, any>, prop: string, value: T) : T
+#### initPathValue<T>(path: string, value: T, validate?: boolean): T
 
 ```javascript
 // Init and returns the property value if it isn't set yet
 registry.parse({});
 registry.initPathValue('foo', 'bar');
 registry.get('foo'); // It returns: 'bar'
-```
 
-#### The value will not change because the property has already init
-
-```javascript
+// The value will not change because the property has already init
 registry.initPathValue('foo', 'bar2');
 registry.get('foo'); // It returns: 'bar'
-```
 
-#### Init deep property
-
-```javascript
+// Init deep property
 registry.initPathValue('animal.list', ['dog', 'cat']);
 registry.get('animal.list'); // It returns: ['dog', 'cat']
 
@@ -170,7 +164,7 @@ registry.initPathValue('animal.list', ['tiger']);
 registry.get('animal.list'); // It returns: ['dog', 'cat']
 ```
 
-#### registry.validate() -> validate data
+#### validate(data?: any): Registry | throw RegistryDataError
 
 ```javascript
 // No function value
@@ -183,7 +177,7 @@ registry.parse({ foo: new Map(), bar: new Set() }).validate(); // Throw an excep
 Registry.from({ foo: new Map(), bar: new Set() }).validate(); // Throw an exception which instance of RegistryDataError
 Registry.from([{ foo: 1 }, { bar: { func: () => {} } }]).validate(); // Throw an exception which instance of RegistryDataError
 
-// registry.isValidData() -> check the data is valid
+// isValidData(data?: any): boolean
 Registry.from([{ foo: 1 }, { bar: { bar2: 123 } }]).isValidData(); // It returns: true
 Registry.from([{ foo: 1 }, { bar: { func: () => {} } }]).isValidData(); // It returns: false
 ```

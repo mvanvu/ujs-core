@@ -1,18 +1,18 @@
 'use strict';
 export class Str extends String {
-   get text() {
+   get text(): string {
       return this.toString();
    }
 
-   static uFirst(str: string) {
+   static uFirst(str: string): string {
       return str.length > 1 ? `${str[0].toUpperCase()}${str.substring(1)}` : str;
    }
 
-   static lFirst(str: string) {
+   static lFirst(str: string): string {
       return str.length > 1 ? `${str[0].toLowerCase()}${str.substring(1)}` : str;
    }
 
-   static toCapitalize(str: string, ignoreNoneWord = false) {
+   static toCapitalize(str: string, ignoreNoneWord = false): string {
       const words = str.split(/\b/).map(Str.uFirst);
 
       if (ignoreNoneWord) {
@@ -22,11 +22,11 @@ export class Str extends String {
       return words.join('');
    }
 
-   static toCamelCase(str: string) {
+   static toCamelCase(str: string): string {
       return Str.lFirst(Str.toCapitalize(str, true));
    }
 
-   static camelToSnackCase(str: string) {
+   static camelToSnackCase(str: string): string {
       const output: string[] = [];
 
       for (let i = 0, n = str.length; i < n; i++) {
@@ -37,7 +37,7 @@ export class Str extends String {
       return output.join('').toLowerCase();
    }
 
-   static snackToCamelCase(str: string) {
+   static snackToCamelCase(str: string): string {
       const output: string[] = [];
       let upperNext = false;
 
@@ -64,7 +64,7 @@ export class Str extends String {
       return output.join('');
    }
 
-   static truncate(str: string, options?: { maxLength?: number; wordCount?: boolean; pad?: string }) {
+   static truncate(str: string, options?: { maxLength?: number; wordCount?: boolean; pad?: string }): string {
       const pad = options.pad || '...';
       const len = options.maxLength || 50;
       str = str.trim();
@@ -90,11 +90,11 @@ export class Str extends String {
       return str;
    }
 
-   static from(strLike: any) {
+   static from(strLike: any): Str {
       return new Str(strLike);
    }
 
-   static repeat(char: string, level = 0) {
+   static repeat(char: string, level = 0): string {
       let output = char;
       level = parseInt(level.toString());
 
@@ -109,31 +109,31 @@ export class Str extends String {
       return output;
    }
 
-   uFirst() {
+   uFirst(): string {
       return Str.uFirst(this.text);
    }
 
-   lFirst() {
+   lFirst(): string {
       return Str.lFirst(this.text);
    }
 
-   toCapitalize(ignoreNoneWord = false) {
+   toCapitalize(ignoreNoneWord = false): string {
       return Str.toCapitalize(this.text, ignoreNoneWord);
    }
 
-   toCamelCase() {
+   toCamelCase(): string {
       return Str.toCamelCase(this.text);
    }
 
-   camelToSnackCase() {
+   camelToSnackCase(): string {
       return Str.camelToSnackCase(this.text);
    }
 
-   snackToCamelCase() {
+   snackToCamelCase(): string {
       return Str.snackToCamelCase(this.text);
    }
 
-   truncate(options?: { maxLength?: number; wordCount?: boolean; pad?: string }) {
+   truncate(options?: { maxLength?: number; wordCount?: boolean; pad?: string }): string {
       return Str.truncate(this.text, options);
    }
 }

@@ -6,7 +6,7 @@
 import { Util, UtilRaceError } from '@mvanvu/ujs';
 ```
 
-#### clone<T>(src: T): T (any type and ignore reference pointer)
+#### clone<T>(src: T): T => (any type and ignore reference pointer)
 
 ```javascript
 const foo = { bar: 123 };
@@ -18,7 +18,7 @@ const fn = () => 1;
 Util.clone(fn); // It returns: fn
 ```
 
-#### Callback(fn, params: any[], instanceThis?: any): an async function to call if the value is callable
+#### async callback<T>(fn: any, params: any[] = [], inst?: any): Promise<T> => an async function to call if the value is callable
 
 ```javascript
 // Call a none function, just do nothing and return it
@@ -48,7 +48,7 @@ await Util.callback(new Promise((resolve) => resolve('Im here'))); // It returns
 
 ```
 
-#### sort(data: any[] | object, options?: { key?: string })
+#### sort<T extends any[] | ObjectRecord>(data: T, options?: { key?: string }): T
 
 ```javascript
 Util.sort(['March', 'Jan', 'Feb', 'Dec']); // It returns: ['Dec', 'Feb', 'Jan', 'March']
@@ -59,7 +59,7 @@ const sorted = Util.sort(Array({ foo: 10, bar: 20 }, { foo: 5, bar: 10 }), { key
 sorted; // It returns: Array({ foo: 5, bar: 10 }, { foo: 10, bar: 20 })
 ```
 
-#### baseName(path: string, suffix?: string)
+#### baseName(path: string, suffix?: string): string
 
 ```javascript
 Util.baseName('/www/site/home.html'); // It returns: 'home.html'
@@ -74,7 +74,7 @@ Util.dirName('/etc/passwd'); // It returns: '/etc'
 Util.dirName('/some/path/to/'); // It returns: '/some/path'
 ```
 
-#### async race(callback: any, maxMiliseconds: number) -> Run a callback in the limited time (miliseconds)
+#### race<T>(callback: any, maxMiliseconds: number): Promise<T> => Run a callback in the limited time (miliseconds)
 
 ```javascript
 // Run the callback in around of maximum seconds otherwise it will be thrown an instance of UtilRaceError
@@ -92,14 +92,14 @@ const timeout = async () => {
 (await timeout()) instanceof UtilRaceError; // It returns: true
 ```
 
-#### Util.debug(...entries: any[])
+#### Util.debug(...entries: any[]): void
 
 ```javascript
 // Log the variable with deep properties and color
 Util.debug({ user: { id: 1, ua: 'admin', age: 30, major: ['Full stack developer'] } });
 ```
 
-#### Util.debugDev(...entries: any[])
+#### Util.debugDev(...entries: any[]): void
 
 ```javascript
 // The same Util.debug but only log in NodeJS and process?.env?.NODE_ENV === 'development'

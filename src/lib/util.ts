@@ -2,6 +2,7 @@
 import { Registry } from './registry';
 import { DateTime } from './datetime';
 import { Is } from './is';
+import { ObjectRecord } from 'src/type';
 
 export class UtilRaceError extends Error {}
 export class Util {
@@ -45,7 +46,7 @@ export class Util {
       return Is.asyncFunc(fn) ? await fn.apply(inst, params) : fn instanceof Promise ? await fn : Is.func(fn) ? fn.apply(inst, params) : fn;
    }
 
-   static sort(data: any[] | object, options?: { key?: string }) {
+   static sort<T extends any[] | ObjectRecord>(data: T, options?: { key?: string }): T {
       const k = options?.key;
       const compare = (a: any, b: any) => (a < b ? -1 : a > b ? 1 : 0);
 
@@ -88,7 +89,7 @@ export class Util {
       return data;
    }
 
-   static baseName(path: string, suffix?: string) {
+   static baseName(path: string, suffix?: string): string {
       let b = path;
       const lastChar = b.charAt(b.length - 1);
 
@@ -105,12 +106,12 @@ export class Util {
       return b;
    }
 
-   static dirName(path: string) {
+   static dirName(path: string): string {
       return path.replace(/\\/g, '/').replace(/\/[^/]*\/?$/, '');
    }
 
-   static async race(callback: any, maxMiliseconds: number) {
-      return await Promise.race([
+   static async race<T>(callback: any, maxMiliseconds: number): Promise<T> {
+      return <T>await Promise.race([
          Promise.resolve(Util.callback(callback)),
          new Promise((_resolve, reject) => {
             setTimeout(() => reject(new UtilRaceError('Race timeout.')), maxMiliseconds);
@@ -118,7 +119,7 @@ export class Util {
       ]);
    }
 
-   static debug(...entries: any[]) {
+   static debug(...entries: any[]): void {
       const colors = {
          object: '\u001b[35m', // Magenta for objects
          prop: '\u001b[36m', // Cyan for properties
@@ -175,7 +176,7 @@ export class Util {
       console.log(...entries.map((entry) => dump(entry, 0)));
    }
 
-   static debugDev(...entries: any[]) {
+   static debugDev(...entries: any[]): void {
       if (Is.nodeJs() && process?.env?.NODE_ENV === 'development') {
          Util.debug(...entries);
       }

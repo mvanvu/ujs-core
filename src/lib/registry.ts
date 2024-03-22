@@ -1,8 +1,9 @@
 'use strict';
+import { ObjectRecord } from 'src/type';
 import { Is } from './is';
 import { Transform } from './transform';
 import { Util } from './util';
-export type RegistryDataType = Record<string, any> | any[];
+export type RegistryDataType = ObjectRecord | any[];
 export class RegistryDataError extends Error {}
 
 export class Registry {

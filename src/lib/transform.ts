@@ -1,5 +1,5 @@
 'use strict';
-import { CommonType } from '../type';
+import { CommonType, LastElement, ObjectRecord, DefaultObject } from '../type';
 import { Is } from './is';
 
 export class Transform {
@@ -73,7 +73,7 @@ export class Transform {
    }
 
    // Convert to JSON
-   static toJsonObject<T extends any[] | Record<string, any>>(value: any, defaultJson?: T): T {
+   static toJsonObject<T extends any[] | ObjectRecord>(value: any, defaultJson?: T): DefaultObject<T> {
       if (Is.objectOrArray(value)) {
          // The Json object must be a flat key-pair value
          value = JSON.stringify(value);
@@ -135,12 +135,12 @@ export class Transform {
    }
 
    // Convert to unsigned number
-   static toUNumber(value: any) {
+   static toUNumber(value: any): number {
       return Math.abs(Transform.toNumber(value));
    }
 
    // Convert to integer
-   static toInt(value: any) {
+   static toInt(value: any): number {
       let num = Transform.toNumber(value);
 
       if (num > Number.MAX_SAFE_INTEGER) {
@@ -153,12 +153,12 @@ export class Transform {
    }
 
    // Convert to unsigned integer
-   static toUInt(value: any) {
+   static toUInt(value: any): number {
       return Math.abs(Transform.toInt(value));
    }
 
    // Convert to unique array
-   static toArrayUnique(value: any) {
+   static toArrayUnique(value: any): any[] {
       if (Array.isArray(value)) {
          const unique = [];
 
@@ -175,7 +175,7 @@ export class Transform {
    }
 
    // Convert a string to a safe URL path
-   static toPath(value: any) {
+   static toPath(value: any): string {
       return Transform.toString(value)
          .trim()
          .toLowerCase()
@@ -187,19 +187,19 @@ export class Transform {
    }
 
    // Convert a string to alnum
-   static toAlnum(value: any) {
+   static toAlnum(value: any): string {
       return Transform.toString(value)
          .trim()
          .replace(/[^a-zA-Z0-9]/g, '');
    }
 
-   static toNoneDiacritics(value: any) {
+   static toNoneDiacritics(value: any): string {
       return Transform.toString(value)
          .normalize('NFD')
          .replace(/[\u0300-\u036f]/g, '');
    }
 
-   static toNonAccentVietnamese(value: any) {
+   static toNonAccentVietnamese(value: any): string {
       value = Transform.toString(value)
          .replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
          .replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
@@ -222,7 +222,7 @@ export class Transform {
       return Transform.toNoneDiacritics(value);
    }
 
-   static toASCIIString(value: any) {
+   static toASCIIString(value: any): string {
       return Transform.clean(value, ['toString', 'toNoneDiacritics']).replace(/[^a-zA-Z0-9\s]/g, '');
    }
 
@@ -239,7 +239,7 @@ export class Transform {
       return `${Transform.toASCIIString(Transform.toPath(name))}${ext ? `.${ext}` : ''}`;
    }
 
-   static toDefault(value: any, ...defValues: any[]) {
+   static toDefault<T extends any[]>(value: any, ...defValues: T): LastElement<T> {
       const nothing = [null, undefined, NaN];
 
       if (!nothing.includes(value)) {
@@ -257,7 +257,7 @@ export class Transform {
       return undefined;
    }
 
-   static toStripTags(value: any, allowedTags?: string) {
+   static toStripTags(value: any, allowedTags?: string): string {
       // Making sure the allowed arg is a string containing only tags in lowercase (<a><b><c>)
       allowedTags = (((allowedTags || '') + '').toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('');
       const tags = /<\/?([a-z0-9]*)\b[^>]*>?/gi;
@@ -280,7 +280,7 @@ export class Transform {
       }
    }
 
-   static toSafeHtml(value: any, options?: { allowedTags?: string[]; allowedAttributes?: string[] }) {
+   static toSafeHtml(value: any, options?: { allowedTags?: string[]; allowedAttributes?: string[] }): string {
       // Allowed HTML tags and attributes
       const allowedTags = Array.isArray(options?.allowedTags)
          ? options.allowedTags
@@ -364,7 +364,7 @@ export class Transform {
       return value;
    }
 
-   static cleanIfType(value: any, typeTransform: string | string[], typeValue: CommonType | CommonType[]) {
+   static cleanIfType(value: any, typeTransform: string | string[], typeValue: CommonType | CommonType[]): any {
       for (const type of Is.array(typeValue) ? <CommonType[]>typeValue : [<CommonType>typeValue]) {
          if (Is.typeOf(value, type)) {
             return Transform.clean(value, typeTransform);
