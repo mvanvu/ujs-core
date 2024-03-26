@@ -24,4 +24,5 @@ export declare class Str extends String {
         wordCount?: boolean;
         pad?: string;
     }): string;
+    [Symbol.iterator](): Generator<string, void, unknown>;
 }

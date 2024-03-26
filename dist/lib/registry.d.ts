@@ -13,16 +13,16 @@ export declare class Registry {
         validate?: boolean;
         clone?: boolean;
     }): Registry;
-    merge(data: any, validate?: boolean): Registry;
+    merge(data: any, validate?: boolean): this;
     parse(data?: any, options?: {
         validate?: boolean;
         clone?: boolean;
-    }): Registry;
-    validate(data?: any): Registry;
+    }): this;
+    validate(data?: any): this;
     isValidData(data?: any): boolean;
     private isPathNum;
     get<T>(path: string, defaultValue?: any, filter?: string | string[]): T;
-    set(path: string, value: any, validate?: boolean): Registry;
+    set(path: string, value: any, validate?: boolean): this;
     initPathValue<T>(path: string, value: T, validate?: boolean): T;
     has(path: string): boolean;
     is(path: string, compareValue?: any): boolean;
@@ -30,7 +30,7 @@ export declare class Registry {
     isPathArray(path?: string): boolean;
     isPathObject(path?: string): boolean;
     isPathFlat(path: string): boolean;
-    remove(path: string): Registry;
+    remove(path: string): this;
     toString(): string;
     valueOf<T extends RegistryDataType>(): T;
     clone(): Registry;

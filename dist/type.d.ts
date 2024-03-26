@@ -55,3 +55,10 @@ export type ExtendsObjects<T extends object, O extends object[]> = MergeObjects<
 export type DefaultObject<T> = IsObject<T> extends true ? T : {};
 export type FirstElement<T extends any[]> = T extends [infer First, ...infer _] ? First : undefined;
 export type LastElement<T extends any[]> = T extends [...infer _, infer Last] ? Last : undefined;
+export interface EventHandler {
+    name: string;
+    priority: number;
+    once?: boolean;
+    disabled?: boolean;
+    handler: (...args: any[]) => any | Promise<any>;
+}

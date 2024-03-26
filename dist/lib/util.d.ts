@@ -6,6 +6,7 @@ export declare class Util {
     static callback<T>(fn: any, params?: any[], inst?: any): Promise<T>;
     static sort<T extends any[] | ObjectRecord>(data: T, options?: {
         key?: string;
+        desc?: boolean;
     }): T;
     static baseName(path: string, suffix?: string): string;
     static dirName(path: string): string;

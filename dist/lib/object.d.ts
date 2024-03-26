@@ -16,4 +16,9 @@ export declare class Obj {
     initPropValue<T>(prop: string, value: T): T;
     valueOf(): ObjectRecord;
     toString(): string;
+    [Symbol.iterator](): Generator<{
+        [x: string]: any;
+        [x: number]: any;
+        [x: symbol]: any;
+    }, void, unknown>;
 }

@@ -38,13 +38,13 @@ export declare class Arr extends Array {
     intersect<T>(target: any[]): T[];
     diff<T>(target: any[]): T[];
     chunk<T>(size?: number): Array<T[]>;
-    reset(): Arr;
-    current<T>(): T;
-    first<T>(): T;
-    last<T>(): T;
-    prev<T>(): T;
-    next<T>(): T;
+    reset(): this;
+    current<T>(): T | undefined;
+    first<T>(): T | undefined;
+    last<T>(): T | undefined;
+    prev<T>(): T | undefined;
+    next<T>(): T | undefined;
     walk<T>(index: number | 'first' | 'last' | 'prev' | 'next', callback: Function): T | undefined;
-    empty(): Arr;
-    update(elements: Iterable<any> | ArrayLike<any>): Arr;
+    empty(): this;
+    update(elements: Iterable<any> | ArrayLike<any>): this;
 }

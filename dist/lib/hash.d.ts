@@ -1,6 +1,6 @@
 import { DateTimeLike } from './datetime';
 export declare class Hash {
-    static getCrypto(): any;
+    static getCrypto(): Crypto | undefined;
     static randomBytes(size: number): Uint8Array | number[];
     static uuid(): string;
     static sha256(str: string): Promise<string>;
