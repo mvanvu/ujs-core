@@ -1,5 +1,6 @@
 export * from './array';
 export * from './datetime';
+export * from './event-emitter';
 export * from './util';
 export * from './hash';
 export * from './is';

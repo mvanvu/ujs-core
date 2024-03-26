@@ -128,4 +128,12 @@ export class Obj {
    toString(): string {
       return JSON.stringify(this.#objects);
    }
+
+   // Three dots syntax: ...Str
+   *[Symbol.iterator]() {
+      const obj = this.valueOf();
+      console.log({ obj });
+
+      yield { ...obj };
+   }
 }

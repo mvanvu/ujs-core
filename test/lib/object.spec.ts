@@ -61,4 +61,7 @@ it('Core Object', () => {
    // ## Try to re-init
    Obj.initPropValue(o, 'animal.list', ['tiger']);
    expect(o.animal.list).toEqual(['dog', 'cat']);
+   const objs = { ...new Obj({ foo: 'bar' }) };
+
+   console.log({ objs });
 });

@@ -3,7 +3,7 @@ import { DateTime, DateTimeLike } from './datetime';
 import { Is } from './is';
 
 export class Hash {
-   static getCrypto() {
+   static getCrypto(): Crypto | undefined {
       // Node & Browser support
       return typeof crypto !== 'undefined' ? crypto : typeof window !== 'undefined' ? window.crypto || window['msCrypto'] : void 0;
    }
@@ -12,8 +12,8 @@ export class Hash {
       const crypto = Hash.getCrypto();
 
       if (crypto !== void 0) {
-         if (crypto.randomBytes !== void 0) {
-            return crypto.randomBytes;
+         if (crypto['randomBytes'] !== void 0) {
+            return crypto['randomBytes'];
          }
 
          if (crypto.getRandomValues !== void 0) {

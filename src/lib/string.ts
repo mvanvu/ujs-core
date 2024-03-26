@@ -136,4 +136,11 @@ export class Str extends String {
    truncate(options?: { maxLength?: number; wordCount?: boolean; pad?: string }): string {
       return Str.truncate(this.text, options);
    }
+
+   // Three dots syntax: ...Str
+   *[Symbol.iterator]() {
+      for (let i = 0, n = this.text.length; i < n; i++) {
+         yield this.text[i];
+      }
+   }
 }

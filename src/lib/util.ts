@@ -46,9 +46,10 @@ export class Util {
       return Is.asyncFunc(fn) ? await fn.apply(inst, params) : fn instanceof Promise ? await fn : Is.func(fn) ? fn.apply(inst, params) : fn;
    }
 
-   static sort<T extends any[] | ObjectRecord>(data: T, options?: { key?: string }): T {
+   static sort<T extends any[] | ObjectRecord>(data: T, options?: { key?: string; desc?: boolean }): T {
       const k = options?.key;
-      const compare = (a: any, b: any) => (a < b ? -1 : a > b ? 1 : 0);
+      const desc = options?.desc === true;
+      const compare = (a: any, b: any) => (desc ? (a > b ? -1 : a < b ? 1 : 0) : a < b ? -1 : a > b ? 1 : 0);
 
       if (Array.isArray(data)) {
          if (k) {

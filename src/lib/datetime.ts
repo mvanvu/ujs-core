@@ -134,7 +134,7 @@ export class DateTime {
       return this;
    }
 
-   utc(): DateTime {
+   utc(): this {
       if (this.offset !== 0) {
          const utcTimeInMilliseconds = this.date.getTime() - -this.offset * 60000;
          this.date.setTime(utcTimeInMilliseconds);
@@ -151,7 +151,7 @@ export class DateTime {
       return dt;
    }
 
-   add(interval: number, unit: DateTimeUnit = 'millisecond'): DateTime {
+   add(interval: number, unit: DateTimeUnit = 'millisecond'): this {
       switch (unit) {
          case 'millisecond':
             this.date.setMilliseconds(this.date.getMilliseconds() + interval);
@@ -189,77 +189,77 @@ export class DateTime {
       return this;
    }
 
-   addYear(year: number): DateTime {
+   addYear(year: number): this {
       return this.add(year, 'year');
    }
 
-   addMonth(month: number): DateTime {
+   addMonth(month: number): this {
       return this.add(month, 'month');
    }
 
-   addWeek(week: number): DateTime {
+   addWeek(week: number): this {
       return this.add(week, 'week');
    }
 
-   addDate(date: number): DateTime {
+   addDate(date: number): this {
       return this.add(date, 'date');
    }
 
-   addHour(hour: number): DateTime {
+   addHour(hour: number): this {
       return this.add(hour, 'hour');
    }
 
-   addMinute(minute: number): DateTime {
+   addMinute(minute: number): this {
       return this.add(minute, 'minute');
    }
 
-   addSecond(second: number): DateTime {
+   addSecond(second: number): this {
       return this.add(second, 'second');
    }
 
-   addMillisecond(millisecond: number): DateTime {
+   addMillisecond(millisecond: number): this {
       return this.add(millisecond, 'millisecond');
    }
 
-   nextDate(): DateTime {
+   nextDate(): this {
       return this.addDate(1);
    }
 
-   prevDate(): DateTime {
+   prevDate(): this {
       return this.addDate(-1);
    }
 
-   nextWeek(): DateTime {
+   nextWeek(): this {
       return this.addWeek(1);
    }
 
-   prevWeek(): DateTime {
+   prevWeek(): this {
       return this.addWeek(-1);
    }
 
-   nextMonth(): DateTime {
+   nextMonth(): this {
       return this.addMonth(1);
    }
 
-   prevMonth(): DateTime {
+   prevMonth(): this {
       return this.addMonth(-1);
    }
 
-   nextYear(): DateTime {
+   nextYear(): this {
       return this.addYear(1);
    }
 
-   prevYear(): DateTime {
+   prevYear(): this {
       return this.addYear(-1);
    }
 
-   startOf(): DateTime {
+   startOf(): this {
       this.date.setHours(0, 0, 0, 0);
 
       return this;
    }
 
-   endOf(): DateTime {
+   endOf(): this {
       this.date.setHours(23, 59, 59, 999);
 
       return this;

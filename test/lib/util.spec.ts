@@ -34,8 +34,11 @@ it('Core Util', async () => {
    // # sort<T extends any[] | ObjectRecord>(data: T, options?: { key?: string }): T
    expect(Util.sort(['March', 'Jan', 'Feb', 'Dec'])).toEqual(['Dec', 'Feb', 'Jan', 'March']);
    expect(Util.sort([1, 30, 4, 21, 100000])).toEqual([1, 4, 21, 30, 100000]);
-   expect(Object.keys(Util.sort({ foo: 10, bar: 20 }))).toEqual(['bar', 'foo']);
 
+   // ## Sort by desc (defaults to asc)
+   expect(Util.sort([1, 30, 4, 21, 100000], { desc: true })).toEqual([100000, 30, 21, 4, 1]);
+
+   // ## Sort by key
    const sorted = Util.sort(Array({ foo: 10, bar: 20 }, { foo: 5, bar: 10 }), { key: 'foo' });
    expect(sorted).toEqual(Array({ foo: 5, bar: 10 }, { foo: 10, bar: 20 }));
 

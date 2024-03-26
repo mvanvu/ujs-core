@@ -18,7 +18,7 @@ export class Registry {
       return new Registry(data, options);
    }
 
-   merge(data: any, validate?: boolean): Registry {
+   merge(data: any, validate?: boolean): this {
       const deepMerge = (data: any, path?: string) => {
          if (Is.array(data)) {
             for (let i = 0, n = data.length; i < n; i++) {
@@ -38,7 +38,7 @@ export class Registry {
       return this;
    }
 
-   parse(data?: any, options?: { validate?: boolean; clone?: boolean }): Registry {
+   parse(data?: any, options?: { validate?: boolean; clone?: boolean }): this {
       if (data === undefined) {
          data = {};
       } else if (Is.string(data) && ['{', '['].includes(data[0])) {
@@ -68,7 +68,7 @@ export class Registry {
       return this;
    }
 
-   validate(data?: any): Registry {
+   validate(data?: any): this {
       if (!this.isValidData(data)) {
          throw new RegistryDataError(
             'The object element data must be a Record<key, value> or Array<[flat] | Record<key, value>> not from any Class/Function constructor',
@@ -131,7 +131,7 @@ export class Registry {
       return <T>(filter ? Transform.clean(this.cached[path], filter) : this.cached[path]);
    }
 
-   set(path: string, value: any, validate?: boolean): Registry {
+   set(path: string, value: any, validate?: boolean): this {
       if (validate === true) {
          this.validate(value);
       }
@@ -248,7 +248,7 @@ export class Registry {
       return Is.flatValue(this.get(path));
    }
 
-   remove(path: string): Registry {
+   remove(path: string): this {
       return this.set(path, undefined);
    }
 

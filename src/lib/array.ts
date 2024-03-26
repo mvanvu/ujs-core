@@ -172,25 +172,25 @@ export class Arr extends Array {
       return Arr.chunk(this.elements, size);
    }
 
-   reset(): Arr {
+   reset(): this {
       this.#index = 0;
 
       return this;
    }
 
-   current<T>(): T {
+   current<T>(): T | undefined {
       return this.elements[this.#index];
    }
 
-   first<T>(): T {
+   first<T>(): T | undefined {
       return this.elements[(this.#index = 0)];
    }
 
-   last<T>(): T {
+   last<T>(): T | undefined {
       return this.elements[(this.#index = this.elements.length - 1)];
    }
 
-   prev<T>(): T {
+   prev<T>(): T | undefined {
       const index = this.#index - 1;
 
       if (this.elements[index] !== undefined) {
@@ -200,7 +200,7 @@ export class Arr extends Array {
       return this.elements[index];
    }
 
-   next<T>(): T {
+   next<T>(): T | undefined {
       const index = this.#index + 1;
 
       if (this.elements[index] !== undefined) {
@@ -242,13 +242,13 @@ export class Arr extends Array {
       }
    }
 
-   empty(): Arr {
+   empty(): this {
       this.splice(0, this.elements.length);
 
       return this;
    }
 
-   update(elements: Iterable<any> | ArrayLike<any>): Arr {
+   update(elements: Iterable<any> | ArrayLike<any>): this {
       this.empty().push(...Arr.from(elements));
 
       return this;

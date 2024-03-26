@@ -90,4 +90,7 @@ o.animal.list; // It returns: ['dog', 'cat']
 // Try to re-init
 Obj.initPropValue(o, 'animal.list', ['tiger']);
 o.animal.list; // It returns: ['dog', 'cat']
+const objs = { ...new Obj({ foo: 'bar' }) };
+
+console.log({ objs });
 ```

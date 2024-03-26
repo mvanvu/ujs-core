@@ -53,8 +53,11 @@ await Util.callback(new Promise((resolve) => resolve('Im here'))); // It returns
 ```javascript
 Util.sort(['March', 'Jan', 'Feb', 'Dec']); // It returns: ['Dec', 'Feb', 'Jan', 'March']
 Util.sort([1, 30, 4, 21, 100000]); // It returns: [1, 4, 21, 30, 100000]
-Object.keys(Util.sort({ foo: 10, bar: 20 })); // It returns: ['bar', 'foo']
 
+// Sort by desc (defaults to asc)
+Util.sort([1, 30, 4, 21, 100000], { desc: true }); // It returns: [100000, 30, 21, 4, 1]
+
+// Sort by key
 const sorted = Util.sort(Array({ foo: 10, bar: 20 }, { foo: 5, bar: 10 }), { key: 'foo' });
 sorted; // It returns: Array({ foo: 5, bar: 10 }, { foo: 10, bar: 20 })
 ```

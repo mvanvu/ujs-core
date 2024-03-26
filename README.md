@@ -44,6 +44,7 @@ See all the sample tests at: /test/lib
 
 -  [Array](docs/Array.md) an advanced of the JS native Array
 -  [DateTime](docs/Datetime.md) an advanced of the JS native Date
+-  [EventEmitter](docs/Event-emitter.md) an event emitter
 -  [Hash](docs/Hash.md) provide some useful methods such as: base64, sha256, uuid, JWT...
 -  [Is](docs/Is.md) validate the value that will (or will not) match some conditions
 -  [Object](docs/Object.md) provide some useful static and instance methods for the Object
