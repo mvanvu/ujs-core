@@ -72,4 +72,18 @@ it('Core Util', async () => {
 
    // # Util.debugDev(...entries: any[]): void
    // ## The same Util.debug but only log in NodeJS and process?.env?.NODE_ENV === 'development'
+
+   // # numberFormat(number: number, options?: NumberFormatOptions): string
+   expect(Util.numberFormat(1234.567)).toEqual('1,235');
+   expect(Util.numberFormat(1234.567, { decimals: 2 })).toEqual('1,234.57');
+   expect(Util.numberFormat(1234.567, { decimals: 2, decimalPoint: ',', separator: '' })).toEqual('1234,57');
+
+   // ## With prefix
+   expect(Util.numberFormat(1234.567, { decimals: 2, prefix: '$' })).toEqual('$1,234.57');
+
+   // ## With suffix
+   expect(Util.numberFormat(1234.567, { decimals: 2, suffix: 'USD' })).toEqual('1,234.57USD');
+
+   // ## With pattern (the string that contains {value})
+   expect(Util.numberFormat(1234.567, { decimals: 2, pattern: '$${value}' })).toEqual('$$1,234.57');
 });

@@ -186,3 +186,12 @@ export interface EventHandler {
    disabled?: boolean;
    handler: (...args: any[]) => any | Promise<any>;
 }
+
+export interface NumberFormatOptions {
+   decimals?: number;
+   decimalPoint?: string; // Defaults to dot (.)
+   separator?: string; // Defaults to comma (,)
+   prefix?: string;
+   suffix?: string;
+   pattern?: string;
+}

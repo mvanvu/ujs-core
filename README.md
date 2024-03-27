@@ -1,4 +1,4 @@
-# UJS (TypeScript)
+# Util JS
 
 UMD JS work on the both Browser and NodeJs
 

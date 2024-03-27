@@ -2,7 +2,7 @@
 import { Registry } from './registry';
 import { DateTime } from './datetime';
 import { Is } from './is';
-import { ObjectRecord } from 'src/type';
+import { NumberFormatOptions, ObjectRecord } from '../type';
 
 export class UtilRaceError extends Error {}
 export class Util {
@@ -181,5 +181,30 @@ export class Util {
       if (Is.nodeJs() && process?.env?.NODE_ENV === 'development') {
          Util.debug(...entries);
       }
+   }
+
+   static numberFormat(number: number, options?: NumberFormatOptions): string {
+      if (isNaN(number)) {
+         return 'NaN';
+      }
+
+      let numStr = number
+         .toFixed(options?.decimals ?? 0)
+         .replace('.', options?.decimalPoint ?? '.')
+         .replace(/\B(?=(\d{3})+(?!\d))/g, options?.separator ?? ',');
+
+      if (options?.prefix) {
+         numStr = `${options.prefix}${numStr}`;
+      }
+
+      if (options?.suffix) {
+         numStr = `${numStr}${options.suffix}`;
+      }
+
+      if (options?.pattern?.includes('{value}')) {
+         numStr = options.pattern.replace('{value}', numStr);
+      }
+
+      return numStr;
    }
 }

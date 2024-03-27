@@ -45,7 +45,7 @@ it('Core Event Emitter', async () => {
    expect(eventEmitter.emit('greet', 'Amy', 16)).toEqual([]);
 
    // # once(name: string, handler: EventHandler['handler']): this
-   // ## Trigger the event in the first time the it will be removed
+   // ## Trigger the event in the first time then remove it
    eventEmitter.once('onlyOne', () => 'The first time');
    expect(eventEmitter.emit('onlyOne')).toEqual(['The first time']);
    expect(eventEmitter.emit('onlyOne')).toEqual([]);
