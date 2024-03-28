@@ -107,11 +107,7 @@ export class EventEmitter {
       }
 
       for (const evt of events) {
-         if (Is.asyncFunc(evt.handler)) {
-            ret.push(Util.callback(evt.handler, args, null));
-         } else {
-            ret.push(evt.handler.apply(null, args));
-         }
+         ret.push((() => evt.handler.call(this, args))());
 
          if (evt.once) {
             this.remove(evt.name);
