@@ -1,4 +1,4 @@
-import { ObjectRecord } from 'src/type';
+import { NumberFormatOptions, ObjectRecord } from '../type';
 export declare class UtilRaceError extends Error {
 }
 export declare class Util {
@@ -13,4 +13,5 @@ export declare class Util {
     static race<T>(callback: any, maxMiliseconds: number): Promise<T>;
     static debug(...entries: any[]): void;
     static debugDev(...entries: any[]): void;
+    static numberFormat(number: number, options?: NumberFormatOptions): string;
 }

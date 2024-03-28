@@ -62,3 +62,11 @@ export interface EventHandler {
     disabled?: boolean;
     handler: (...args: any[]) => any | Promise<any>;
 }
+export interface NumberFormatOptions {
+    decimals?: number;
+    decimalPoint?: string;
+    separator?: string;
+    prefix?: string;
+    suffix?: string;
+    pattern?: string;
+}
