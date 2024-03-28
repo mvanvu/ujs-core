@@ -2,7 +2,7 @@
 import { Registry } from './registry';
 import { Is } from './is';
 import { Util } from './util';
-import { Path, NestedPick, NestedOmit, ExtendsObject, ObjectKey, ExtendsObjects, DefaultObject, ObjectRecord } from '../type';
+import { Path, NestedPick, NestedOmit, ExtendsObject, ExtendsObjects, DefaultObject, ObjectRecord } from '../type';
 
 export class Obj {
    #objects: ObjectRecord;
@@ -66,7 +66,7 @@ export class Obj {
       const result = target as ExtendsObject<T, O>;
 
       for (const key in source) {
-         const k = <ObjectKey>key;
+         const k = <PropertyKey>key;
          const targetData = result[k];
          const sourceData = source[k];
 

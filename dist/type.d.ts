@@ -37,8 +37,7 @@ export type UnionPick<T, K extends Path<T>> = K extends keyof T ? Pick<T, K> : K
     [P in Key]: Rest extends Path<T[P]> ? UnionPick<T[P], Rest> : never;
 } : never : never;
 export type NestedPick<T extends object, K extends Path<T>> = UnionToIntersection<UnionPick<T, K>>;
-export type ObjectKey = string | number | symbol;
-export type ObjectRecord = Record<ObjectKey, any>;
+export type ObjectRecord = Record<PropertyKey, any>;
 export type NonNeverProps<T extends object> = {
     [K in keyof T as T[K] extends never ? never : K]: T[K];
 };

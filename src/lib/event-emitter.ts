@@ -107,7 +107,7 @@ export class EventEmitter {
       }
 
       for (const evt of events) {
-         ret.push((() => evt.handler.call(this, args))());
+         ret.push(evt.handler(...args));
 
          if (evt.once) {
             this.remove(evt.name);
