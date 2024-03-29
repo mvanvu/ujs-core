@@ -1,12 +1,15 @@
 'use strict';
-import { ObjectRecord } from '../type';
+import { ObjectRecord, EventHandler } from '../type';
 import { Is } from './is';
 import { Transform } from './transform';
+import { EventEmitter } from './event-emitter';
 import { Util } from './util';
 export type RegistryDataType = ObjectRecord | any[];
 export class RegistryDataError extends Error {}
 
 export class Registry {
+   #eventEmitter = new EventEmitter();
+
    private cached: Record<string, any> = {};
    private data: RegistryDataType;
 
@@ -132,6 +135,8 @@ export class Registry {
    }
 
    set(path: string, value: any, validate?: boolean): this {
+      const prevValue = this.get(path);
+
       if (validate === true) {
          this.validate(value);
       }
@@ -200,6 +205,12 @@ export class Registry {
 
             data[keys[n]] = value;
          }
+      }
+
+      const curValue = this.get(path);
+
+      if (prevValue !== curValue) {
+         this.#eventEmitter.emit(path);
       }
 
       return this;
@@ -278,9 +289,17 @@ export class Registry {
       const registry = this.clone();
 
       for (const path of Array.isArray(paths) ? paths : [paths]) {
-         registry.remove(path);
+         this.remove(path);
       }
 
       return registry;
+   }
+
+   watch(paths: string[] | string, callback: EventHandler['handler']) {
+      for (const path of Array.isArray(paths) ? paths : [paths]) {
+         if (!this.#eventEmitter.has(path)) {
+            this.#eventEmitter.on(path, callback);
+         }
+      }
    }
 }

@@ -186,7 +186,7 @@ export interface EventHandler {
    priority: number;
    once?: boolean;
    disabled?: boolean;
-   handler: (...args: any[]) => any | Promise<any>;
+   handler: (...args: any[]) => any | Promise<any> | Function;
 }
 
 export interface NumberFormatOptions {

@@ -58,6 +58,10 @@ export class EventEmitter {
       return this;
    }
 
+   has(name: string): boolean {
+      return this.#events.findIndex((evt) => evt.name === name) !== -1;
+   }
+
    remove(name?: string | string[]): this {
       if (name === undefined) {
          this.#events.splice(0, this.#events.length);
