@@ -13,8 +13,6 @@ it('Core Object', () => {
 
    // ## Omit will applied for the object instance
    const inst = { foo: 1, bar: 2, deep: { foo: 123, bar: 456 } };
-   const inst2 = Obj.from(inst);
-   inst2.omit('')
    expect(Obj.omit(inst, ['deep'])).toMatchObject({ foo: 1, bar: 2 });
    expect(inst).not.toHaveProperty('deep');
 

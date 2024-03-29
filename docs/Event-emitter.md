@@ -52,6 +52,17 @@ eventEmitter.on('whoAmI', () => `I'm god!`, EventEmitter.HIGH); // Set the prior
 await eventEmitter.emitAsync('whoAmI'); // It returns: [`I'm god!`, 'Hmm! human']
 ```
 
+#### async emitAsyncSequently(name: string | string[], ...args: any[]): Promise<any[]>
+
+```javascript
+// The event will fire in sequentially, the next event will be fired after the previous event fired
+let isFirstFired = false;
+eventEmitter.on('sequently', () => new Promise((resolve) => setTimeout(() => resolve((isFirstFired = true)), 100)));
+eventEmitter.on('sequently', () => new Promise((resolve) => setTimeout(() => resolve(isFirstFired ? 'OK' : 'OOPS!'), 50)));
+await eventEmitter.emitAsync('sequently'); // It returns: [true, 'OOPS!']
+await eventEmitter.emitAsyncSequently('sequently'); // It returns: [true, 'OK']
+```
+
 #### open(name?: string | string[]): this
 
 ```javascript
@@ -74,7 +85,7 @@ eventEmitter.emit('greet', 'Amy', 16); // It returns: []
 #### once(name: string, handler: EventHandler['handler']): this
 
 ```javascript
-// Trigger the event in the first time the it will be removed
+// Trigger the event in the first time then remove it
 eventEmitter.once('onlyOne', () => 'The first time');
 eventEmitter.emit('onlyOne'); // It returns: ['The first time']
 eventEmitter.emit('onlyOne'); // It returns: []

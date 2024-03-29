@@ -107,3 +107,20 @@ Util.debug({ user: { id: 1, ua: 'admin', age: 30, major: ['Full stack developer'
 ```javascript
 // The same Util.debug but only log in NodeJS and process?.env?.NODE_ENV === 'development'
 ```
+
+#### numberFormat(number: number, options?: NumberFormatOptions): string
+
+```javascript
+Util.numberFormat(1234.567); // It returns: '1,235'
+Util.numberFormat(1234.567, { decimals: 2 }); // It returns: '1,234.57'
+Util.numberFormat(1234.567, { decimals: 2, decimalPoint: ',', separator: '' }); // It returns: '1234,57'
+
+// With prefix
+Util.numberFormat(1234.567, { decimals: 2, prefix: '$' }); // It returns: '$1,234.57'
+
+// With suffix
+Util.numberFormat(1234.567, { decimals: 2, suffix: 'USD' }); // It returns: '1,234.57USD'
+
+// With pattern (the string that contains {value})
+Util.numberFormat(1234.567, { decimals: 2, pattern: '$${value}' }); // It returns: '$$1,234.57'
+```

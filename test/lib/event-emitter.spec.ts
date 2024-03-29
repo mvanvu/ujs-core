@@ -31,6 +31,14 @@ it('Core Event Emitter', async () => {
    eventEmitter.on('whoAmI', () => `I'm god!`, EventEmitter.HIGH); // Set the priority is higher (100)
    expect(await eventEmitter.emitAsync('whoAmI')).toEqual([`I'm god!`, 'Hmm! human']);
 
+   // # async emitAsyncSequently(name: string | string[], ...args: any[]): Promise<any[]>
+   // ## The event will fire in sequentially, the next event will be fired after the previous event fired
+   let isFirstFired = false;
+   eventEmitter.on('sequently', () => new Promise((resolve) => setTimeout(() => resolve((isFirstFired = true)), 100)));
+   eventEmitter.on('sequently', () => new Promise((resolve) => setTimeout(() => resolve(isFirstFired ? 'OK' : 'OOPS!'), 50)));
+   expect(await eventEmitter.emitAsync('sequently')).toEqual([true, 'OOPS!']);
+   expect(await eventEmitter.emitAsyncSequently('sequently')).toEqual([true, 'OK']);
+
    // # open(name?: string | string[]): this
    // ## Re-open the events (open all of the events if the name is undefined)
    eventEmitter.open('greet');

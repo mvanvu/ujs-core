@@ -173,6 +173,10 @@ export type ExtendsObjects<T extends object, O extends object[]> = MergeObjects<
 
 export type DefaultObject<T> = IsObject<T> extends true ? T : {};
 
+export type DefaultArray<T> = IsArray<T> extends true ? T : [];
+
+export type DefaultValue<V, D> = V extends undefined | null ? D : V;
+
 export type FirstElement<T extends any[]> = T extends [infer First, ...infer _] ? First : undefined;
 
 export type LastElement<T extends any[]> = T extends [...infer _, infer Last] ? Last : undefined;

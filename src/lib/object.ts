@@ -4,14 +4,14 @@ import { Is } from './is';
 import { Util } from './util';
 import { Path, NestedPick, NestedOmit, ExtendsObject, ExtendsObjects, DefaultObject, ObjectRecord } from '../type';
 
-export class Obj {
-   #objects: ObjectRecord;
+export class Obj<OT extends ObjectRecord> {
+   #objects: OT;
 
-   constructor(objects: ObjectRecord) {
+   constructor(objects: OT) {
       this.#objects = objects;
    }
 
-   get objects(): ObjectRecord {
+   get objects(): OT {
       return this.#objects;
    }
 
@@ -101,7 +101,7 @@ export class Obj {
       return obj;
    }
 
-   static from(o: ObjectRecord): Obj {
+   static from<OT>(o: OT): Obj<OT> {
       return new Obj(o);
    }
 
@@ -121,15 +121,15 @@ export class Obj {
       return Obj.reset(this.#objects, newData);
    }
 
-   initPropValue<T>(prop: string, value: T): T {
+   initPropValue<T extends any>(prop: string, value: T): T {
       return Obj.initPropValue(this.#objects, prop, value);
    }
 
-   omit<K extends Path<this['objects']>>(props: K | K[]): NestedOmit<this['objects'], K> {
+   omit<K extends Path<OT>>(props: K | K[]): NestedOmit<OT, K> {
       return Obj.omit(this.#objects, props);
    }
 
-   valueOf(): ObjectRecord {
+   valueOf(): OT {
       return this.#objects;
    }
 

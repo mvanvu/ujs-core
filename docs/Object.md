@@ -20,7 +20,11 @@ Obj.pick({ foo: 1, bar: 2, deep: { foo: 123 } }, ['deep.foo']); // It returns: {
 ```javascript
 Obj.omit({ foo: 1, bar: 2 }, ['foo']); // It returns: { bar: 2 }
 Obj.omit({ foo: 1, bar: 2 }, ['bar']); // It returns: { foo: 1 }
-Obj.omit({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, ['deep']); // It returns: { foo: 1, bar: 2 }
+
+// Omit will applied for the object instance
+const inst = { foo: 1, bar: 2, deep: { foo: 123, bar: 456 } };
+Obj.omit(inst, ['deep']); // It returns: { foo: 1, bar: 2 }
+inst; // It returns: [ROOT].'deep' === undefined
 
 const fromObj = { foo: 1, bar: 2, deep: { foo: 123, bar: { foo2: 'foo2', baz: 456 } } };
 Obj.omit(fromObj, ['deep.foo']); // It returns: { foo: 1, bar: 2, deep: { bar: { baz: 456 } } }
@@ -90,7 +94,4 @@ o.animal.list; // It returns: ['dog', 'cat']
 // Try to re-init
 Obj.initPropValue(o, 'animal.list', ['tiger']);
 o.animal.list; // It returns: ['dog', 'cat']
-const objs = { ...new Obj({ foo: 'bar' }) };
-
-console.log({ objs });
 ```

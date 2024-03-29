@@ -2,6 +2,7 @@
 
 import { Registry } from './registry';
 import { Is } from './is';
+import { DefaultArray } from '../type';
 
 export class Arr extends Array {
    #index = 0;
@@ -142,6 +143,16 @@ export class Arr extends Array {
       arr.push(...Array.from(elements));
 
       return arr;
+   }
+
+   static update<T extends any[]>(array: any[], ...elements: T): DefaultArray<T> {
+      array.splice(0, array.length);
+
+      if (elements.length) {
+         array.push(...elements);
+      }
+
+      return array as DefaultArray<T>;
    }
 
    sum(options?: { key?: string }): number {

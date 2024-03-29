@@ -92,6 +92,13 @@ Arr.diff([2, 1, 4, 5], [1, 2, 3]); // It returns: [4, 5, 3]
 Arr.diff([{ foo: 1 }, { bar: 2 }], [{ foo: 1 }, { bar2: '2' }]); // It returns: [{ bar: 2 }, { bar2: '2' }]
 ```
 
+#### Arr.reset<T extends any[]>(array: any[], elements?: T): DefaultArray<T>
+
+```javascript
+Arr.update([4, 5, 6]); // It returns: []
+Arr.update([4, 5, 6], 1, 2, 3); // It returns: [1, 2, 3]
+```
+
 #### Step
 
 ```javascript

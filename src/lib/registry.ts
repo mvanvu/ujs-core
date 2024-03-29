@@ -1,5 +1,5 @@
 'use strict';
-import { ObjectRecord } from 'src/type';
+import { ObjectRecord } from '../type';
 import { Is } from './is';
 import { Transform } from './transform';
 import { Util } from './util';

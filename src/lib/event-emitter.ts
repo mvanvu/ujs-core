@@ -100,24 +100,29 @@ export class EventEmitter {
 
    emit(name: string | string[], ...args: any[]): any[] {
       const ret = [];
-      const events = this.getEventHandlers(name);
 
-      if (!events.length) {
-         return ret;
-      }
+      for (const event of this.getEventHandlers(name)) {
+         ret.push(event.handler.call(this, ...args));
 
-      for (const evt of events) {
-         ret.push(evt.handler.call(this, ...args));
-
-         if (evt.once) {
-            this.remove(evt.name);
+         if (event.once) {
+            this.remove(event.name);
          }
       }
 
       return ret;
    }
 
-   emitAsync(name: string | string[], ...args: any[]): Promise<any> {
+   emitAsync(name: string | string[], ...args: any[]): Promise<any[]> {
       return Promise.all(this.emit(name, ...args));
+   }
+
+   async emitAsyncSequently(name: string | string[], ...args: any[]): Promise<any[]> {
+      const ret = [];
+
+      for (const event of this.getEventHandlers(name)) {
+         ret.push(await Util.callback(event.handler, args, this));
+      }
+
+      return ret;
    }
 }

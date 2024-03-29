@@ -68,6 +68,10 @@ it('Core Array', () => {
    // ## Find the difference of two arrays by key-value pair
    expect(Arr.diff([{ foo: 1 }, { bar: 2 }], [{ foo: 1 }, { bar2: '2' }])).toEqual([{ bar: 2 }, { bar2: '2' }]);
 
+   // # Arr.reset<T extends any[]>(array: any[], elements?: T): DefaultArray<T>
+   expect(Arr.update([4, 5, 6])).toEqual([]);
+   expect(Arr.update([4, 5, 6], 1, 2, 3)).toEqual([1, 2, 3]);
+
    // # Step
    const arr = Arr.from([1, 2, 3]);
 
