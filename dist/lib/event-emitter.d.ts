@@ -9,10 +9,12 @@ export declare class EventEmitter {
     static getInstance(): EventEmitter;
     on(name: string, handler: EventHandler['handler'], priority?: number): this;
     once(name: string, handler: EventHandler['handler']): this;
+    has(name: string): boolean;
     remove(name?: string | string[]): this;
     off(name?: string | string[]): this;
     open(name?: string | string[]): this;
     getEventHandlers(name: string | string[]): EventHandler[];
     emit(name: string | string[], ...args: any[]): any[];
-    emitAsync(name: string | string[], ...args: any[]): Promise<any>;
+    emitAsync(name: string | string[], ...args: any[]): Promise<any[]>;
+    emitAsyncSequently(name: string | string[], ...args: any[]): Promise<any[]>;
 }

@@ -1,3 +1,4 @@
+import { DefaultArray } from '../type';
 export declare class Arr extends Array {
     #private;
     get elements(): any[];
@@ -23,6 +24,7 @@ export declare class Arr extends Array {
     static diff<T>(a: any[], b: any[]): T[];
     static chunk<T>(array: T[], size?: number): Array<T[]>;
     static from(elements: Iterable<any> | ArrayLike<any>): Arr;
+    static update<T extends any[]>(array: any[], ...elements: T): DefaultArray<T>;
     sum(options?: {
         key?: string;
     }): number;

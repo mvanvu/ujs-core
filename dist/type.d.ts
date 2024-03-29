@@ -52,6 +52,8 @@ export type ExtendsObject<T extends object, O extends object> = {
 export type MergeObjects<T extends object[]> = T extends [infer First, ...infer Rest] ? First extends object ? Rest extends object[] ? ExtendsObject<First, MergeObjects<Rest>> : never : never : {};
 export type ExtendsObjects<T extends object, O extends object[]> = MergeObjects<[T, ...O]>;
 export type DefaultObject<T> = IsObject<T> extends true ? T : {};
+export type DefaultArray<T> = IsArray<T> extends true ? T : [];
+export type DefaultValue<V, D> = V extends undefined | null ? D : V;
 export type FirstElement<T extends any[]> = T extends [infer First, ...infer _] ? First : undefined;
 export type LastElement<T extends any[]> = T extends [...infer _, infer Last] ? Last : undefined;
 export interface EventHandler {
@@ -59,7 +61,7 @@ export interface EventHandler {
     priority: number;
     once?: boolean;
     disabled?: boolean;
-    handler: (...args: any[]) => any | Promise<any>;
+    handler: (...args: any[]) => any | Promise<any> | Function;
 }
 export interface NumberFormatOptions {
     decimals?: number;

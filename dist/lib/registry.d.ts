@@ -1,8 +1,9 @@
-import { ObjectRecord } from 'src/type';
+import { ObjectRecord, EventHandler } from '../type';
 export type RegistryDataType = ObjectRecord | any[];
 export declare class RegistryDataError extends Error {
 }
 export declare class Registry {
+    #private;
     private cached;
     private data;
     constructor(data?: any, options?: {
@@ -36,4 +37,5 @@ export declare class Registry {
     clone(): Registry;
     pick(paths: string[] | string): Registry;
     omit(paths: string[] | string): Registry;
+    watch(paths: string[] | string, callback: EventHandler['handler']): void;
 }
