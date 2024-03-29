@@ -11,6 +11,10 @@ export class Obj {
       this.#objects = objects;
    }
 
+   get objects(): ObjectRecord {
+      return this.#objects;
+   }
+
    static pick<T extends ObjectRecord, K extends Path<T>>(source: T, props: K | K[]): NestedPick<T, K> {
       const src = Registry.from(source);
       const dest = Registry.from();
@@ -23,7 +27,7 @@ export class Obj {
    }
 
    static omit<T extends ObjectRecord, K extends Path<T>>(source: T, props: K | K[]): NestedOmit<T, K> {
-      const dest = Registry.from(source);
+      const dest = Registry.from(source, { clone: false });
 
       for (const prop of Array.isArray(props) ? props : [props]) {
          dest.remove(prop);
@@ -121,19 +125,15 @@ export class Obj {
       return Obj.initPropValue(this.#objects, prop, value);
    }
 
+   omit<K extends Path<this['objects']>>(props: K | K[]): NestedOmit<this['objects'], K> {
+      return Obj.omit(this.#objects, props);
+   }
+
    valueOf(): ObjectRecord {
       return this.#objects;
    }
 
    toString(): string {
       return JSON.stringify(this.#objects);
-   }
-
-   // Three dots syntax: ...Str
-   *[Symbol.iterator]() {
-      const obj = this.valueOf();
-      console.log({ obj });
-
-      yield { ...obj };
    }
 }

@@ -24,7 +24,7 @@ export class Util {
          src.forEach((val) => newInst.add(Util.clone(val)));
       } else if (src instanceof Map) {
          newInst = new Map();
-         src.forEach((val) => newInst.set(Util.clone(val)));
+         src.forEach((val, key) => newInst.set(key, Util.clone(val)));
       } else if (Array.isArray(src)) {
          newInst = [];
          src.forEach((val) => newInst.push(Util.clone(val)));
@@ -133,6 +133,10 @@ export class Util {
       };
       const paintChar = (str: string, color: string) => `${color}${str}${colors.reset}`;
       const dump = (entry: any, depth: number) => {
+         if (entry instanceof Error) {
+            return console.debug(entry);
+         }
+
          let str = '';
 
          if (Is.object(entry)) {

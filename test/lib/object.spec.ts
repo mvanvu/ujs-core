@@ -10,7 +10,13 @@ it('Core Object', () => {
    // # omit<T extends object, K extends Path<T>>(source: T, props: K | K[]): NestedOmit<T, K>
    expect(Obj.omit({ foo: 1, bar: 2 }, ['foo'])).toMatchObject({ bar: 2 });
    expect(Obj.omit({ foo: 1, bar: 2 }, ['bar'])).toMatchObject({ foo: 1 });
-   expect(Obj.omit({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, ['deep'])).toMatchObject({ foo: 1, bar: 2 });
+
+   // ## Omit will applied for the object instance
+   const inst = { foo: 1, bar: 2, deep: { foo: 123, bar: 456 } };
+   const inst2 = Obj.from(inst);
+   inst2.omit('')
+   expect(Obj.omit(inst, ['deep'])).toMatchObject({ foo: 1, bar: 2 });
+   expect(inst).not.toHaveProperty('deep');
 
    const fromObj = { foo: 1, bar: 2, deep: { foo: 123, bar: { foo2: 'foo2', baz: 456 } } };
    expect(Obj.omit(fromObj, ['deep.foo'])).toMatchObject({ foo: 1, bar: 2, deep: { bar: { baz: 456 } } });
@@ -61,7 +67,4 @@ it('Core Object', () => {
    // ## Try to re-init
    Obj.initPropValue(o, 'animal.list', ['tiger']);
    expect(o.animal.list).toEqual(['dog', 'cat']);
-   const objs = { ...new Obj({ foo: 'bar' }) };
-
-   console.log({ objs });
 });
