@@ -65,15 +65,16 @@ it('Util Registry', () => {
    expect(clone.get('foo')).toEqual(456);
    expect(registry.get('foo')).toEqual(123);
 
-   // # merge(data: any, validate?: boolean): Registry
-   registry.merge({ bar: { foo3: 'bar3' }, foo2: 456 });
+   // # extends(data: any, validate?: boolean): Registry
+   registry.extends({ bar: { foo3: 'bar3' }, foo2: 456 });
    expect(registry.get('foo2')).toEqual(456);
    expect(registry.get('bar.foo1')).toEqual('bar1');
    expect(registry.get('bar.foo3')).toEqual('bar3');
-   registry.merge({ bar: 456, fn: () => 1 });
+   registry.extends({ bar: 456, fn: () => 1 });
    expect(registry.get('bar')).toEqual(456);
    expect(registry.isValidData()).toBeFalsy();
 
+   // # merge(data: any, validate?: boolean): Registry => @deprecated use extends instead
    // # parse(data?: any, options?: { validate?: boolean; clone?: boolean }): Registry
    // ## Parse the data to Array or Flat Object and override the current data
    registry.parse([1, 'foo', 2, 'bar', { foo: 'bar' }]);

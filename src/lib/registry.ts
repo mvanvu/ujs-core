@@ -21,22 +21,29 @@ export class Registry {
       return new Registry(data, options);
    }
 
+   /**
+    * @deprecated use extends instead
+    */
    merge(data: any, validate?: boolean): this {
-      const deepMerge = (data: any, path?: string) => {
+      return this.extends(data, validate);
+   }
+
+   extends(data: any, validate?: boolean): this {
+      const deepExtends = (data: any, path?: string) => {
          if (Is.array(data)) {
             for (let i = 0, n = data.length; i < n; i++) {
-               deepMerge(data[i], `${path ? `${path}.` : ''}${i}`);
+               deepExtends(data[i], `${path ? `${path}.` : ''}${i}`);
             }
          } else if (Is.object(data)) {
             for (const p in data) {
-               deepMerge(data[p], `${path ? `${path}.` : ''}${p}`);
+               deepExtends(data[p], `${path ? `${path}.` : ''}${p}`);
             }
-         } else {
+         } else if (Is.string(path)) {
             this.set(path, data, validate);
          }
       };
 
-      deepMerge(Registry.from(data).valueOf());
+      deepExtends(Registry.from(data).valueOf());
 
       return this;
    }
@@ -113,7 +120,6 @@ export class Registry {
 
    get<T>(path: string, defaultValue?: any, filter?: string | string[]): T {
       path = this.preparePath(path);
-      const isDeep = (value: any) => Is.object(value) || Array.isArray(value);
 
       if (this.cached[path] === undefined) {
          if (path.indexOf('.') === -1) {
@@ -126,7 +132,7 @@ export class Registry {
                const path = paths[i];
                data = data[path];
 
-               if (!isDeep(data)) {
+               if (!Is.objectOrArray(data)) {
                   data = i + 1 === n ? data : defaultValue;
                   break;
                }
@@ -217,14 +223,14 @@ export class Registry {
          }
       }
 
+      const newValue = this.get(path);
+
+      if (!Is.equals(prevValue, newValue)) {
+         this.#eventEmitter.emit(path, newValue, prevValue);
+      }
+
       if (value === undefined) {
          this.#eventEmitter.remove(path);
-      } else {
-         const newValue = this.get(path);
-
-         if (!Is.equals(prevValue, newValue)) {
-            this.#eventEmitter.emit(path, newValue, prevValue);
-         }
       }
 
       return this;
@@ -239,7 +245,7 @@ export class Registry {
    }
 
    has(path: string): boolean {
-      return !Is.undefined(this.get(path));
+      return !Is.undefined(this.get(path, undefined));
    }
 
    is(path: string, compareValue?: any): boolean {

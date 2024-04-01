@@ -15,6 +15,7 @@ export declare class Registry {
         clone?: boolean;
     }): Registry;
     merge(data: any, validate?: boolean): this;
+    extends(data: any, validate?: boolean): this;
     parse(data?: any, options?: {
         validate?: boolean;
         clone?: boolean;
@@ -22,6 +23,7 @@ export declare class Registry {
     validate(data?: any): this;
     isValidData(data?: any): boolean;
     private isPathNum;
+    private preparePath;
     get<T>(path: string, defaultValue?: any, filter?: string | string[]): T;
     set(path: string, value: any, validate?: boolean): this;
     initPathValue<T>(path: string, value: T, validate?: boolean): T;
