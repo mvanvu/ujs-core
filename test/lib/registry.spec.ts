@@ -77,26 +77,26 @@ it('Util Registry', () => {
    // # parse(data?: any, options?: { validate?: boolean; clone?: boolean }): Registry
    // ## Parse the data to Array or Flat Object and override the current data
    registry.parse([1, 'foo', 2, 'bar', { foo: 'bar' }]);
-   expect(registry.get('0')).toEqual(1);
-   expect(registry.get('1')).toEqual('foo');
+   expect(registry.get('[0]')).toEqual(1);
+   expect(registry.get('[1]')).toEqual('foo');
 
-   registry.set('3.0', { num: 123 });
-   expect(registry.get('3.0.num')).toEqual(123);
-   expect(registry.get('4.foo')).toEqual('bar');
+   registry.set('[3][0]', { num: 123 });
+   expect(registry.get('[3][0].num')).toEqual(123);
+   expect(registry.get('[4].foo')).toEqual('bar');
 
    registry.parse({ array: registry.valueOf() });
-   expect(registry.get('array.3.0.num')).toEqual(123);
+   expect(registry.get('array[3][0].num')).toEqual(123);
 
-   registry.remove('array.4.foo');
-   expect(registry.has('array.4.foo')).toBeFalsy();
+   registry.remove('array[4].foo');
+   expect(registry.has('array[4].foo')).toBeFalsy();
 
    // # isCached(path: string): boolean
-   registry.set('array.4.foo', 456);
-   registry.get('array.4.foo');
-   expect(registry.isCached('array.4.foo')).toBeTruthy();
+   registry.set('array[4].foo', 456);
+   registry.get('array[4].foo');
+   expect(registry.isCached('array[4].foo')).toBeTruthy();
 
-   registry.set('array.4', 456);
-   expect(registry.isCached('array.4.foo')).toBeFalsy();
+   registry.set('array[4]', 456);
+   expect(registry.isCached('array[4].foo')).toBeFalsy();
 
    // # initPathValue<T>(path: string, value: T, validate?: boolean): T
    // ## Init and returns the property value if it isn't set yet
@@ -130,4 +130,9 @@ it('Util Registry', () => {
    // ## isValidData(data?: any): boolean
    expect(Registry.from([{ foo: 1 }, { bar: { bar2: 123 } }]).isValidData()).toBeTruthy();
    expect(Registry.from([{ foo: 1 }, { bar: { func: () => {} } }]).isValidData()).toBeFalsy();
+
+   // # watch(paths: string[] | string, callback: EventHandler['handler'])
+   // ## Watching the modified properties
+   registry.watch('animal.list', (newVal, prevVal) => console.log({ newVal, prevVal }));
+   registry.set('animal.list', ['dog', 'cat', 'tiger']);
 });

@@ -103,7 +103,16 @@ export class Registry {
       return /^\d+$/.test(path);
    }
 
+   private preparePath(path: string) {
+      if (path.match(/\[\d+\]/)) {
+         path = Transform.trim(path.replace(/\[(\d+)\]/g, '.$1'), { specialChars: '.' });
+      }
+
+      return path;
+   }
+
    get<T>(path: string, defaultValue?: any, filter?: string | string[]): T {
+      path = this.preparePath(path);
       const isDeep = (value: any) => Is.object(value) || Array.isArray(value);
 
       if (this.cached[path] === undefined) {
@@ -135,6 +144,7 @@ export class Registry {
    }
 
    set(path: string, value: any, validate?: boolean): this {
+      path = this.preparePath(path);
       const prevValue = this.get(path);
 
       if (validate === true) {
@@ -207,10 +217,14 @@ export class Registry {
          }
       }
 
-      const curValue = this.get(path);
+      if (value === undefined) {
+         this.#eventEmitter.remove(path);
+      } else {
+         const newValue = this.get(path);
 
-      if (prevValue !== curValue) {
-         this.#eventEmitter.emit(path);
+         if (!Is.equals(prevValue, newValue)) {
+            this.#eventEmitter.emit(path, newValue, prevValue);
+         }
       }
 
       return this;
@@ -244,7 +258,7 @@ export class Registry {
     * For test caching purpose
     */
    isCached(path: string): boolean {
-      return this.cached.hasOwnProperty(path);
+      return this.cached.hasOwnProperty(this.preparePath(path));
    }
 
    isPathArray(path?: string): boolean {
@@ -279,7 +293,8 @@ export class Registry {
       const registry = Registry.from();
 
       for (const path of Array.isArray(paths) ? paths : [paths]) {
-         registry.set(path, this.get(path));
+         const p = this.preparePath(path);
+         registry.set(p, this.get(p));
       }
 
       return registry;
@@ -289,7 +304,7 @@ export class Registry {
       const registry = this.clone();
 
       for (const path of Array.isArray(paths) ? paths : [paths]) {
-         this.remove(path);
+         registry.remove(this.preparePath(path));
       }
 
       return registry;
@@ -297,8 +312,10 @@ export class Registry {
 
    watch(paths: string[] | string, callback: EventHandler['handler']) {
       for (const path of Array.isArray(paths) ? paths : [paths]) {
-         if (!this.#eventEmitter.has(path)) {
-            this.#eventEmitter.on(path, callback);
+         const p = this.preparePath(path);
+
+         if (!this.#eventEmitter.has(p)) {
+            this.#eventEmitter.on(p, callback);
          }
       }
    }
