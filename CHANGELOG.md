@@ -3,7 +3,7 @@
 -  **Added:**
    -  New class EventEmitter
 
-## Version 0.0.5
+## Version 0.0.5 (2024-04-01)
 
 -  **Added:**
 
