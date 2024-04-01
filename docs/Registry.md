@@ -101,16 +101,22 @@ clone.get('foo'); // It returns: 456
 registry.get('foo'); // It returns: 123
 ```
 
-#### merge(data: any, validate?: boolean): Registry
+#### extends(data: any, validate?: boolean): Registry
 
 ```javascript
-registry.merge({ bar: { foo3: 'bar3' }, foo2: 456 });
+registry.extends({ bar: { foo3: 'bar3' }, foo2: 456 });
 registry.get('foo2'); // It returns: 456
 registry.get('bar.foo1'); // It returns: 'bar1'
 registry.get('bar.foo3'); // It returns: 'bar3'
-registry.merge({ bar: 456, fn: () => 1 });
+registry.extends({ bar: 456, fn: () => 1 });
 registry.get('bar'); // It returns: 456
 registry.isValidData(); // It returns: false
+```
+
+#### merge(data: any, validate?: boolean): Registry => @deprecated use extends instead
+
+```javascript
+
 ```
 
 #### parse(data?: any, options?: { validate?: boolean; clone?: boolean }): Registry
@@ -118,29 +124,29 @@ registry.isValidData(); // It returns: false
 ```javascript
 // Parse the data to Array or Flat Object and override the current data
 registry.parse([1, 'foo', 2, 'bar', { foo: 'bar' }]);
-registry.get('0'); // It returns: 1
-registry.get('1'); // It returns: 'foo'
+registry.get('[0]'); // It returns: 1
+registry.get('[1]'); // It returns: 'foo'
 
-registry.set('3.0', { num: 123 });
-registry.get('3.0.num'); // It returns: 123
-registry.get('4.foo'); // It returns: 'bar'
+registry.set('[3][0]', { num: 123 });
+registry.get('[3][0].num'); // It returns: 123
+registry.get('[4].foo'); // It returns: 'bar'
 
 registry.parse({ array: registry.valueOf() });
-registry.get('array.3.0.num'); // It returns: 123
+registry.get('array[3][0].num'); // It returns: 123
 
-registry.remove('array.4.foo');
-registry.has('array.4.foo'); // It returns: false
+registry.remove('array[4].foo');
+registry.has('array[4].foo'); // It returns: false
 ```
 
 #### isCached(path: string): boolean
 
 ```javascript
-registry.set('array.4.foo', 456);
-registry.get('array.4.foo');
-registry.isCached('array.4.foo'); // It returns: true
+registry.set('array[4].foo', 456);
+registry.get('array[4].foo');
+registry.isCached('array[4].foo'); // It returns: true
 
-registry.set('array.4', 456);
-registry.isCached('array.4.foo'); // It returns: false
+registry.set('array[4]', 456);
+registry.isCached('array[4].foo'); // It returns: false
 ```
 
 #### initPathValue<T>(path: string, value: T, validate?: boolean): T
@@ -180,4 +186,12 @@ Registry.from([{ foo: 1 }, { bar: { func: () => {} } }]).validate(); // Throw an
 // isValidData(data?: any): boolean
 Registry.from([{ foo: 1 }, { bar: { bar2: 123 } }]).isValidData(); // It returns: true
 Registry.from([{ foo: 1 }, { bar: { func: () => {} } }]).isValidData(); // It returns: false
+```
+
+#### watch(paths: string[] | string, callback: EventHandler['handler'])
+
+```javascript
+// Watching the modified properties
+registry.watch('animal.list', (newVal, prevVal) => console.log({ newVal, prevVal }));
+registry.set('animal.list', ['dog', 'cat', 'tiger']);
 ```
