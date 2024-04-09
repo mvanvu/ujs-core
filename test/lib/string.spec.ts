@@ -1,6 +1,7 @@
 import { Str } from '../../src';
 
 it('Core String', () => {
+   // # @deprecated use Util instead
    // # Common
    expect(Str.toCamelCase('Hello world!')).toEqual('helloWorld');
    expect(Str.camelToSnackCase('helloWorld')).toEqual('hello_world');

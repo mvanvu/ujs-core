@@ -6,6 +6,12 @@
 import { Str } from '@mvanvu/ujs';
 ```
 
+#### @deprecated use Util instead
+
+```javascript
+
+```
+
 #### Common
 
 ```javascript

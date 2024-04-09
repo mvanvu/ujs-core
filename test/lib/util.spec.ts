@@ -10,15 +10,18 @@ it('Core Util', async () => {
    const fn = () => 1;
    expect(Util.clone(fn)).toEqual(fn);
 
-   // # async callback<T>(fn: any, params: any[] = [], inst?: any): Promise<T> => an async function to call if the value is callable
+   // # async callback<T>(fn: any, params: any[] = [], inst?: any): Promise<T>
+   // ## @deprecated use call() instead
+
+   // # call<T>(instanceThis: any, fn: any, ...params: any[]): T
    // ## Call a none function, just do nothing and return it
-   expect(await Util.callback('Im not callable')).toEqual('Im not callable');
+   expect(Util.call(null, 'Im not callable')).toEqual('Im not callable');
 
    // ## Call a function
-   expect(await Util.callback(() => 'Hi!')).toEqual('Hi!');
+   expect(Util.call(null, () => 'Hi!')).toEqual('Hi!');
 
    // ## Call a function with arguments
-   expect(await Util.callback((name: string, age: number) => `I'm ${name}, ${age} years old!`, ['Yu', 25])).toEqual(`I'm Yu, 25 years old!`);
+   expect(Util.call(null, (name: string, age: number) => `I'm ${name}, ${age} years old!`, 'Yu', 25)).toEqual(`I'm Yu, 25 years old!`);
 
    // ## Call a function with this instance
    // ## Note: this instance can't call with arrow function
@@ -26,10 +29,10 @@ it('Core Util', async () => {
       return this;
    }
 
-   expect(await Util.callback(whoAmI, [], 'Iron man')).toEqual('Iron man');
+   expect(Util.call('Iron man', whoAmI)).toEqual('Iron man');
 
-   // ## When the callback is an instance of Promise, then the arguments and this instance will be ignored
-   expect(await Util.callback(new Promise((resolve) => resolve('Im here')))).toEqual('Im here');
+   // # callAsync<T>(instanceThis: any, fn: any, ...params: any[]): Promise<T>
+   expect(await Util.callAsync(null, new Promise((resolve) => resolve('Im here')))).toEqual('Im here');
 
    // # sort<T extends any[] | ObjectRecord>(data: T, options?: { key?: string }): T
    expect(Util.sort(['March', 'Jan', 'Feb', 'Dec'])).toEqual(['Dec', 'Feb', 'Jan', 'March']);

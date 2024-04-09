@@ -24,6 +24,8 @@ export declare class Transform {
         allowedTags?: string[];
         allowedAttributes?: string[];
     }): string;
+    static toLowerCase(value: any): string;
+    static toUpperCase(value: any): string;
     static clean(value: any, typeTransform: string | string[], ...params: any[]): any;
     static cleanIfType(value: any, typeTransform: string | string[], typeValue: CommonType | CommonType[]): any;
 }

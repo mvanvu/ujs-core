@@ -338,6 +338,14 @@ export class Transform {
          .replace(/\s+/gi, ' ');
    }
 
+   static toLowerCase(value: any): string {
+      return Transform.toString(value).toLowerCase();
+   }
+
+   static toUpperCase(value: any): string {
+      return Transform.toString(value).toUpperCase();
+   }
+
    // Clean up value with a list of transform
    static clean(value: any, typeTransform: string | string[], ...params: any[]): any {
       const methodMaps = {};

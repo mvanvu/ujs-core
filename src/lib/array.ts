@@ -2,7 +2,8 @@
 
 import { Registry } from './registry';
 import { Is } from './is';
-import { DefaultArray } from '../type';
+import { Util } from './util';
+import { Callable, DefaultArray } from '../type';
 
 export class Arr extends Array {
    #index = 0;
@@ -221,8 +222,8 @@ export class Arr extends Array {
       return this.elements[index];
    }
 
-   walk<T>(index: number | 'first' | 'last' | 'prev' | 'next', callback: Function): T | undefined {
-      if (typeof callback !== 'function') {
+   walk<T>(index: number | 'first' | 'last' | 'prev' | 'next' | 'over', callback: Callable): T | Promise<T> | undefined {
+      if (!Is.callable(callback)) {
          return;
       }
 
@@ -243,13 +244,23 @@ export class Arr extends Array {
             case 'next':
                index = this.#index + 1;
                break;
+
+            default:
+            case 'over':
+               this.#index = 0;
+
+               for (const n = this.elements.length; this.#index < n; this.#index++) {
+                  Util.call(this, callback, this.#index, this.elements[this.#index]);
+               }
+
+               return;
          }
       }
 
       if (this.elements[index] !== undefined) {
          this.#index = index;
 
-         return callback.apply(this, [index, this.elements]);
+         return Util.call(this, callback, index, this.elements);
       }
    }
 

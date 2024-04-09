@@ -181,12 +181,14 @@ export type FirstElement<T extends any[]> = T extends [infer First, ...infer _] 
 
 export type LastElement<T extends any[]> = T extends [...infer _, infer Last] ? Last : undefined;
 
+export type Callable = (...args: any[]) => any | Promise<any> | Function;
+
 export interface EventHandler {
    name: string;
    priority: number;
    once?: boolean;
    disabled?: boolean;
-   handler: (...args: any[]) => any | Promise<any> | Function;
+   handler: Callable;
 }
 
 export interface NumberFormatOptions {

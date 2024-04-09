@@ -56,12 +56,13 @@ export type DefaultArray<T> = IsArray<T> extends true ? T : [];
 export type DefaultValue<V, D> = V extends undefined | null ? D : V;
 export type FirstElement<T extends any[]> = T extends [infer First, ...infer _] ? First : undefined;
 export type LastElement<T extends any[]> = T extends [...infer _, infer Last] ? Last : undefined;
+export type Callable = (...args: any[]) => any | Promise<any> | Function;
 export interface EventHandler {
     name: string;
     priority: number;
     once?: boolean;
     disabled?: boolean;
-    handler: (...args: any[]) => any | Promise<any> | Function;
+    handler: Callable;
 }
 export interface NumberFormatOptions {
     decimals?: number;

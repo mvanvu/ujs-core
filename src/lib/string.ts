@@ -1,4 +1,6 @@
 'use strict';
+
+/** @deprecated use Util instead */
 export class Str extends String {
    get text(): string {
       return this.toString();

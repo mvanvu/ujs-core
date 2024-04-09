@@ -1,6 +1,7 @@
 import { Obj } from '../../src';
 
 it('Core Object', () => {
+   // # @deprecated use Registry instead
    // # pick<T extends object, K extends Path<T>>(source: T, props: K | K[]): NestedPick<T, K>
    expect(Obj.pick({ foo: 1, bar: 2 }, ['foo'])).toMatchObject({ foo: 1 });
    expect(Obj.pick({ foo: 1, bar: 2 }, ['bar'])).toMatchObject({ bar: 2 });

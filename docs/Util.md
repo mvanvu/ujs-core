@@ -18,19 +18,25 @@ const fn = () => 1;
 Util.clone(fn); // It returns: fn
 ```
 
-#### async callback<T>(fn: any, params: any[] = [], inst?: any): Promise<T> => an async function to call if the value is callable
+#### async callback<T>(fn: any, params: any[] = [], inst?: any): Promise<T>
+
+```javascript
+// @deprecated use call() instead
+```
+
+#### call<T>(instanceThis: any, fn: any, ...params: any[]): T
 
 ```javascript
 // Call a none function, just do nothing and return it
-await Util.callback('Im not callable'); // It returns: 'Im not callable'
+Util.call(null, 'Im not callable'); // It returns: 'Im not callable'
 
 
 // Call a function
-await Util.callback(() => 'Hi!'); // It returns: 'Hi!'
+Util.call(null, () => 'Hi!'); // It returns: 'Hi!'
 
 
 // Call a function with arguments
-await Util.callback((name: string, age: number) => `I'm ${name}, ${age} years old!`, ['Yu', 25]); // It returns: `I'm Yu, 25 years old!`
+Util.call(null, (name: string, age: number) => `I'm ${name}, ${age} years old!`, 'Yu', 25); // It returns: `I'm Yu, 25 years old!`
 
 
 // Call a function with this instance
@@ -40,12 +46,14 @@ function whoAmI() {
 return this;
 }
 
-await Util.callback(whoAmI, [], 'Iron man'); // It returns: 'Iron man'
+Util.call('Iron man', whoAmI); // It returns: 'Iron man'
 
+```
 
-// When the callback is an instance of Promise, then the arguments and this instance will be ignored
-await Util.callback(new Promise((resolve) => resolve('Im here'))); // It returns: 'Im here'
+#### callAsync<T>(instanceThis: any, fn: any, ...params: any[]): Promise<T>
 
+```javascript
+await Util.callAsync(null, new Promise((resolve) => resolve('Im here'))); // It returns: 'Im here'
 ```
 
 #### sort<T extends any[] | ObjectRecord>(data: T, options?: { key?: string }): T

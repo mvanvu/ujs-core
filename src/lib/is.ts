@@ -480,7 +480,7 @@ export class Is {
          return true;
       }
 
-      return Is.func(value) || Is.asyncFunc(value) || value instanceof Promise;
+      return Is.func(value) || Is.asyncFunc(value);
    }
 
    static number<T>(value: T, each = false): boolean {

@@ -34,6 +34,12 @@ it('Util Transform', () => {
    // ## From an object
    expect(Transform.toString({ foo: 'bar' })).toEqual(JSON.stringify({ foo: 'bar' }));
 
+   // # toLowerCase(value: any): string
+   expect(Transform.toLowerCase('HELLO World')).toEqual('hello world');
+
+   // # toUpperCase(value: any): string
+   expect(Transform.toUpperCase('HELLO World')).toEqual('HELLO WORLD');
+
    // # toArrayUnique(value: any): any[]
    const unique = Transform.toArrayUnique([{ foo: 123 }, { foo: 123 }, { foo: 456 }]);
    expect(unique.length).toEqual(2);

@@ -4,6 +4,7 @@ import { Is } from './is';
 import { Util } from './util';
 import { Path, NestedPick, NestedOmit, ExtendsObject, ExtendsObjects, DefaultObject, ObjectRecord } from '../type';
 
+/** @deprecated Use Registry instead */
 export class Obj<OT extends ObjectRecord> {
    #objects: OT;
 

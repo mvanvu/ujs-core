@@ -6,6 +6,12 @@
 import { Obj } from '@mvanvu/ujs';
 ```
 
+#### @deprecated use Registry instead
+
+```javascript
+
+```
+
 #### pick<T extends object, K extends Path<T>>(source: T, props: K | K[]): NestedPick<T, K>
 
 ```javascript

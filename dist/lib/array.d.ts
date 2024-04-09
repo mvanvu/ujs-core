@@ -1,4 +1,4 @@
-import { DefaultArray } from '../type';
+import { Callable, DefaultArray } from '../type';
 export declare class Arr extends Array {
     #private;
     get elements(): any[];
@@ -46,7 +46,7 @@ export declare class Arr extends Array {
     last<T>(): T | undefined;
     prev<T>(): T | undefined;
     next<T>(): T | undefined;
-    walk<T>(index: number | 'first' | 'last' | 'prev' | 'next', callback: Function): T | undefined;
+    walk<T>(index: number | 'first' | 'last' | 'prev' | 'next' | 'over', callback: Callable): T | Promise<T> | undefined;
     empty(): this;
     update(elements: Iterable<any> | ArrayLike<any>): this;
 }

@@ -114,6 +114,10 @@ it('Core Array', () => {
    arr.walk('last', (index: number) => (arr[index] *= 2));
    expect(arr.current()).toEqual(12);
 
+   let length = 0;
+   arr.walk('over', (index: number, element: number) => length++);
+   expect(length).toEqual(arr.length);
+
    // # Arr.chunk<T>(array: T[], size = 1): Array<T[]>
    // ## Chunk the array by 1 size (defaults is 1)
    expect(Arr.chunk(['a', 'b', 'c', 'd'])).toEqual([['a'], ['b'], ['c'], ['d']]);

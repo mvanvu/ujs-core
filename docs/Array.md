@@ -147,6 +147,10 @@ arr.current(); // It returns: 4
 arr.walk('last', (index: number) => (arr[index] *= 2));
 arr.current(); // It returns: 12
 
+let length = 0;
+arr.walk('over', (index: number, element: number) => length++);
+length; // It returns: arr.length
+
 ```
 
 #### Arr.chunk<T>(array: T[], size = 1): Array<T[]>

@@ -106,7 +106,7 @@ export class EventEmitter {
       const ret = [];
 
       for (const event of this.getEventHandlers(name)) {
-         ret.push(event.handler.call(this, ...args));
+         ret.push(Util.call(this, event.handler, ...args));
 
          if (event.once) {
             this.remove(event.name);
@@ -124,7 +124,7 @@ export class EventEmitter {
       const ret = [];
 
       for (const event of this.getEventHandlers(name)) {
-         ret.push(await Util.callback(event.handler, args, this));
+         ret.push(await Util.callAsync(this, event.handler, ...args));
       }
 
       return ret;

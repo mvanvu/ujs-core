@@ -45,6 +45,18 @@ Transform.toString(true); // It returns: 'true'
 Transform.toString({ foo: 'bar' }); // It returns: JSON.stringify({ foo: 'bar' })
 ```
 
+#### toLowerCase(value: any): string
+
+```javascript
+Transform.toLowerCase('HELLO World'); // It returns: 'hello world'
+```
+
+#### toUpperCase(value: any): string
+
+```javascript
+Transform.toUpperCase('HELLO World'); // It returns: 'HELLO WORLD'
+```
+
 #### toArrayUnique(value: any): any[]
 
 ```javascript
