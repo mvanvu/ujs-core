@@ -1,7 +1,35 @@
-import { CommonType, ObjectCommonType } from '../type';
+import { CommonType, IsEqual, ObjectCommonType } from '../type';
 export type ObjectRulesOptions = {
     rules: ObjectCommonType;
     suitable?: boolean;
+};
+export type ArrayRulesOptions = {
+    rules: CommonType | ObjectCommonType;
+    suitable?: boolean;
+    notEmpty?: boolean;
+};
+export type ObjectArrayRulesOptions = {
+    object?: ObjectRulesOptions;
+    array?: ArrayRulesOptions;
+};
+export type EqualsRulesOptions = {
+    equalsTo: any;
+};
+export type StrongPasswordOptions = {
+    minLength?: number;
+    noSpaces?: boolean;
+};
+export type FlatObjectRulesOptions = {
+    allowArray?: boolean | {
+        root?: boolean;
+        deep?: boolean;
+    };
+};
+export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' | 'flatValue' | 'nodeJs' | 'valid' ? never : T;
+export type IsValidOptions<T> = {
+    type: T;
+    each?: boolean;
+    meta?: IsEqual<T, 'object'> extends true ? ObjectRulesOptions : IsEqual<T, 'array'> extends true ? ArrayRulesOptions : IsEqual<T, 'objectOrArray'> extends true ? ObjectArrayRulesOptions : IsEqual<T, 'equals'> extends true ? EqualsRulesOptions : IsEqual<T, 'flatObject'> extends true ? FlatObjectRulesOptions : IsEqual<T, 'strongPassword'> extends true ? StrongPasswordOptions : undefined;
 };
 export declare class IsError extends Error {
 }
@@ -13,23 +41,17 @@ export declare class Is {
     static datetime(d: any, each?: boolean): boolean;
     static dateString(d: any, each?: boolean): boolean;
     static flatValue(value: any, each?: boolean): boolean;
+    static primitive(value: any, each?: boolean): boolean;
     static empty(value: any, each?: boolean): boolean;
-    static nothing(value: any): boolean;
+    static nothing(value: any, each?: boolean): boolean;
     static object(value: any, options?: ObjectRulesOptions): boolean;
-    static flatObject(value: any, allowArray?: boolean | {
-        root?: boolean;
-        deep?: boolean;
-    }): boolean;
+    static flatObject(value: any, allowArray?: FlatObjectRulesOptions['allowArray']): boolean;
     static objectOrArray<T>(value: T): boolean;
-    static array(value: any, options?: {
-        rules: CommonType | ObjectCommonType;
-        suitable?: boolean;
-        notEmpty?: boolean;
-    }): boolean;
+    static array(value: any, options?: ArrayRulesOptions): boolean;
     static asyncFunc(value: any, each?: boolean): boolean;
     static func(value: any, each?: boolean): boolean;
     static callable(value: any, each?: boolean): boolean;
-    static number<T>(value: T, each?: boolean): boolean;
+    static number(value: any, each?: boolean): boolean;
     static sNumber(value: any, each?: boolean): boolean;
     static uNumber(value: any, each?: boolean): boolean;
     static int(value: any, each?: boolean): boolean;
@@ -49,8 +71,8 @@ export declare class Is {
     static regex(value: any, each?: boolean): boolean;
     static nodeJs(): boolean;
     static nullOrUndefined(value: any, each?: boolean): boolean;
-    static strongPassword(value: any, options?: {
-        minLength?: number;
-        noSpaces?: boolean;
-    }, each?: boolean): boolean;
+    static strongPassword(value: any, options?: StrongPasswordOptions, each?: boolean): boolean;
+    static promise(value: any): boolean;
+    static email(value: any, each?: boolean): boolean;
+    static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean;
 }

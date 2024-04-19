@@ -22,7 +22,8 @@ export type CommonType =
    | 'NaN'
    | 'datestring'
    | 'date'
-   | 'datetime';
+   | 'datetime'
+   | 'primitive';
 
 export interface ObjectCommonType {
    [key: string]: CommonType | ObjectCommonType;

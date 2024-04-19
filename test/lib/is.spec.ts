@@ -166,21 +166,22 @@ it('Core Is', () => {
    expect(Is.equals({ foo: 'bar', bar: 123 }, { bar: 123, foo: 'bar2' })).toBeFalsy();
    expect(Is.equals({ foo: 'bar', bar: 123 }, { bar: 123 })).toBeFalsy();
 
-   // # Is.flatValue(value: any): boolean
-   // ## The flat value is a primitive value
-   expect(Is.flatValue(123)).toBeTruthy();
-   expect(Is.flatValue(-123)).toBeTruthy();
-   expect(Is.flatValue(null)).toBeTruthy();
-   expect(Is.flatValue(void 0)).toBeTruthy();
-   expect(Is.flatValue('')).toBeTruthy();
-   expect(Is.flatValue(true)).toBeTruthy();
-   expect(Is.flatValue(false)).toBeTruthy();
-   expect(Is.flatValue(NaN)).toBeTruthy();
-   expect(Is.flatValue([])).toBeFalsy();
-   expect(Is.flatValue({})).toBeFalsy();
-   expect(Is.flatValue(() => {})).toBeFalsy();
-   expect(Is.flatValue(new Set())).toBeFalsy();
-   expect(Is.flatValue(new Map())).toBeFalsy();
+   // # @deprecated Is.flatValue(value: any): boolean
+   // Is.primitive(value: any): boolean
+
+   expect(Is.primitive(123)).toBeTruthy();
+   expect(Is.primitive(-123)).toBeTruthy();
+   expect(Is.primitive(null)).toBeTruthy();
+   expect(Is.primitive(void 0)).toBeTruthy();
+   expect(Is.primitive('')).toBeTruthy();
+   expect(Is.primitive(true)).toBeTruthy();
+   expect(Is.primitive(false)).toBeTruthy();
+   expect(Is.primitive(NaN)).toBeTruthy();
+   expect(Is.primitive([])).toBeFalsy();
+   expect(Is.primitive({})).toBeFalsy();
+   expect(Is.primitive(() => {})).toBeFalsy();
+   expect(Is.primitive(new Set())).toBeFalsy();
+   expect(Is.primitive(new Map())).toBeFalsy();
 
    // # Is.empty(value: any): boolean
    expect(Is.empty(0)).toBeTruthy();
@@ -230,4 +231,17 @@ it('Core Is', () => {
    // ## More options: Allow properies as array on root level and don't allow properties as array on deep level
    expect(Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }, { root: false, deep: true })).toBeFalsy();
    expect(Is.flatObject({ foo: 1, bar: 2 }, { root: false, deep: true })).toBeTruthy();
+
+   // # valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
+   // ## Validate the value with the specific options
+   expect(Is.valid('I am a string', { type: 'string' })).toBeTruthy();
+   expect(Is.valid(['Str 1', 'Str 2'], { type: 'string', each: true })).toBeTruthy();
+   expect(Is.valid(['Str 1', 'Str 2', 3], { type: 'string', each: true })).toBeFalsy();
+   expect(Is.valid({}, { type: 'object' })).toBeTruthy();
+   expect(Is.valid({ foo: 1, bar: false }, { type: 'object', meta: { suitable: true, rules: { foo: 'number', bar: 'boolean' } } })).toBeTruthy();
+   expect(Is.valid({ foo: 1, bar: false }, { type: 'flatObject' })).toBeTruthy();
+   expect(Is.valid({ foo: 1, bar: false }, { type: 'objectOrArray', meta: { object: { rules: { foo: 'number', bar: 'boolean' } } } })).toBeTruthy();
+   expect(Is.valid([{ foo: 1, bar: false }], { type: 'objectOrArray', meta: { array: { rules: { foo: 'number', bar: 'boolean' } } } })).toBeTruthy();
+   expect(Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: false } })).toBeTruthy();
+   expect(Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: true } })).toBeFalsy();
 });

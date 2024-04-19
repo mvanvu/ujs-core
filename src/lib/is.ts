@@ -1,130 +1,123 @@
 'use strict';
 import { DateTime } from './datetime';
-import { CommonType, ObjectCommonType } from '../type';
+import { CommonType, IsEqual, ObjectCommonType } from '../type';
 export type ObjectRulesOptions = { rules: ObjectCommonType; suitable?: boolean };
+
+export type ArrayRulesOptions = { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean };
+
+export type ObjectArrayRulesOptions = {
+   object?: ObjectRulesOptions; // For type Is.object only
+   array?: ArrayRulesOptions; // For type Is.array only
+};
+
+export type EqualsRulesOptions = {
+   equalsTo: any;
+};
+
+export type StrongPasswordOptions = { minLength?: number; noSpaces?: boolean };
+
+export type FlatObjectRulesOptions = {
+   allowArray?: boolean | { root?: boolean; deep?: boolean };
+};
+
+export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' | 'flatValue' | 'nodeJs' | 'valid' ? never : T;
+
+export type IsValidOptions<T> = {
+   type: T;
+   each?: boolean;
+   meta?: IsEqual<T, 'object'> extends true
+      ? ObjectRulesOptions
+      : IsEqual<T, 'array'> extends true
+        ? ArrayRulesOptions
+        : IsEqual<T, 'objectOrArray'> extends true
+          ? ObjectArrayRulesOptions
+          : IsEqual<T, 'equals'> extends true
+            ? EqualsRulesOptions
+            : IsEqual<T, 'flatObject'> extends true
+              ? FlatObjectRulesOptions
+              : IsEqual<T, 'strongPassword'> extends true
+                ? StrongPasswordOptions
+                : undefined;
+};
+
 export class IsError extends Error {}
 export class Is {
    static typeOf(value: any, type: CommonType, each = false): boolean {
-      value = each ? (Array.isArray(value) ? value : [value]) : value;
-
-      for (const val of each ? value : [value]) {
-         const typeValue = typeof val;
-
-         switch (type) {
-            case 'string':
-            case 'undefined':
-            case 'boolean':
-            case 'function':
-            case 'symbol':
-               if (typeValue !== type) {
-                  return false;
-               }
-
-               break;
-
-            case 'int':
-            case 'sint':
-            case 'uint':
-               if (!Number.isInteger(val) || (type === 'sint' && val >= 0) || (type === 'uint' && val < 0)) {
-                  return false;
-               }
-
-               break;
-
-            case 'number':
-            case 'snumber':
-            case 'unumber':
-               if (typeValue !== 'number' || !Number(val) || (type === 'snumber' && val >= 0) || (type === 'unumber' && val < 0)) {
-                  return false;
-               }
-
-               break;
-
-            case 'bigint':
-            case 'sbigint':
-            case 'ubigint':
-               if (typeValue !== 'bigint' || (type === 'sbigint' && val >= 0) || (type === 'ubigint' && val < 0)) {
-                  return false;
-               }
-
-               break;
-
-            case 'object':
-               if (!Is.object(val)) {
-                  return false;
-               }
-
-               break;
-
-            case 'array':
-               if (!Array.isArray(val)) {
-                  return false;
-               }
-
-               break;
-
-            case 'null':
-               if (val !== null) {
-                  return false;
-               }
-
-               break;
-
-            case 'NaN':
-               if (!Number.isNaN(val)) {
-                  return false;
-               }
-
-               break;
-
-            case 'map':
-               if (!(val instanceof Map)) {
-                  return false;
-               }
-
-               break;
-
-            case 'set':
-               if (!(val instanceof Set)) {
-                  return false;
-               }
-
-               break;
-
-            case 'regex':
-               if (!(val instanceof RegExp)) {
-                  return false;
-               }
-
-               break;
-
-            case 'date':
-               if (!(val instanceof Date)) {
-                  return false;
-               }
-
-               break;
-
-            case 'datetime':
-               if (!(val instanceof DateTime)) {
-                  return false;
-               }
-
-               break;
-
-            case 'datestring':
-               if (typeValue !== 'string' || !DateTime.parse(val)) {
-                  return false;
-               }
-
-               break;
-
-            default:
-               return false;
+      if (each) {
+         if (!Array.isArray(value)) {
+            return false;
          }
+
+         for (const val of value) {
+            if (!Is.typeOf(val, type, false)) {
+               return false;
+            }
+         }
+
+         return true;
       }
 
-      return true;
+      const typeValue = typeof value;
+
+      switch (type) {
+         case 'string':
+         case 'undefined':
+         case 'boolean':
+         case 'function':
+         case 'symbol':
+            return typeValue === type;
+
+         case 'int':
+         case 'sint':
+         case 'uint':
+            return !Number.isInteger(value) || (type === 'sint' && value >= 0) || (type === 'uint' && value < 0) ? false : true;
+
+         case 'number':
+         case 'snumber':
+         case 'unumber':
+            return typeValue !== 'number' || !Number(value) || (type === 'snumber' && value >= 0) || (type === 'unumber' && value < 0) ? false : true;
+
+         case 'bigint':
+         case 'sbigint':
+         case 'ubigint':
+            return typeValue !== 'bigint' || (type === 'sbigint' && value >= 0) || (type === 'ubigint' && value < 0) ? false : true;
+
+         case 'object':
+            return Is.object(value);
+
+         case 'array':
+            return Array.isArray(value);
+
+         case 'null':
+            return value === null;
+
+         case 'NaN':
+            return Number.isNaN(value);
+
+         case 'map':
+            return value instanceof Map;
+
+         case 'set':
+            return value instanceof Set;
+
+         case 'regex':
+            return value instanceof RegExp;
+
+         case 'date':
+            return value instanceof Date;
+
+         case 'datetime':
+            return value instanceof DateTime;
+
+         case 'datestring':
+            return typeValue === 'string' && !!DateTime.parse(value);
+
+         case 'primitive':
+            return Is.primitive(value);
+
+         default:
+            return false;
+      }
    }
 
    static equals(a: any, b: any): boolean {
@@ -280,10 +273,15 @@ export class Is {
       return Is.typeOf(d, 'datestring', each);
    }
 
+   /** @deprecated Use Is.primitive instead */
    static flatValue(value: any, each = false): boolean {
+      return Is.primitive(value, each);
+   }
+
+   static primitive(value: any, each = false): boolean {
       if (each && Is.array(value)) {
          for (const val of value) {
-            if (!Is.flatValue(val)) {
+            if (!Is.primitive(val)) {
                return false;
             }
          }
@@ -336,7 +334,17 @@ export class Is {
       return !Boolean(value);
    }
 
-   static nothing(value: any): boolean {
+   static nothing(value: any, each?: boolean): boolean {
+      if (each && Is.array(value)) {
+         for (const val of value) {
+            if (!Is.nothing(val)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
       return [null, undefined, NaN].includes(value);
    }
 
@@ -373,7 +381,7 @@ export class Is {
       return true;
    }
 
-   static flatObject(value: any, allowArray?: boolean | { root?: boolean; deep?: boolean }): boolean {
+   static flatObject(value: any, allowArray?: FlatObjectRulesOptions['allowArray']): boolean {
       if (!Is.object(value)) {
          return false;
       }
@@ -429,7 +437,7 @@ export class Is {
       return Is.object(value) || Is.array(value);
    }
 
-   static array(value: any, options?: { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean }): boolean {
+   static array(value: any, options?: ArrayRulesOptions): boolean {
       if (!Array.isArray(value) || (options?.notEmpty && !value.length)) {
          return false;
       }
@@ -483,7 +491,7 @@ export class Is {
       return Is.func(value) || Is.asyncFunc(value);
    }
 
-   static number<T>(value: T, each = false): boolean {
+   static number(value: any, each = false): boolean {
       return Is.typeOf(value, 'number', each);
    }
 
@@ -579,7 +587,7 @@ export class Is {
       return value === undefined || value === null;
    }
 
-   static strongPassword(value: any, options?: { minLength?: number; noSpaces?: boolean }, each = false): boolean {
+   static strongPassword(value: any, options?: StrongPasswordOptions, each = false): boolean {
       if (each && Is.array(value)) {
          for (const val of value) {
             if (!Is.strongPassword(val, options)) {
@@ -605,5 +613,87 @@ export class Is {
          value.length >= minLength && // Min length
          /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9\s])/g.test(value) // At less 1 lower char, 1 upper char, 1 digit and 1 special char
       );
+   }
+
+   static promise(value: any): boolean {
+      return value !== null && typeof value === 'object' && typeof value.then === 'function';
+   }
+
+   static email(value: any, each = false): boolean {
+      if (each) {
+         if (!Array.isArray(value)) {
+            return false;
+         }
+
+         for (const e of value) {
+            if (!Is.email(e)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
+      return typeof value === 'string' && /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value);
+   }
+
+   static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean {
+      const { type: method } = options;
+      const invalidMethods = ['typeOf', 'prototype', 'flatValue', 'nodeJs', 'valid'];
+
+      if (invalidMethods.includes(method) || !Is.callable(Is[method])) {
+         return false;
+      }
+
+      const each: boolean = options.each === true;
+
+      if (each) {
+         if (!Array.isArray(value)) {
+            return false;
+         }
+
+         for (const val of value) {
+            if (!Is.valid(val, { type: method, each: false, meta: options.meta })) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
+      switch (method) {
+         case 'object':
+            return Is.object(value, options.meta as ObjectRulesOptions);
+
+         case 'array':
+            return Is.array(value, options.meta as ArrayRulesOptions);
+
+         case 'objectOrArray':
+            if (!Is.objectOrArray(value)) {
+               return false;
+            }
+
+            if (Array.isArray(value)) {
+               return Is.array(value, (options.meta as ObjectArrayRulesOptions)?.array);
+            }
+
+            return Is.object(value, (options.meta as ObjectArrayRulesOptions)?.object);
+
+         case 'equals':
+            const { equalsTo } = (options.meta as EqualsRulesOptions) ?? {};
+
+            return equalsTo === undefined ? false : Is.equals(value, equalsTo);
+
+         case 'flatObject':
+            const { allowArray } = (options.meta as FlatObjectRulesOptions) ?? {};
+
+            return Is.flatObject(value, allowArray);
+
+         case 'strongPassword':
+            return Is.strongPassword(value, options.meta as StrongPasswordOptions);
+
+         default:
+            return Is[method].call(null, value, false);
+      }
    }
 }
