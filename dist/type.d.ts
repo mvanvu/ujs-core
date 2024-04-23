@@ -30,7 +30,7 @@ export type PathInternal<T, TraversedTypes = T> = T extends ReadonlyArray<infer 
 }[TupleKeys<T>] : PathImpl<number, V, TraversedTypes> : {
     [K in keyof T]-?: PathImpl<K & string, T[K], TraversedTypes>;
 }[keyof T];
-export type Path<T> = T extends any ? PathInternal<T> : never;
+export type Path<T> = T extends any ? (PathInternal<T> extends never ? string : PathInternal<T>) : string;
 export type PathValue<T, P extends Path<T>> = T extends any ? P extends `${infer K}.${infer R}` ? K extends keyof T ? R extends Path<T[K]> ? PathValue<T[K], R> : never : K extends number ? T extends ReadonlyArray<infer V> ? PathValue<V, R & Path<V>> : never : never : P extends keyof T ? T[P] : P extends number ? T extends ReadonlyArray<infer V> ? V : never : never : never;
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
 export type UnionPick<T, K extends Path<T>> = K extends keyof T ? Pick<T, K> : K extends `${infer Key}.${infer Rest}` ? Key extends keyof T ? {

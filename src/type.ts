@@ -90,7 +90,7 @@ export type PathInternal<T, TraversedTypes = T> =
            [K in keyof T]-?: PathImpl<K & string, T[K], TraversedTypes>;
         }[keyof T];
 
-export type Path<T> = T extends any ? PathInternal<T> : never;
+export type Path<T> = T extends any ? (PathInternal<T> extends never ? string : PathInternal<T>) : string;
 
 export type PathValue<T, P extends Path<T>> = T extends any
    ? P extends `${infer K}.${infer R}`
