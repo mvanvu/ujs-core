@@ -1,5 +1,5 @@
 'use strict';
-import { ObjectRecord, EventHandler } from '../type';
+import { ObjectRecord, EventHandler, Path } from '../type';
 import { Is } from './is';
 import { Transform } from './transform';
 import { EventEmitter } from './event-emitter';
@@ -7,18 +7,18 @@ import { Util } from './util';
 export type RegistryDataType = ObjectRecord | any[];
 export class RegistryDataError extends Error {}
 
-export class Registry {
+export class Registry<TData = any> {
    #eventEmitter = new EventEmitter();
 
    private cached: Record<string, any> = {};
    private data: RegistryDataType;
 
-   constructor(data?: any, options?: { validate?: boolean; clone?: boolean }) {
+   constructor(data?: TData, options?: { validate?: boolean; clone?: boolean }) {
       this.parse(data, options);
    }
 
-   static from(data?: any, options?: { validate?: boolean; clone?: boolean }): Registry {
-      return new Registry(data, options);
+   static from<TData = any>(data?: TData, options?: { validate?: boolean; clone?: boolean }): Registry<TData> {
+      return new Registry<TData>(data, options);
    }
 
    /**
@@ -118,14 +118,14 @@ export class Registry {
       return path;
    }
 
-   get<T>(path: string, defaultValue?: any, filter?: string | string[]): T {
-      path = this.preparePath(path);
+   get<T, TP = Path<TData> extends never ? string : Path<TData>>(path: TP, defaultValue?: any, filter?: string | string[]): T {
+      const p = this.preparePath(path as string);
 
-      if (this.cached[path] === undefined) {
-         if (path.indexOf('.') === -1) {
-            this.cached[path] = this.data[path];
+      if (this.cached[p] === undefined) {
+         if (p.indexOf('.') === -1) {
+            this.cached[p] = this.data[p];
          } else {
-            const paths = path.split('.');
+            const paths = p.split('.');
             let data = this.data;
 
             for (let i = 0, n = paths.length; i < n; i++) {
@@ -138,19 +138,19 @@ export class Registry {
                }
             }
 
-            this.cached[path] = data;
+            this.cached[p] = data;
          }
       }
 
-      if (this.cached[path] === undefined || this.cached[path] === defaultValue) {
+      if (this.cached[p] === undefined || this.cached[p] === defaultValue) {
          return defaultValue;
       }
 
-      return <T>(filter ? Transform.clean(this.cached[path], filter) : this.cached[path]);
+      return <T>(filter ? Transform.clean(this.cached[p], filter) : this.cached[p]);
    }
 
-   set(path: string, value: any, validate?: boolean): this {
-      path = this.preparePath(path);
+   set<TP = Path<TData> extends never ? string : Path<TData>>(path: TP, value: any, validate?: boolean): this {
+      const p = this.preparePath(path as string);
       const prevValue = this.get(path);
 
       if (validate === true) {
@@ -159,24 +159,24 @@ export class Registry {
 
       // Remove cached data
       for (const key in this.cached) {
-         if (key.startsWith(path)) {
+         if (key.startsWith(p)) {
             delete this.cached[key];
          }
       }
 
-      if (path.indexOf('.') === -1) {
+      if (p.indexOf('.') === -1) {
          if (value === undefined) {
-            if (this.isPathNum(path) && Array.isArray(this.data)) {
+            if (this.isPathNum(p) && Array.isArray(this.data)) {
                this.data.splice(Number(path), 1);
             } else {
-               delete this.data[path];
+               delete this.data[p];
             }
          } else {
-            this.data[path] = value;
+            this.data[p] = value;
          }
       } else {
          let data = this.data;
-         const keys = path.split('.');
+         const keys = p.split('.');
          const n = keys.length - 1;
 
          for (let i = 0; i < n; i++) {
@@ -226,11 +226,11 @@ export class Registry {
       const newValue = this.get(path);
 
       if (!Is.equals(prevValue, newValue)) {
-         this.#eventEmitter.emit(path, newValue, prevValue);
+         this.#eventEmitter.emit(p, newValue, prevValue);
       }
 
       if (value === undefined) {
-         this.#eventEmitter.remove(path);
+         this.#eventEmitter.remove(p);
       }
 
       return this;
@@ -244,11 +244,11 @@ export class Registry {
       return value;
    }
 
-   has(path: string): boolean {
+   has<TP = Path<TData> extends never ? string : Path<TData>>(path: TP): boolean {
       return !Is.undefined(this.get(path, undefined));
    }
 
-   is(path: string, compareValue?: any): boolean {
+   is<TP = Path<TData> extends never ? string : Path<TData>>(path: TP, compareValue?: any): boolean {
       const value = this.get(path);
 
       if (Is.undefined(compareValue)) {
@@ -267,19 +267,19 @@ export class Registry {
       return this.cached.hasOwnProperty(this.preparePath(path));
    }
 
-   isPathArray(path?: string): boolean {
+   isPathArray<TP = Path<TData> extends never ? string : Path<TData>>(path?: TP): boolean {
       return Is.array(path ? this.get(path) : this.data);
    }
 
-   isPathObject(path?: string): boolean {
+   isPathObject<TP = Path<TData> extends never ? string : Path<TData>>(path?: TP): boolean {
       return Is.object(path ? this.get(path) : this.data);
    }
 
-   isPathFlat(path: string): boolean {
-      return Is.flatValue(this.get(path));
+   isPathFlat<TP = Path<TData> extends never ? string : Path<TData>>(path: TP): boolean {
+      return Is.primitive(this.get(path));
    }
 
-   remove(path: string): this {
+   remove<TP = Path<TData> extends never ? string : Path<TData>>(path: TP): this {
       return this.set(path, undefined);
    }
 
@@ -295,30 +295,30 @@ export class Registry {
       return Registry.from(this.data, { clone: true });
    }
 
-   pick(paths: string[] | string): Registry {
+   pick<TP = Path<TData> extends never ? string : Path<TData>>(paths: TP[] | TP): Registry {
       const registry = Registry.from();
 
       for (const path of Array.isArray(paths) ? paths : [paths]) {
-         const p = this.preparePath(path);
+         const p = this.preparePath(path as string);
          registry.set(p, this.get(p));
       }
 
       return registry;
    }
 
-   omit(paths: string[] | string): Registry {
+   omit<TP = Path<TData> extends never ? string : Path<TData>>(paths: TP[] | TP): Registry {
       const registry = this.clone();
 
       for (const path of Array.isArray(paths) ? paths : [paths]) {
-         registry.remove(this.preparePath(path));
+         registry.remove(this.preparePath(path as string));
       }
 
       return registry;
    }
 
-   watch(paths: string[] | string, callback: EventHandler['handler']) {
+   watch<TP = Path<TData> extends never ? string : Path<TData>>(paths: TP[] | TP, callback: EventHandler['handler']) {
       for (const path of Array.isArray(paths) ? paths : [paths]) {
-         const p = this.preparePath(path);
+         const p = this.preparePath(path as string);
 
          if (!this.#eventEmitter.has(p)) {
             this.#eventEmitter.on(p, callback);
