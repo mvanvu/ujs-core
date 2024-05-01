@@ -48,7 +48,11 @@ export class Util {
    }
 
    static call<T>(instanceThis: any, fn: any, ...params: any[]): T {
-      return Is.callable(fn) ? fn.call(instanceThis, ...params) : fn;
+      return typeof fn?.constructor === 'function' && fn?.toString()?.startsWith('class ')
+         ? new fn(...params)
+         : Is.callable(fn)
+           ? fn.call(instanceThis, ...params)
+           : fn;
    }
 
    static callAsync<T>(instanceThis: any, fn: any, ...params: any[]): Promise<T> {
