@@ -14,7 +14,14 @@ export type EqualsRulesOptions = {
    equalsTo: any;
 };
 
-export type StrongPasswordOptions = { minLength?: number; noSpaces?: boolean };
+export type StrongPasswordOptions = {
+   minLength?: number;
+   noSpaces?: boolean;
+   minSpecialChars?: number;
+   minUpper?: number;
+   minLower?: number;
+   minNumber?: number;
+};
 
 export type FlatObjectRulesOptions = {
    allowArray?: boolean | { root?: boolean; deep?: boolean };
@@ -37,7 +44,9 @@ export type IsValidOptions<T> = {
               ? FlatObjectRulesOptions
               : IsEqual<T, 'strongPassword'> extends true
                 ? StrongPasswordOptions
-                : undefined;
+                : IsEqual<T, 'inArray'> extends true
+                  ? any[]
+                  : undefined;
 };
 
 export class IsError extends Error {}
@@ -604,18 +613,40 @@ export class Is {
 
       const minLength = options?.minLength ?? 8;
       const noSpaces = options?.noSpaces ?? true;
+      const minSpecialChars = options?.minSpecialChars ?? 1;
+      const minUpper = options?.minUpper ?? 1;
+      const minLower = options?.minLower ?? 1;
+      const minNumber = options?.minNumber ?? 1;
 
-      if (noSpaces && value.match(/\s+/)) {
+      if (
+         value.length < minLength ||
+         (noSpaces && value.match(/\s+/)) ||
+         (value.match(/[._-~`@#$%^&*()+=,]/g) || []).length < minSpecialChars ||
+         (value.match(/[A-Z]/g) || []).length < minUpper ||
+         (value.match(/[a-z]/g) || []).length < minLower ||
+         (value.match(/[0-9]/g) || []).length < minNumber
+      ) {
          return false;
       }
 
-      return (
-         value.length >= minLength && // Min length
-         /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9\s])/g.test(value) // At less 1 lower char, 1 upper char, 1 digit and 1 special char
-      );
+      return true;
    }
 
-   static promise(value: any): boolean {
+   static promise(value: any, each = false): boolean {
+      if (each) {
+         if (!Array.isArray(value)) {
+            return false;
+         }
+
+         for (const val of value) {
+            if (!Is.promise(val)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
       return value !== null && typeof value === 'object' && typeof value.then === 'function';
    }
 
@@ -635,6 +666,24 @@ export class Is {
       }
 
       return typeof value === 'string' && /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value);
+   }
+
+   static inArray(value: any, array: any[], each = false): boolean {
+      if (each) {
+         if (!Array.isArray(value)) {
+            return false;
+         }
+
+         for (const val of value) {
+            if (!Is.inArray(val, array)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
+      return array.includes(value);
    }
 
    static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean {
@@ -691,6 +740,9 @@ export class Is {
 
          case 'strongPassword':
             return Is.strongPassword(value, options.meta as StrongPasswordOptions);
+
+         case 'inArray':
+            return Is.inArray(value, options.meta as any[], options.each);
 
          default:
             return Is[method].call(null, value, false);

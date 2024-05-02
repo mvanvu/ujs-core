@@ -18,6 +18,10 @@ export type EqualsRulesOptions = {
 export type StrongPasswordOptions = {
     minLength?: number;
     noSpaces?: boolean;
+    minSpecialChars?: number;
+    minUpper?: number;
+    minLower?: number;
+    minNumber?: number;
 };
 export type FlatObjectRulesOptions = {
     allowArray?: boolean | {
@@ -29,7 +33,7 @@ export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' 
 export type IsValidOptions<T> = {
     type: T;
     each?: boolean;
-    meta?: IsEqual<T, 'object'> extends true ? ObjectRulesOptions : IsEqual<T, 'array'> extends true ? ArrayRulesOptions : IsEqual<T, 'objectOrArray'> extends true ? ObjectArrayRulesOptions : IsEqual<T, 'equals'> extends true ? EqualsRulesOptions : IsEqual<T, 'flatObject'> extends true ? FlatObjectRulesOptions : IsEqual<T, 'strongPassword'> extends true ? StrongPasswordOptions : undefined;
+    meta?: IsEqual<T, 'object'> extends true ? ObjectRulesOptions : IsEqual<T, 'array'> extends true ? ArrayRulesOptions : IsEqual<T, 'objectOrArray'> extends true ? ObjectArrayRulesOptions : IsEqual<T, 'equals'> extends true ? EqualsRulesOptions : IsEqual<T, 'flatObject'> extends true ? FlatObjectRulesOptions : IsEqual<T, 'strongPassword'> extends true ? StrongPasswordOptions : IsEqual<T, 'inArray'> extends true ? any[] : undefined;
 };
 export declare class IsError extends Error {
 }
@@ -72,7 +76,8 @@ export declare class Is {
     static nodeJs(): boolean;
     static nullOrUndefined(value: any, each?: boolean): boolean;
     static strongPassword(value: any, options?: StrongPasswordOptions, each?: boolean): boolean;
-    static promise(value: any): boolean;
+    static promise(value: any, each?: boolean): boolean;
     static email(value: any, each?: boolean): boolean;
+    static inArray(value: any, array: any[], each?: boolean): boolean;
     static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean;
 }

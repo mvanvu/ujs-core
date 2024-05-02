@@ -209,7 +209,7 @@ it('Core Is', () => {
    const arr = [{ foo: 123, bar: { number: { digit: 123 } } }];
    expect(Is.array(arr, { rules: { foo: 'number', bar: { number: { digit: 'uint' } } } })).toBeTruthy();
 
-   // # Is.strongPassword(value: string, options?: { minLength?: number; noSpaces?: boolean }): boolean
+   // # Is.strongPassword(value: string, options?: { minLength?: number; noSpaces?: boolean; minSpecialChars?: number; minUpper?: number; minLower?: number; minNumber?: number; }): boolean
    // ## Check the value is a strong password, returns false if the value is not a string
    const pwd = 'MyStrongPwd@123';
    expect(Is.strongPassword(pwd)).toBeTruthy();
