@@ -215,23 +215,24 @@ Is.equals({ foo: 'bar', bar: 123 }, { bar: 123, foo: 'bar2' }); // It returns: f
 Is.equals({ foo: 'bar', bar: 123 }, { bar: 123 }); // It returns: false
 ```
 
-#### Is.flatValue(value: any): boolean
+#### @deprecated Is.flatValue(value: any): boolean
 
 ```javascript
-// The flat value is a primitive value
-Is.flatValue(123); // It returns: true
-Is.flatValue(-123); // It returns: true
-Is.flatValue(null); // It returns: true
-Is.flatValue(void 0); // It returns: true
-Is.flatValue(''); // It returns: true
-Is.flatValue(true); // It returns: true
-Is.flatValue(false); // It returns: true
-Is.flatValue(NaN); // It returns: true
-Is.flatValue([]); // It returns: false
-Is.flatValue({}); // It returns: false
-Is.flatValue(() => {}); // It returns: false
-Is.flatValue(new Set()); // It returns: false
-Is.flatValue(new Map()); // It returns: false
+// Is.primitive(value: any): boolean
+
+Is.primitive(123); // It returns: true
+Is.primitive(-123); // It returns: true
+Is.primitive(null); // It returns: true
+Is.primitive(void 0); // It returns: true
+Is.primitive(''); // It returns: true
+Is.primitive(true); // It returns: true
+Is.primitive(false); // It returns: true
+Is.primitive(NaN); // It returns: true
+Is.primitive([]); // It returns: false
+Is.primitive({}); // It returns: false
+Is.primitive(() => {}); // It returns: false
+Is.primitive(new Set()); // It returns: false
+Is.primitive(new Map()); // It returns: false
 ```
 
 #### Is.empty(value: any): boolean
@@ -266,7 +267,7 @@ const arr = [{ foo: 123, bar: { number: { digit: 123 } } }];
 Is.array(arr, { rules: { foo: 'number', bar: { number: { digit: 'uint' } } } }); // It returns: true
 ```
 
-#### Is.strongPassword(value: string, options?: { minLength?: number; noSpaces?: boolean }): boolean
+#### Is.strongPassword(value: string, options?: { minLength?: number; noSpaces?: boolean; minSpecialChars?: number; minUpper?: number; minLower?: number; minNumber?: number; }): boolean
 
 ```javascript
 // Check the value is a strong password, returns false if the value is not a string
@@ -293,4 +294,20 @@ Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }, false); // It returns: false
 // More options: Allow properies as array on root level and don't allow properties as array on deep level
 Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }, { root: false, deep: true }); // It returns: false
 Is.flatObject({ foo: 1, bar: 2 }, { root: false, deep: true }); // It returns: true
+```
+
+#### valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
+
+```javascript
+// Validate the value with the specific options
+Is.valid('I am a string', { type: 'string' }); // It returns: true
+Is.valid(['Str 1', 'Str 2'], { type: 'string', each: true }); // It returns: true
+Is.valid(['Str 1', 'Str 2', 3], { type: 'string', each: true }); // It returns: false
+Is.valid({}, { type: 'object' }); // It returns: true
+Is.valid({ foo: 1, bar: false }, { type: 'object', meta: { suitable: true, rules: { foo: 'number', bar: 'boolean' } } }); // It returns: true
+Is.valid({ foo: 1, bar: false }, { type: 'flatObject' }); // It returns: true
+Is.valid({ foo: 1, bar: false }, { type: 'objectOrArray', meta: { object: { rules: { foo: 'number', bar: 'boolean' } } } }); // It returns: true
+Is.valid([{ foo: 1, bar: false }], { type: 'objectOrArray', meta: { array: { rules: { foo: 'number', bar: 'boolean' } } } }); // It returns: true
+Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: false } }); // It returns: true
+Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: true } }); // It returns: false
 ```

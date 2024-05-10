@@ -1,4 +1,5 @@
 'use strict';
+import { ObjectRecord } from 'src/type';
 import { DateTime, DateTimeLike } from './datetime';
 import { Is } from './is';
 
@@ -153,45 +154,74 @@ export class JWT {
    static readonly EXPIRED_TOKEN = 'INVALID_IAT';
    static readonly EXPIRED = 'EXPIRED_TOKEN';
 
-   async sign(data: any, options: { iat: DateTimeLike; secret: string }): Promise<string> {
-      const iat = DateTime.from(options.iat);
+   async sign(data: any, options: { exp: DateTimeLike; secret: string }): Promise<string> {
+      const exp = DateTime.from(options.exp);
+      const iat = DateTime.now();
 
-      if (!iat.valid) {
+      if (!exp.valid) {
          throw new JWTErrorInvalid();
       }
 
+      if (exp.lte(iat)) {
+         throw new JWTError('The expiry time must greater now');
+      }
+
+      if (!Is.string(options.secret) || Is.empty(options.secret)) {
+         throw new JWTError('Must provide a strong secret key');
+      }
+
       const header = Hash.base64UrlEncode(JSON.stringify(this.validHeader));
-      const payload = Hash.base64UrlEncode(JSON.stringify({ data, iat: iat.iso }));
-      const signature = Hash.base64UrlEncode(await Hash.sha256(`${header}.${payload}.${options.secret}`));
+      const payload = Hash.base64UrlEncode(JSON.stringify({ data, iat: iat.iso, exp: exp.iso }));
+      const secret = Hash.base64UrlEncode(options.secret);
+      const signature = Hash.base64UrlEncode(await Hash.sha256(`${header}.${payload}.${secret}`));
 
       return `${header}.${payload}.${signature}`;
    }
 
    async verify<T>(token: string, options: { secret: string }): Promise<T> {
-      const parts = token.split('.');
+      if (!Is.string(options.secret) || Is.empty(options.secret)) {
+         throw new JWTError('Must provide a strong secret key');
+      }
 
-      if (parts.length !== 3) {
+      const parts = token.split('.');
+      const decoded = this.decode(token);
+
+      if (parts.length !== 3 || !decoded) {
          throw new JWTErrorInvalid();
       }
 
-      const header = JSON.parse(Hash.base64UrlDecode(parts[0]));
-      const payload = JSON.parse(Hash.base64UrlDecode(parts[1]));
-      let d: DateTime | false;
+      let exp: DateTime | false;
+      const { header, payload } = decoded;
 
       if (
          !Is.equals(header, this.validHeader) ||
          !Is.object(payload) ||
-         !Is.equals(Object.keys(payload).sort(), ['data', 'iat']) ||
-         !(d = DateTime.from(payload.iat)).valid ||
-         Hash.base64UrlEncode(await Hash.sha256(`${parts[0]}.${parts[1]}.${options.secret}`)) !== parts[2]
+         !Is.equals(Object.keys(payload).sort(), ['data', 'exp', 'iat']) ||
+         !(exp = DateTime.from(payload.exp)).valid ||
+         Hash.base64UrlEncode(await Hash.sha256(`${parts[0]}.${parts[1]}.${Hash.base64UrlEncode(options.secret)}`)) !== parts[2]
       ) {
          throw new JWTErrorInvalid();
       }
 
-      if (d.lt('now', 'second')) {
+      if (exp.lte('now')) {
          throw new JWTErrorExpired();
       }
 
       return payload.data;
+   }
+
+   decode(token: string): { header: any; payload: any } | null {
+      try {
+         const parts = token.split('.');
+
+         if (parts.length >= 3) {
+            const header = JSON.parse(Hash.base64UrlDecode(parts[0]));
+            const payload = JSON.parse(Hash.base64UrlDecode(parts[1]));
+
+            return { header, payload };
+         }
+      } catch {}
+
+      return null;
    }
 }

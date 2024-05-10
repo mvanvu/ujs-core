@@ -32,7 +32,7 @@ it('Core Hash', async () => {
    const jwt = Hash.jwt();
    const hashSecret = Hash.uuid();
    const data = { sub: 123456, username: 'Im' };
-   const token = await jwt.sign(data, { iat: DateTime.now().add(30, 'second'), secret: hashSecret });
+   const token = await jwt.sign(data, { exp: DateTime.now().add(30, 'second'), secret: hashSecret });
 
    // ## Valid secret
    expect(await jwt.verify(token, { secret: hashSecret })).toEqual(data);
@@ -47,4 +47,7 @@ it('Core Hash', async () => {
    };
 
    expect((await verify()) instanceof JWTErrorInvalid).toBeTruthy();
+
+   // ## Decode token
+   expect(jwt.decode(token)?.payload?.data).toMatchObject(data);
 });

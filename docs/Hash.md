@@ -58,7 +58,7 @@ Hash.base64UrlDecode('aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS9zZWFyY2g_cT1iYXNlNjR1cmw');
 const jwt = Hash.jwt();
 const hashSecret = Hash.uuid();
 const data = { sub: 123456, username: 'Im' };
-const token = await jwt.sign(data, { iat: DateTime.now().add(30, 'second'), secret: hashSecret });
+const token = await jwt.sign(data, { exp: DateTime.now().add(30, 'second'), secret: hashSecret });
 
 // Valid secret
 await jwt.verify(token, { secret: hashSecret }); // It returns: data
@@ -73,4 +73,8 @@ const verify = async () => {
 };
 
 (await verify()) instanceof JWTErrorInvalid; // It returns: true
+
+// Decode token
+console.log(jwt.decode(token));
+jwt.decode(token)?.payload?.data; // It returns: data
 ```
