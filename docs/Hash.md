@@ -75,6 +75,5 @@ const verify = async () => {
 (await verify()) instanceof JWTErrorInvalid; // It returns: true
 
 // Decode token
-console.log(jwt.decode(token));
 jwt.decode(token)?.payload?.data; // It returns: data
 ```

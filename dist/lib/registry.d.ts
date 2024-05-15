@@ -2,18 +2,19 @@ import { ObjectRecord, EventHandler, Path } from '../type';
 export type RegistryDataType = ObjectRecord | any[];
 export declare class RegistryDataError extends Error {
 }
+export declare class RegistryConsistentError extends Error {
+}
+export type RegistryOptions = {
+    validate?: boolean;
+    clone?: boolean;
+    consistent?: boolean;
+};
 export declare class Registry<TData = any> {
     #private;
     private cached;
     private data;
-    constructor(data?: TData, options?: {
-        validate?: boolean;
-        clone?: boolean;
-    });
-    static from<TData = any>(data?: TData, options?: {
-        validate?: boolean;
-        clone?: boolean;
-    }): Registry<TData>;
+    constructor(data?: TData, options?: RegistryOptions);
+    static from<TData = any>(data?: TData, options?: RegistryOptions): Registry<TData>;
     merge(data: any, validate?: boolean): this;
     extends(data: any, validate?: boolean): this;
     parse(data?: any, options?: {
@@ -25,6 +26,7 @@ export declare class Registry<TData = any> {
     private isPathNum;
     private preparePath;
     get<T = any>(path: Path<TData>, defaultValue?: any, filter?: string | string[]): T;
+    private consistent;
     set(path: Path<TData>, value: any, validate?: boolean): this;
     initPathValue<T = any>(path: Path<TData>, value: T, validate?: boolean): T;
     has(path: Path<TData>): boolean;

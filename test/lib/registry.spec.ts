@@ -1,8 +1,8 @@
-import { Registry, RegistryDataError } from '../../src';
+import { Registry, RegistryConsistentError, RegistryDataError } from '../../src';
 
 it('Util Registry', () => {
    // # Create a registry instance
-   const registry = Registry.from({ foo: 123, bar: { foo1: 'bar1', foo2: 'bar2' } });
+   const registry = Registry.from<any>({ foo: 123, bar: { foo1: 'bar1', foo2: 'bar2' } });
    // ## OR const registry = Registry.from(); // the original data = {}
 
    // # registry.get<T>(path: string, defaultValue?: any, filter?: string | string[]): T
@@ -136,4 +136,10 @@ it('Util Registry', () => {
    // ## Watching the modified properties
    registry.watch('animal.list', (newVal, prevVal) => console.log({ newVal, prevVal }));
    registry.set('animal.list', ['dog', 'cat', 'tiger']);
+
+   // # Consistent mode: read only, throw RegistryConsistentError on the no exists path
+   const consistent = Registry.from<any>({ foo: 'bar' }, { consistent: true });
+   expect(() => consistent.get('bar')).toThrow(RegistryConsistentError);
+   expect(() => consistent.set('foo', 123)).toThrow(RegistryConsistentError);
+   expect(() => consistent.remove('foo')).toThrow(RegistryConsistentError);
 });

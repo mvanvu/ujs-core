@@ -6,18 +6,22 @@ import { EventEmitter } from './event-emitter';
 import { Util } from './util';
 export type RegistryDataType = ObjectRecord | any[];
 export class RegistryDataError extends Error {}
+export class RegistryConsistentError extends Error {}
+export type RegistryOptions = { validate?: boolean; clone?: boolean; consistent?: boolean };
 
 export class Registry<TData = any> {
+   #consistent: boolean;
    #eventEmitter = new EventEmitter();
 
    private cached: Record<string, any> = {};
    private data: RegistryDataType;
 
-   constructor(data?: TData, options?: { validate?: boolean; clone?: boolean }) {
+   constructor(data?: TData, options?: RegistryOptions) {
       this.parse(data, options);
+      this.#consistent = options?.consistent === true;
    }
 
-   static from<TData = any>(data?: TData, options?: { validate?: boolean; clone?: boolean }): Registry<TData> {
+   static from<TData = any>(data?: TData, options?: RegistryOptions): Registry<TData> {
       return new Registry<TData>(data, options);
    }
 
@@ -25,10 +29,13 @@ export class Registry<TData = any> {
     * @deprecated use extends instead
     */
    merge(data: any, validate?: boolean): this {
+      this.consistent();
+
       return this.extends(data, validate);
    }
 
    extends(data: any, validate?: boolean): this {
+      this.consistent();
       const deepExtends = (data: any, path?: string) => {
          if (Is.array(data)) {
             for (let i = 0, n = data.length; i < n; i++) {
@@ -49,6 +56,8 @@ export class Registry<TData = any> {
    }
 
    parse(data?: any, options?: { validate?: boolean; clone?: boolean }): this {
+      this.consistent();
+
       if (data === undefined) {
          data = {};
       } else if (Is.string(data) && ['{', '['].includes(data[0])) {
@@ -142,14 +151,27 @@ export class Registry<TData = any> {
          }
       }
 
-      if (this.cached[p] === undefined || this.cached[p] === defaultValue) {
+      const notExists = this.cached[p] === undefined;
+
+      if (notExists) {
+         this.consistent();
+      }
+
+      if (notExists || this.cached[p] === defaultValue) {
          return defaultValue;
       }
 
       return filter ? Transform.clean(this.cached[p], filter) : this.cached[p];
    }
 
+   private consistent() {
+      if (this.#consistent) {
+         throw new RegistryConsistentError();
+      }
+   }
+
    set(path: Path<TData>, value: any, validate?: boolean): this {
+      this.consistent();
       const p = this.preparePath(path as string);
       const prevValue = this.get(path);
 
@@ -292,7 +314,7 @@ export class Registry<TData = any> {
    }
 
    clone(): Registry {
-      return Registry.from(this.data, { clone: true });
+      return Registry.from(this.data, { clone: true, consistent: this.#consistent });
    }
 
    pick(paths: Path<TData>[] | Path<TData>): Registry {
@@ -303,15 +325,20 @@ export class Registry<TData = any> {
          registry.set(p, this.get(p as Path<TData>));
       }
 
+      registry.#consistent = this.#consistent;
+
       return registry;
    }
 
    omit(paths: Path<TData>[] | Path<TData>): Registry {
       const registry = this.clone();
+      registry.#consistent = false;
 
       for (const path of Array.isArray(paths) ? paths : [paths]) {
          registry.remove(this.preparePath(path as string));
       }
+
+      registry.#consistent = this.#consistent;
 
       return registry;
    }

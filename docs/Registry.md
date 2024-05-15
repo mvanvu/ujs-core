@@ -3,13 +3,13 @@
 ### Usage
 
 ```javascript
-import { Registry, RegistryDataError } from '@mvanvu/ujs';
+import { Registry, RegistryConsistentError, RegistryDataError } from '@mvanvu/ujs';
 ```
 
 #### Create a registry instance
 
 ```javascript
-const registry = Registry.from({ foo: 123, bar: { foo1: 'bar1', foo2: 'bar2' } });
+const registry = Registry.from < any > { foo: 123, bar: { foo1: 'bar1', foo2: 'bar2' } };
 
 // OR const registry = Registry.from(); // the original data = {}
 ```
@@ -194,4 +194,13 @@ Registry.from([{ foo: 1 }, { bar: { func: () => {} } }]).isValidData(); // It re
 // Watching the modified properties
 registry.watch('animal.list', (newVal, prevVal) => console.log({ newVal, prevVal }));
 registry.set('animal.list', ['dog', 'cat', 'tiger']);
+```
+
+#### Consistent mode: read only, throw RegistryConsistentError on the no exists path
+
+```javascript
+const consistent = Registry.from < any > ({ foo: 'bar' }, { consistent: true });
+consistent.get('bar'); // Throw an exception which instance of RegistryConsistentError
+consistent.set('foo', 123); // Throw an exception which instance of RegistryConsistentError
+consistent.remove('foo'); // Throw an exception which instance of RegistryConsistentError
 ```
