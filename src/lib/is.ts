@@ -27,7 +27,7 @@ export type FlatObjectRulesOptions = {
    allowArray?: boolean | { root?: boolean; deep?: boolean };
 };
 
-export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' | 'flatValue' | 'nodeJs' | 'valid' ? never : T;
+export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' | 'nodeJs' | 'valid' ? never : T;
 
 export type IsValidOptions<T> = {
    type: T;
@@ -46,7 +46,9 @@ export type IsValidOptions<T> = {
                 ? StrongPasswordOptions
                 : IsEqual<T, 'inArray'> extends true
                   ? any[]
-                  : undefined;
+                  : IsEqual<T, 'includes'> extends true
+                    ? any
+                    : undefined;
 };
 
 export class IsError extends Error {}
@@ -280,11 +282,6 @@ export class Is {
 
    static dateString(d: any, each = false): boolean {
       return Is.typeOf(d, 'datestring', each);
-   }
-
-   /** @deprecated Use Is.primitive instead */
-   static flatValue(value: any, each = false): boolean {
-      return Is.primitive(value, each);
    }
 
    static primitive(value: any, each = false): boolean {
@@ -686,9 +683,46 @@ export class Is {
       return array.includes(value);
    }
 
+   static includes(value: any, target: any): boolean {
+      if (Is.string(value)) {
+         return Is.string(target) ? value.includes(target) : false;
+      }
+
+      if (Is.array(value)) {
+         return value.includes(target);
+      }
+
+      if (Is.object(value) && (Is.object(target) || Is.string(target))) {
+         if (Is.string(target)) {
+            const paths = target.split('.');
+            let o = value;
+
+            for (let i = 0, n = paths.length; i < n; i++) {
+               const prop = paths[i];
+
+               if (!Is.object(o) || !o.hasOwnProperty(prop)) {
+                  return false;
+               }
+
+               o = o[prop];
+            }
+         } else {
+            for (const key in target) {
+               if (!value.hasOwnProperty(key) || !Is.equals(value[key], target[key])) {
+                  return false;
+               }
+            }
+         }
+
+         return true;
+      }
+
+      return false;
+   }
+
    static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean {
       const { type: method } = options;
-      const invalidMethods = ['typeOf', 'prototype', 'flatValue', 'nodeJs', 'valid'];
+      const invalidMethods = ['typeOf', 'prototype', 'nodeJs', 'valid'];
 
       if (invalidMethods.includes(method) || !Is.callable(Is[method])) {
          return false;
@@ -743,6 +777,9 @@ export class Is {
 
          case 'inArray':
             return Is.inArray(value, options.meta as any[], options.each);
+
+         case 'includes':
+            return Is.includes(value, options.meta as any);
 
          default:
             return Is[method].call(null, value, false);

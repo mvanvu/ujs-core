@@ -9,7 +9,7 @@ export class Util {
    static clone<T>(src: T): T {
       let newInst: any = src;
 
-      if (Is.flatValue(newInst)) {
+      if (Is.primitive(newInst)) {
          return newInst;
       }
 

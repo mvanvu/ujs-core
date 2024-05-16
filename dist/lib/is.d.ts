@@ -29,11 +29,11 @@ export type FlatObjectRulesOptions = {
         deep?: boolean;
     };
 };
-export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' | 'flatValue' | 'nodeJs' | 'valid' ? never : T;
+export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' | 'nodeJs' | 'valid' ? never : T;
 export type IsValidOptions<T> = {
     type: T;
     each?: boolean;
-    meta?: IsEqual<T, 'object'> extends true ? ObjectRulesOptions : IsEqual<T, 'array'> extends true ? ArrayRulesOptions : IsEqual<T, 'objectOrArray'> extends true ? ObjectArrayRulesOptions : IsEqual<T, 'equals'> extends true ? EqualsRulesOptions : IsEqual<T, 'flatObject'> extends true ? FlatObjectRulesOptions : IsEqual<T, 'strongPassword'> extends true ? StrongPasswordOptions : IsEqual<T, 'inArray'> extends true ? any[] : undefined;
+    meta?: IsEqual<T, 'object'> extends true ? ObjectRulesOptions : IsEqual<T, 'array'> extends true ? ArrayRulesOptions : IsEqual<T, 'objectOrArray'> extends true ? ObjectArrayRulesOptions : IsEqual<T, 'equals'> extends true ? EqualsRulesOptions : IsEqual<T, 'flatObject'> extends true ? FlatObjectRulesOptions : IsEqual<T, 'strongPassword'> extends true ? StrongPasswordOptions : IsEqual<T, 'inArray'> extends true ? any[] : IsEqual<T, 'includes'> extends true ? any : undefined;
 };
 export declare class IsError extends Error {
 }
@@ -44,7 +44,6 @@ export declare class Is {
     static date(d: any, each?: boolean): boolean;
     static datetime(d: any, each?: boolean): boolean;
     static dateString(d: any, each?: boolean): boolean;
-    static flatValue(value: any, each?: boolean): boolean;
     static primitive(value: any, each?: boolean): boolean;
     static empty(value: any, each?: boolean): boolean;
     static nothing(value: any, each?: boolean): boolean;
@@ -79,5 +78,6 @@ export declare class Is {
     static promise(value: any, each?: boolean): boolean;
     static email(value: any, each?: boolean): boolean;
     static inArray(value: any, array: any[], each?: boolean): boolean;
+    static includes(value: any, target: any): boolean;
     static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean;
 }

@@ -296,6 +296,29 @@ Is.flatObject({ foo: 1, bar: [{ bar: 2 }] }, { root: false, deep: true }); // It
 Is.flatObject({ foo: 1, bar: 2 }, { root: false, deep: true }); // It returns: true
 ```
 
+#### Is.includes(value: any, target: any): boolean
+
+```javascript
+// When the value is string or array
+Is.includes('Hello World', 'ello Wor'); // It returns: true
+Is.includes(['Hello World'], 'ello Wor'); // It returns: false
+Is.includes(['Hello', 'World'], 'World'); // It returns: true
+
+// When the value is object and the target is object or string
+Is.includes({ foo: 1, bar: 2 }, { foo: 1, bar: 2 }); // It returns: true
+Is.includes({ foo: 1, bar: 2 }, { foo: 1 }); // It returns: true
+Is.includes({ foo: 1, bar: 2 }, { bar: 2 }); // It returns: true
+Is.includes({ foo: 1, bar: 2 }, { bar: '2' }); // It returns: false
+Is.includes({ foo: 1, bar: 2 }, { deep: { foo: 123, bar: 456 } }); // It returns: false
+Is.includes({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, { deep: { foo: 123, bar: 456 } }); // It returns: true
+
+// Otherwise will returns false
+Is.includes(123, 'string'); // It returns: false
+Is.includes('string', false); // It returns: false
+Is.includes(null, 'string'); // It returns: false
+Is.includes({}, false); // It returns: false
+```
+
 #### valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
 
 ```javascript
@@ -310,4 +333,5 @@ Is.valid({ foo: 1, bar: false }, { type: 'objectOrArray', meta: { object: { rule
 Is.valid([{ foo: 1, bar: false }], { type: 'objectOrArray', meta: { array: { rules: { foo: 'number', bar: 'boolean' } } } }); // It returns: true
 Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: false } }); // It returns: true
 Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: true } }); // It returns: false
+Is.valid({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, { type: 'includes', meta: { deep: { foo: 123, bar: 456 } } }); // It returns: true
 ```
