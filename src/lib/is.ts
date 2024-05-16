@@ -720,6 +720,24 @@ export class Is {
       return false;
    }
 
+   static class(value: any, each = false): boolean {
+      if (each) {
+         if (!Array.isArray(value)) {
+            return false;
+         }
+
+         for (const val of value) {
+            if (!Is.class(val)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
+      return Is.func(value) && value.toString()?.startsWith('class ');
+   }
+
    static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean {
       const { type: method } = options;
       const invalidMethods = ['typeOf', 'prototype', 'nodeJs', 'valid'];
@@ -776,7 +794,7 @@ export class Is {
             return Is.strongPassword(value, options.meta as StrongPasswordOptions);
 
          case 'inArray':
-            return Is.inArray(value, options.meta as any[], options.each);
+            return Is.inArray(value, options.meta as any[]);
 
          case 'includes':
             return Is.includes(value, options.meta as any);

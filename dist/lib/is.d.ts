@@ -79,5 +79,6 @@ export declare class Is {
     static email(value: any, each?: boolean): boolean;
     static inArray(value: any, array: any[], each?: boolean): boolean;
     static includes(value: any, target: any): boolean;
+    static class(value: any, each?: boolean): boolean;
     static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean;
 }

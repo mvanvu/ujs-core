@@ -252,7 +252,12 @@ it('Core Is', () => {
    expect(Is.includes(null, 'string')).toBeFalsy();
    expect(Is.includes({}, false)).toBeFalsy();
 
-   // # valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
+   // # Is.class(value: any, each = false): boolean
+   expect(Is.class(class Foo {})).toBeTruthy();
+   expect(Is.class([class Foo {}, class Bar {}], true)).toBeTruthy();
+   expect(Is.class(function () {})).toBeFalsy();
+
+   // # Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
    // ## Validate the value with the specific options
    expect(Is.valid('I am a string', { type: 'string' })).toBeTruthy();
    expect(Is.valid(['Str 1', 'Str 2'], { type: 'string', each: true })).toBeTruthy();
@@ -265,4 +270,5 @@ it('Core Is', () => {
    expect(Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: false } })).toBeTruthy();
    expect(Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: true } })).toBeFalsy();
    expect(Is.valid({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, { type: 'includes', meta: { deep: { foo: 123, bar: 456 } } })).toBeTruthy();
+   expect(Is.valid(class Foo {}, { type: 'class' })).toBeTruthy();
 });

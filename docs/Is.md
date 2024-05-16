@@ -319,7 +319,15 @@ Is.includes(null, 'string'); // It returns: false
 Is.includes({}, false); // It returns: false
 ```
 
-#### valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
+#### Is.class(value: any, each = false): boolean
+
+```javascript
+Is.class(class Foo {}); // It returns: true
+Is.class([class Foo {}, class Bar {}], true); // It returns: true
+Is.class(function () {}); // It returns: false
+```
+
+#### Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
 
 ```javascript
 // Validate the value with the specific options
@@ -334,4 +342,5 @@ Is.valid([{ foo: 1, bar: false }], { type: 'objectOrArray', meta: { array: { rul
 Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: false } }); // It returns: true
 Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: true } }); // It returns: false
 Is.valid({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, { type: 'includes', meta: { deep: { foo: 123, bar: 456 } } }); // It returns: true
+Is.valid(class Foo {}, { type: 'class' }); // It returns: true
 ```
