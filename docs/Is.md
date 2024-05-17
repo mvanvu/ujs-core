@@ -327,6 +327,25 @@ Is.class([class Foo {}, class Bar {}], true); // It returns: true
 Is.class(function () {}); // It returns: false
 ```
 
+#### static mongoId(value: any, each = false): boolean
+
+```javascript
+Is.mongoId('507f1f77bcf86cd799439011'); // It returns: true
+Is.mongoId(['507f1f77bcf86cd799439011', '507f191e810c19729de860ea'], true); // It returns: true
+Is.mongoId(1); // It returns: false
+Is.mongoId([1, 2], true); // It returns: false
+```
+
+#### static creditCard(value: any, type?: CreditCardType, each = false): boolean\
+
+```javascript
+Is.creditCard('4000056655665556', 'VISA'); // It returns: true
+Is.creditCard('2223003122003222', 'MASTERCARD'); // It returns: true
+Is.creditCard('6011111111111117', 'DISCOVER'); // It returns: true
+Is.creditCard('36227206271667', 'DINERS'); // It returns: true
+Is.creditCard('3566002020360505', 'JCB'); // It returns: true
+```
+
 #### Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
 
 ```javascript
@@ -343,4 +362,8 @@ Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'numbe
 Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: true } }); // It returns: false
 Is.valid({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, { type: 'includes', meta: { deep: { foo: 123, bar: 456 } } }); // It returns: true
 Is.valid(class Foo {}, { type: 'class' }); // It returns: true
+Is.valid(['4242424242424242', '4000056655665556'], { type: 'creditCard', each: true, meta: 'VISA' }); // It returns: true
+Is.valid(['5555555555554444', '2223003122003222', '5105105105105100'], { type: 'creditCard', each: true, meta: 'MASTERCARD' }); // It returns: true
+Is.valid(['6011111111111117', '6011000990139424', '6011981111111113'], { type: 'creditCard', each: true, meta: 'DISCOVER' }); // It returns: true
+Is.valid(['3056930009020004', '36227206271667'], { type: 'creditCard', each: true, meta: 'DINERS' }); // It returns: true
 ```

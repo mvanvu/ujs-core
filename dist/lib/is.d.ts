@@ -29,18 +29,19 @@ export type FlatObjectRulesOptions = {
         deep?: boolean;
     };
 };
-export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' | 'nodeJs' | 'valid' ? never : T;
+export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' | 'nodeJs' | 'valid' | 'each' ? never : T;
 export type IsValidOptions<T> = {
     type: T;
     each?: boolean;
-    meta?: IsEqual<T, 'object'> extends true ? ObjectRulesOptions : IsEqual<T, 'array'> extends true ? ArrayRulesOptions : IsEqual<T, 'objectOrArray'> extends true ? ObjectArrayRulesOptions : IsEqual<T, 'equals'> extends true ? EqualsRulesOptions : IsEqual<T, 'flatObject'> extends true ? FlatObjectRulesOptions : IsEqual<T, 'strongPassword'> extends true ? StrongPasswordOptions : IsEqual<T, 'inArray'> extends true ? any[] : IsEqual<T, 'includes'> extends true ? any : undefined;
+    meta?: IsEqual<T, 'object'> extends true ? ObjectRulesOptions : IsEqual<T, 'array'> extends true ? ArrayRulesOptions : IsEqual<T, 'objectOrArray'> extends true ? ObjectArrayRulesOptions : IsEqual<T, 'equals'> extends true ? EqualsRulesOptions : IsEqual<T, 'flatObject'> extends true ? FlatObjectRulesOptions : IsEqual<T, 'strongPassword'> extends true ? StrongPasswordOptions : IsEqual<T, 'inArray'> extends true ? any[] : IsEqual<T, 'includes'> extends true ? any : IsEqual<T, 'creditCard'> extends true ? CreditCardType : undefined;
 };
+export type CreditCardType = 'VISA' | 'AMEX' | 'MASTERCARD' | 'DISCOVER' | 'DINERS' | 'JCB' | 'CHINA_UNION_PAY';
 export declare class IsError extends Error {
 }
 export declare class Is {
     static typeOf(value: any, type: CommonType, each?: boolean): boolean;
     static equals(a: any, b: any): boolean;
-    static emptyObject(obj: any, each?: boolean): boolean;
+    static emptyObject(value: any, each?: boolean): boolean;
     static date(d: any, each?: boolean): boolean;
     static datetime(d: any, each?: boolean): boolean;
     static dateString(d: any, each?: boolean): boolean;
@@ -78,7 +79,10 @@ export declare class Is {
     static promise(value: any, each?: boolean): boolean;
     static email(value: any, each?: boolean): boolean;
     static inArray(value: any, array: any[], each?: boolean): boolean;
-    static includes(value: any, target: any): boolean;
+    static includes(value: any, target: any, each?: boolean): boolean;
     static class(value: any, each?: boolean): boolean;
+    static each(each: boolean, value: any, callback: (item: any) => boolean): boolean;
+    static mongoId(value: any, each?: boolean): boolean;
+    static creditCard(value: any, type?: CreditCardType, each?: boolean): boolean;
     static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean;
 }
