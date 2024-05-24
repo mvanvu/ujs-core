@@ -154,7 +154,7 @@ export class Registry<TData = any> {
       const notExists = this.cached[p] === undefined;
 
       if (notExists) {
-         this.consistent();
+         this.consistent(path);
       }
 
       if (notExists || this.cached[p] === defaultValue) {
@@ -164,14 +164,14 @@ export class Registry<TData = any> {
       return filter ? Transform.clean(this.cached[p], filter) : this.cached[p];
    }
 
-   private consistent() {
+   private consistent(path?: Path<TData>): void {
       if (this.#consistent) {
-         throw new RegistryConsistentError(`This registry in consistent mode, make sure you don't get the no exists value and don't set/remove any value`);
+         throw new RegistryConsistentError(`This registry in consistent mode, make sure you don't get the no exists value and don't set/remove any value${path ? `, path: ${path}` : ''}`);
       }
    }
 
    set(path: Path<TData>, value: any, validate?: boolean): this {
-      this.consistent();
+      this.consistent(path);
       const p = this.preparePath(path as string);
       const prevValue = this.get(path);
 
