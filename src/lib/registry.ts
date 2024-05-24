@@ -166,7 +166,7 @@ export class Registry<TData = any> {
 
    private consistent() {
       if (this.#consistent) {
-         throw new RegistryConsistentError();
+         throw new RegistryConsistentError(`This registry in consistent mode, make sure you don't get the no exists value and don't set/remove any value`);
       }
    }
 
