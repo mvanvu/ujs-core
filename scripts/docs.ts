@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { Arr, Str } from '../src';
+import { Util } from '../src';
 (async () => {
    const docsPath = process.cwd() + '/test/lib';
    const testFiles = fs.readdirSync(docsPath);
@@ -9,7 +9,7 @@ import { Arr, Str } from '../src';
          continue;
       }
 
-      const docFile = Arr.from([]);
+      const docFile: string[] = [];
       const lines = fs.readFileSync(`${docsPath}/${testFile}`).toString('utf8').split('\n');
 
       for (let line of lines) {
@@ -30,7 +30,7 @@ import { Arr, Str } from '../src';
                const code = matched[2];
                let subComment = code.indexOf('#') === 0 ? code.substring(1).trim() : `// ${code}`;
 
-               if (!docFile.last<string[]>().includes('javascript')) {
+               if (!docFile[docFile.length - 1].includes('javascript')) {
                   subComment = `\n${subComment}`;
                }
 
@@ -74,20 +74,20 @@ import { Arr, Str } from '../src';
 
                docFile.push(`${expectMatched[1]}; // ${ret}`);
             } else {
-               docFile.push(line.replace(/^-+/g, (match) => Str.repeat(' ', match.length)));
+               docFile.push(line.replace(/^-+/g, (match) => Util.repeat(' ', match.length)));
             }
          }
       }
 
       if (docFile.length > 1) {
-         docFile.walk('last', (index: number) => {
-            if (docFile[index].match(/;$/g)) {
-               docFile.push('```');
-            }
-         });
+         const last = docFile[docFile.length - 1];
+
+         if (last.match(/;$/g)) {
+            docFile.push('```');
+         }
 
          const outPath = `${process.cwd()}/docs`;
-         const file = Str.uFirst(testFile).split('.')[0];
+         const file = Util.uFirst(testFile).split('.')[0];
 
          if (!fs.existsSync(outPath)) {
             fs.mkdirSync(outPath, { recursive: true });
