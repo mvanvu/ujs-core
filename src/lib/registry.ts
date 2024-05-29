@@ -9,33 +9,23 @@ export class RegistryDataError extends Error {}
 export class RegistryConsistentError extends Error {}
 export type RegistryOptions = { validate?: boolean; clone?: boolean; consistent?: boolean };
 
-export class Registry<TData = any> {
-   #consistent: boolean;
-   #eventEmitter = new EventEmitter();
+export class Registry<TPath = string> {
+   private consistent: boolean = false;
+   private eventEmitter = new EventEmitter();
 
    private cached: Record<string, any> = {};
    private data: RegistryDataType;
 
-   constructor(data?: TData, options?: RegistryOptions) {
+   constructor(data?: any, options?: RegistryOptions) {
       this.parse(data, options);
-      this.#consistent = options?.consistent === true;
+      this.consistent = options?.consistent === true;
    }
 
-   static from<TData = any>(data?: TData, options?: RegistryOptions): Registry<TData> {
-      return new Registry<TData>(data, options);
-   }
-
-   /**
-    * @deprecated use extends instead
-    */
-   merge(data: any, validate?: boolean): this {
-      this.consistent();
-
-      return this.extends(data, validate);
+   static from<TPath = string>(data?: any, options?: RegistryOptions): Registry<TPath> {
+      return new Registry<TPath>(data, options);
    }
 
    extends(data: any, validate?: boolean): this {
-      this.consistent();
       const deepExtends = (data: any, path?: string) => {
          if (Is.array(data)) {
             for (let i = 0, n = data.length; i < n; i++) {
@@ -46,7 +36,7 @@ export class Registry<TData = any> {
                deepExtends(data[p], `${path ? `${path}.` : ''}${p}`);
             }
          } else if (Is.string(path)) {
-            this.set(path as Path<TData>, data, validate);
+            this.set(path as TPath, data, validate);
          }
       };
 
@@ -56,7 +46,7 @@ export class Registry<TData = any> {
    }
 
    parse(data?: any, options?: { validate?: boolean; clone?: boolean }): this {
-      this.consistent();
+      this.validateConsistent();
 
       if (data === undefined) {
          data = {};
@@ -66,7 +56,7 @@ export class Registry<TData = any> {
          } catch {
             throw new RegistryDataError('Invalid JSON string data');
          }
-      } else if ((Is.object(data) || Is.array(data)) && options?.clone !== false) {
+      } else if (Is.objectOrArray(data) && options?.clone !== false) {
          // Renew data to ignore the Object reference
          data = Util.clone(data);
       }
@@ -100,7 +90,7 @@ export class Registry<TData = any> {
    isValidData(data?: any): boolean {
       data = data ?? this.data;
 
-      if (Array.isArray(data)) {
+      if (Is.array(data)) {
          for (const datum of data) {
             if (Is.object(datum) && !Is.flatObject(datum)) {
                return false;
@@ -119,7 +109,7 @@ export class Registry<TData = any> {
       return /^\d+$/.test(path);
    }
 
-   private preparePath(path: string) {
+   private preparePath(path: string): string {
       if (path.match(/\[\d+\]/)) {
          path = Transform.trim(path.replace(/\[(\d+)\]/g, '.$1'), { specialChars: '.' });
       }
@@ -127,7 +117,7 @@ export class Registry<TData = any> {
       return path;
    }
 
-   get<T = any>(path: Path<TData>, defaultValue?: any, filter?: string | string[]): T {
+   get<T = any>(path: TPath, defaultValue?: any, filter?: string | string[]): T {
       const p = this.preparePath(path as string);
 
       if (this.cached[p] === undefined) {
@@ -153,10 +143,6 @@ export class Registry<TData = any> {
 
       const notExists = this.cached[p] === undefined;
 
-      if (notExists) {
-         this.consistent(path);
-      }
-
       if (notExists || this.cached[p] === defaultValue) {
          return defaultValue;
       }
@@ -164,14 +150,16 @@ export class Registry<TData = any> {
       return filter ? Transform.clean(this.cached[p], filter) : this.cached[p];
    }
 
-   private consistent(path?: Path<TData>): void {
-      if (this.#consistent) {
-         throw new RegistryConsistentError(`This registry in consistent mode, make sure you don't get the no exists value and don't set/remove any value${path ? `, path: ${path}` : ''}`);
+   private validateConsistent(path?: TPath): void {
+      if (this.consistent) {
+         throw new RegistryConsistentError(
+            `This registry in consistent mode, make sure you don't get the no exists value and don't set/remove any value${path ? `, path: ${path}` : ''}`,
+         );
       }
    }
 
-   set(path: Path<TData>, value: any, validate?: boolean): this {
-      this.consistent(path);
+   set(path: TPath, value: any, validate?: boolean): this {
+      this.validateConsistent(path);
       const p = this.preparePath(path as string);
       const prevValue = this.get(path);
 
@@ -188,8 +176,8 @@ export class Registry<TData = any> {
 
       if (p.indexOf('.') === -1) {
          if (value === undefined) {
-            if (this.isPathNum(p) && Array.isArray(this.data)) {
-               this.data.splice(Number(path), 1);
+            if (this.isPathNum(p) && Is.array(this.data)) {
+               this.data.splice(Number(p), 1);
             } else {
                delete this.data[p];
             }
@@ -204,10 +192,10 @@ export class Registry<TData = any> {
          for (let i = 0; i < n; i++) {
             const key = keys[i];
 
-            if (!data[key] || (typeof data[key] !== 'object' && !Array.isArray(data[key]))) {
+            if (!Is.objectOrArray(data[key])) {
                // Invalid path, return this if the value === undefined (remove path)
                if (value === undefined) {
-                  if (this.isPathNum(key) && Array.isArray(data[key])) {
+                  if (this.isPathNum(key) && Is.array(data[key])) {
                      data.splice(Number(key), 1);
                   } else {
                      delete data[key];
@@ -230,14 +218,14 @@ export class Registry<TData = any> {
          const isArray = this.isPathNum(keys[n]);
 
          // Remove old value to clear object non reference
-         if (isArray && Array.isArray(data)) {
+         if (isArray && Is.array(data)) {
             data.splice(Number(keys[n]), 1);
          } else {
             delete data[keys[n]];
          }
 
          if (value !== undefined) {
-            if (isArray && !Array.isArray(data)) {
+            if (isArray && !Is.array(data)) {
                data = [];
             }
 
@@ -248,17 +236,17 @@ export class Registry<TData = any> {
       const newValue = this.get(path);
 
       if (!Is.equals(prevValue, newValue)) {
-         this.#eventEmitter.emit(p, newValue, prevValue);
+         this.eventEmitter.emit(p, newValue, prevValue);
       }
 
       if (value === undefined) {
-         this.#eventEmitter.remove(p);
+         this.eventEmitter.remove(p);
       }
 
       return this;
    }
 
-   initPathValue<T = any>(path: Path<TData>, value: T, validate?: boolean): T {
+   initPathValue<T = any>(path: TPath, value: T, validate?: boolean): T {
       if (!this.has(path)) {
          this.set(path, value, validate);
       }
@@ -266,11 +254,11 @@ export class Registry<TData = any> {
       return value;
    }
 
-   has(path: Path<TData>): boolean {
+   has(path: TPath): boolean {
       return !Is.undefined(this.get(path, undefined));
    }
 
-   is(path: Path<TData>, compareValue?: any): boolean {
+   is(path: TPath, compareValue?: any): boolean {
       const value = this.get(path);
 
       if (Is.undefined(compareValue)) {
@@ -289,19 +277,19 @@ export class Registry<TData = any> {
       return this.cached.hasOwnProperty(this.preparePath(path));
    }
 
-   isPathArray(path?: Path<TData>): boolean {
+   isPathArray(path?: TPath): boolean {
       return Is.array(path ? this.get(path) : this.data);
    }
 
-   isPathObject(path?: Path<TData>): boolean {
+   isPathObject(path?: TPath): boolean {
       return Is.object(path ? this.get(path) : this.data);
    }
 
-   isPathFlat(path: Path<TData>): boolean {
+   isPathFlat(path: TPath): boolean {
       return Is.primitive(this.get(path));
    }
 
-   remove(path: Path<TData>): this {
+   remove(path: TPath): this {
       return this.set(path, undefined);
    }
 
@@ -313,42 +301,42 @@ export class Registry<TData = any> {
       return <T>this.data;
    }
 
-   clone(): Registry {
-      return Registry.from(this.data, { clone: true, consistent: this.#consistent });
+   clone(): Registry<TPath> {
+      return Registry.from(this.data, { clone: true, consistent: this.consistent });
    }
 
-   pick(paths: Path<TData>[] | Path<TData>): Registry {
-      const registry = Registry.from();
+   pick(paths: TPath[] | TPath): Registry<TPath> {
+      const registry = Registry.from<TPath>();
 
-      for (const path of Array.isArray(paths) ? paths : [paths]) {
+      for (const path of (Is.array(paths) ? paths : [paths]) as TPath[]) {
          const p = this.preparePath(path as string);
-         registry.set(p, this.get(p as Path<TData>));
+         registry.set(p as TPath, this.get(p as TPath));
       }
 
-      registry.#consistent = this.#consistent;
+      registry.consistent = this.consistent;
 
       return registry;
    }
 
-   omit(paths: Path<TData>[] | Path<TData>): Registry {
+   omit(paths: TPath[] | TPath): Registry<TPath> {
       const registry = this.clone();
-      registry.#consistent = false;
+      registry.consistent = false;
 
-      for (const path of Array.isArray(paths) ? paths : [paths]) {
-         registry.remove(this.preparePath(path as string));
+      for (const path of (Is.array(paths) ? paths : [paths]) as TPath[]) {
+         registry.remove(this.preparePath(path as string) as any);
       }
 
-      registry.#consistent = this.#consistent;
+      registry.consistent = this.consistent;
 
       return registry;
    }
 
-   watch(paths: Path<TData>[] | Path<TData>, callback: EventHandler['handler']) {
-      for (const path of Array.isArray(paths) ? paths : [paths]) {
+   watch(paths: TPath[] | TPath, callback: EventHandler['handler']) {
+      for (const path of (Is.array(paths) ? paths : [paths]) as TPath[]) {
          const p = this.preparePath(path as string);
 
-         if (!this.#eventEmitter.has(p)) {
-            this.#eventEmitter.on(p, callback);
+         if (!this.eventEmitter.has(p)) {
+            this.eventEmitter.on(p, callback);
          }
       }
    }

@@ -3,9 +3,9 @@ import { Is } from './is';
 import { EventHandler } from '../type';
 
 export class EventEmitter {
-   #events: EventHandler[] = [];
+   private _events: EventHandler[] = [];
 
-   static #instance: EventEmitter;
+   private static instance: EventEmitter;
 
    static get HIGH(): 100 {
       return 100;
@@ -24,23 +24,23 @@ export class EventEmitter {
    }
 
    get events(): EventHandler[] {
-      return this.#events;
+      return this._events;
    }
 
    static getInstance(): EventEmitter {
-      if (!EventEmitter.#instance) {
-         EventEmitter.#instance = new EventEmitter();
+      if (!EventEmitter.instance) {
+         EventEmitter.instance = new EventEmitter();
       }
 
-      return EventEmitter.#instance;
+      return EventEmitter.instance;
    }
 
    on(name: string, handler: EventHandler['handler'], priority?: number): this {
-      if (Is.callable(handler) && !this.#events.find((evt) => evt.once === true)) {
-         this.#events.push({ name, handler, once: false, disabled: false, priority: Is.number(priority) ? priority : EventEmitter.NORMAL });
+      if (Is.callable(handler) && !this._events.find((evt) => evt.once === true)) {
+         this._events.push({ name, handler, once: false, disabled: false, priority: Is.number(priority) ? priority : EventEmitter.NORMAL });
 
          // Re-order by priority
-         Util.sort<EventHandler[]>(this.#events, { key: 'priority', desc: true });
+         Util.sort<EventHandler[]>(this._events, { key: 'priority', desc: true });
       }
 
       return this;
@@ -51,30 +51,30 @@ export class EventEmitter {
          for (const n of name) {
             this.once(n, handler);
          }
-      } else if (!this.#events.find((evt) => evt.once === true)) {
-         this.#events.push({ name, handler, once: true, disabled: false, priority: EventEmitter.NORMAL });
+      } else if (!this._events.find((evt) => evt.once === true)) {
+         this._events.push({ name, handler, once: true, disabled: false, priority: EventEmitter.NORMAL });
       }
 
       return this;
    }
 
    has(name: string): boolean {
-      return this.#events.findIndex((evt) => evt.name === name) !== -1;
+      return this._events.findIndex((evt) => evt.name === name) !== -1;
    }
 
    remove(name?: string | string[]): this {
       if (name === undefined) {
-         this.#events.splice(0, this.#events.length);
+         this._events.splice(0, this._events.length);
       } else {
          if (Array.isArray(name)) {
             for (const n of name) {
                this.remove(n);
             }
          } else {
-            const index = this.#events.findIndex((evt) => evt.name === name);
+            const index = this._events.findIndex((evt) => evt.name === name);
 
             if (index !== -1) {
-               this.#events.splice(index, 1);
+               this._events.splice(index, 1);
             }
          }
       }
@@ -84,14 +84,14 @@ export class EventEmitter {
 
    off(name?: string | string[]): this {
       const names = name === undefined ? [] : Array.isArray(name) ? name : [name];
-      this.#events.forEach((evt) => (!names.length || names.includes(evt.name)) && !evt.disabled && (evt.disabled = true));
+      this._events.forEach((evt) => (!names.length || names.includes(evt.name)) && !evt.disabled && (evt.disabled = true));
 
       return this;
    }
 
    open(name?: string | string[]): this {
       const names = name === undefined ? [] : Array.isArray(name) ? name : [name];
-      this.#events.forEach((evt) => (!names.length || names.includes(evt.name)) && evt.disabled && (evt.disabled = false));
+      this._events.forEach((evt) => (!names.length || names.includes(evt.name)) && evt.disabled && (evt.disabled = false));
 
       return this;
    }
@@ -99,7 +99,7 @@ export class EventEmitter {
    getEventHandlers(name: string | string[]): EventHandler[] {
       const names = Array.isArray(name) ? name : [name];
 
-      return this.#events.filter((evt) => names.includes(evt.name) && !evt.disabled);
+      return this._events.filter((evt) => names.includes(evt.name) && !evt.disabled);
    }
 
    emit(name: string | string[], ...args: any[]): any[] {

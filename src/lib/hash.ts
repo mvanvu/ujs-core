@@ -1,5 +1,4 @@
 'use strict';
-import { ObjectRecord } from 'src/type';
 import { DateTime, DateTimeLike } from './datetime';
 import { Is } from './is';
 

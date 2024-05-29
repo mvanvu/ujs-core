@@ -1,4 +1,4 @@
-import { ObjectRecord, EventHandler, Path } from '../type';
+import { ObjectRecord, EventHandler } from '../type';
 export type RegistryDataType = ObjectRecord | any[];
 export declare class RegistryDataError extends Error {
 }
@@ -9,13 +9,13 @@ export type RegistryOptions = {
     clone?: boolean;
     consistent?: boolean;
 };
-export declare class Registry<TData = any> {
-    #private;
+export declare class Registry<TPath = string> {
+    private consistent;
+    private eventEmitter;
     private cached;
     private data;
-    constructor(data?: TData, options?: RegistryOptions);
-    static from<TData = any>(data?: TData, options?: RegistryOptions): Registry<TData>;
-    merge(data: any, validate?: boolean): this;
+    constructor(data?: any, options?: RegistryOptions);
+    static from<TPath = string>(data?: any, options?: RegistryOptions): Registry<TPath>;
     extends(data: any, validate?: boolean): this;
     parse(data?: any, options?: {
         validate?: boolean;
@@ -25,21 +25,21 @@ export declare class Registry<TData = any> {
     isValidData(data?: any): boolean;
     private isPathNum;
     private preparePath;
-    get<T = any>(path: Path<TData>, defaultValue?: any, filter?: string | string[]): T;
-    private consistent;
-    set(path: Path<TData>, value: any, validate?: boolean): this;
-    initPathValue<T = any>(path: Path<TData>, value: T, validate?: boolean): T;
-    has(path: Path<TData>): boolean;
-    is(path: Path<TData>, compareValue?: any): boolean;
+    get<T = any>(path: TPath, defaultValue?: any, filter?: string | string[]): T;
+    private validateConsistent;
+    set(path: TPath, value: any, validate?: boolean): this;
+    initPathValue<T = any>(path: TPath, value: T, validate?: boolean): T;
+    has(path: TPath): boolean;
+    is(path: TPath, compareValue?: any): boolean;
     isCached(path: string): boolean;
-    isPathArray(path?: Path<TData>): boolean;
-    isPathObject(path?: Path<TData>): boolean;
-    isPathFlat(path: Path<TData>): boolean;
-    remove(path: Path<TData>): this;
+    isPathArray(path?: TPath): boolean;
+    isPathObject(path?: TPath): boolean;
+    isPathFlat(path: TPath): boolean;
+    remove(path: TPath): this;
     toString(): string;
     valueOf<T extends RegistryDataType>(): T;
-    clone(): Registry;
-    pick(paths: Path<TData>[] | Path<TData>): Registry;
-    omit(paths: Path<TData>[] | Path<TData>): Registry;
-    watch(paths: Path<TData>[] | Path<TData>, callback: EventHandler['handler']): void;
+    clone(): Registry<TPath>;
+    pick(paths: TPath[] | TPath): Registry<TPath>;
+    omit(paths: TPath[] | TPath): Registry<TPath>;
+    watch(paths: TPath[] | TPath, callback: EventHandler['handler']): void;
 }

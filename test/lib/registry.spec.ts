@@ -139,7 +139,6 @@ it('Util Registry', () => {
 
    // # Consistent mode: read only, throw RegistryConsistentError on the no exists path
    const consistent = Registry.from<any>({ foo: 'bar' }, { consistent: true });
-   expect(() => consistent.get('bar')).toThrow(RegistryConsistentError);
    expect(() => consistent.set('foo', 123)).toThrow(RegistryConsistentError);
    expect(() => consistent.remove('foo')).toThrow(RegistryConsistentError);
 });

@@ -1,6 +1,7 @@
 import { EventHandler } from '../type';
 export declare class EventEmitter {
-    #private;
+    private _events;
+    private static instance;
     static get HIGH(): 100;
     static get MEDIUM(): 50;
     static get NORMAL(): 25;
