@@ -1,5 +1,4 @@
 'use strict';
-import { Registry } from './registry';
 import { DateTime } from './datetime';
 import { Is } from './is';
 import { NumberFormatOptions, ObjectRecord } from '../type';
@@ -13,8 +12,8 @@ export class Util {
          return newInst;
       }
 
-      if (src instanceof DateTime || src instanceof Registry) {
-         newInst = src.clone();
+      if (src instanceof DateTime || (Is.object(src) && Is.func(src['clone']))) {
+         newInst = (src as any).clone();
       } else if (src instanceof Date) {
          newInst = new Date(src);
       } else if (src instanceof RegExp) {

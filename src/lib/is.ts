@@ -1,6 +1,6 @@
 'use strict';
 import { DateTime } from './datetime';
-import { Callable, CommonType, IsEqual, ObjectCommonType } from '../type';
+import { CommonType, IsEqual, ObjectCommonType } from '../type';
 export type ObjectRulesOptions = { rules: ObjectCommonType; suitable?: boolean };
 
 export type ArrayRulesOptions = { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean };
