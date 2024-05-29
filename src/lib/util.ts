@@ -185,7 +185,7 @@ export class Util {
          return str + colors.reset;
       };
 
-      console.log(...entries.map((entry) => dump(entry, 0)));
+      console.debug(...entries.map((entry) => dump(entry, 0)));
    }
 
    static debugDev(...entries: any[]): void {

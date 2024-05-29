@@ -195,7 +195,7 @@ export class JWT {
       if (
          !Is.equals(header, this.validHeader) ||
          !Is.object(payload) ||
-         !Is.equals(Object.keys(payload).sort(), ['data', 'exp', 'iat']) ||
+         !Is.equals(Object.keys(payload), ['data', 'iat', 'exp']) ||
          !(exp = DateTime.from(payload.exp)).valid ||
          Hash.base64UrlEncode(await Hash.sha256(`${parts[0]}.${parts[1]}.${Hash.base64UrlEncode(options.secret)}`)) !== parts[2]
       ) {
