@@ -27,9 +27,6 @@ module.exports = {
    module: {
       rules: [
          {
-            use: 'swc-loader',
-         },
-         {
             use: 'ts-loader',
             include: path.resolve(__dirname, 'src'),
             exclude: /node_modules/,
