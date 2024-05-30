@@ -1,5 +1,5 @@
 'use strict';
-import { ObjectRecord, EventHandler, Path } from '../type';
+import { ObjectRecord, EventHandler, PathValue, Path, IsEqual } from '../type';
 import { Is } from './is';
 import { Transform } from './transform';
 import { EventEmitter } from './event-emitter';
@@ -9,7 +9,9 @@ export class RegistryDataError extends Error {}
 export class RegistryConsistentError extends Error {}
 export type RegistryOptions = { validate?: boolean; clone?: boolean; consistent?: boolean };
 
-export class Registry<TPath = string> {
+type PathOf<T> = T extends object ? Path<T> : string;
+
+export class Registry<TData = unknown, TPath = PathOf<TData>> {
    private consistent: boolean = false;
    private eventEmitter = new EventEmitter();
 
@@ -21,8 +23,8 @@ export class Registry<TPath = string> {
       this.consistent = options?.consistent === true;
    }
 
-   static from<TPath = string>(data?: any, options?: RegistryOptions): Registry<TPath> {
-      return new Registry<TPath>(data, options);
+   static from<TData = unknown, TPath = PathOf<TData>>(data?: any, options?: RegistryOptions): Registry<TData, TPath> {
+      return new Registry<TData, TPath>(data, options);
    }
 
    extends(data: any, validate?: boolean): this {
@@ -117,7 +119,11 @@ export class Registry<TPath = string> {
       return path;
    }
 
-   get<T = any>(path: TPath, defaultValue?: any, filter?: string | string[]): T {
+   get<TResult = unknown, PathOrKey extends TPath = any>(
+      path: PathOrKey,
+      defaultValue?: any,
+      filter?: string | string[],
+   ): IsEqual<TResult, unknown> extends true ? (PathOrKey extends Path<TData> ? PathValue<TData, PathOrKey> : TResult) : TResult {
       const p = this.preparePath(path as string);
 
       if (this.cached[p] === undefined) {
@@ -310,7 +316,7 @@ export class Registry<TPath = string> {
 
       for (const path of (Is.array(paths) ? paths : [paths]) as TPath[]) {
          const p = this.preparePath(path as string);
-         registry.set(p as TPath, this.get(p as TPath));
+         registry.set(p as any, this.get(p as any));
       }
 
       registry.consistent = this.consistent;
@@ -339,5 +345,9 @@ export class Registry<TPath = string> {
             this.eventEmitter.on(p, callback);
          }
       }
+   }
+
+   isEmpty(): boolean {
+      return Is.empty(this.valueOf());
    }
 }

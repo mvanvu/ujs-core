@@ -138,7 +138,14 @@ it('Util Registry', () => {
    registry.set('animal.list', ['dog', 'cat', 'tiger']);
 
    // # Consistent mode: read only, throw RegistryConsistentError on the no exists path
-   const consistent = Registry.from<any>({ foo: 'bar' }, { consistent: true });
+   const consistent = Registry.from({ foo: 'bar' }, { consistent: true });
    expect(() => consistent.set('foo', 123)).toThrow(RegistryConsistentError);
    expect(() => consistent.remove('foo')).toThrow(RegistryConsistentError);
+
+   // # isEmpty(): boolean
+   // ## Check the registry data is empty or not
+   expect(Registry.from({}).isEmpty()).toBeTruthy();
+   expect(Registry.from([]).isEmpty()).toBeTruthy();
+   expect(Registry.from({ foo: 'bar' }).isEmpty()).toBeFalsy();
+   expect(Registry.from([0]).isEmpty()).toBeFalsy();
 });

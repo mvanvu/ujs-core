@@ -199,8 +199,17 @@ registry.set('animal.list', ['dog', 'cat', 'tiger']);
 #### Consistent mode: read only, throw RegistryConsistentError on the no exists path
 
 ```javascript
-const consistent = Registry.from < any > ({ foo: 'bar' }, { consistent: true });
-consistent.get('bar'); // Throw an exception which instance of RegistryConsistentError
+const consistent = Registry.from({ foo: 'bar' }, { consistent: true });
 consistent.set('foo', 123); // Throw an exception which instance of RegistryConsistentError
 consistent.remove('foo'); // Throw an exception which instance of RegistryConsistentError
+```
+
+#### isEmpty(): boolean
+
+```javascript
+// Check the registry data is empty or not
+Registry.from({}).isEmpty(); // It returns: true
+Registry.from([]).isEmpty(); // It returns: true
+Registry.from({ foo: 'bar' }).isEmpty(); // It returns: false
+Registry.from([0]).isEmpty(); // It returns: false
 ```

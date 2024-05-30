@@ -1,4 +1,4 @@
-import { ObjectRecord, EventHandler } from '../type';
+import { ObjectRecord, EventHandler, PathValue, Path, IsEqual } from '../type';
 export type RegistryDataType = ObjectRecord | any[];
 export declare class RegistryDataError extends Error {
 }
@@ -9,13 +9,14 @@ export type RegistryOptions = {
     clone?: boolean;
     consistent?: boolean;
 };
-export declare class Registry<TPath = string> {
+type PathOf<T> = T extends object ? Path<T> : string;
+export declare class Registry<TData = unknown, TPath = PathOf<TData>> {
     private consistent;
     private eventEmitter;
     private cached;
     private data;
     constructor(data?: any, options?: RegistryOptions);
-    static from<TPath = string>(data?: any, options?: RegistryOptions): Registry<TPath>;
+    static from<TData = unknown, TPath = PathOf<TData>>(data?: any, options?: RegistryOptions): Registry<TData, TPath>;
     extends(data: any, validate?: boolean): this;
     parse(data?: any, options?: {
         validate?: boolean;
@@ -25,7 +26,7 @@ export declare class Registry<TPath = string> {
     isValidData(data?: any): boolean;
     private isPathNum;
     private preparePath;
-    get<T = any>(path: TPath, defaultValue?: any, filter?: string | string[]): T;
+    get<TResult = unknown, PathOrKey extends TPath = any>(path: PathOrKey, defaultValue?: any, filter?: string | string[]): IsEqual<TResult, unknown> extends true ? (PathOrKey extends Path<TData> ? PathValue<TData, PathOrKey> : TResult) : TResult;
     private validateConsistent;
     set(path: TPath, value: any, validate?: boolean): this;
     initPathValue<T = any>(path: TPath, value: T, validate?: boolean): T;
@@ -42,4 +43,6 @@ export declare class Registry<TPath = string> {
     pick(paths: TPath[] | TPath): Registry<TPath>;
     omit(paths: TPath[] | TPath): Registry<TPath>;
     watch(paths: TPath[] | TPath, callback: EventHandler['handler']): void;
+    isEmpty(): boolean;
 }
+export {};

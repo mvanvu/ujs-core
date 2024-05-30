@@ -24,13 +24,14 @@ export type IsNull<T> = T extends null ? true : false;
 export type IsUndefined<T> = T extends undefined ? true : false;
 export type TupleKeys<T extends ReadonlyArray<any>> = Exclude<keyof T, keyof any[]>;
 export type AnyIsEqual<T1, T2> = T1 extends T2 ? (IsEqual<T1, T2> extends true ? true : never) : never;
-export type PathImpl<K extends string | number, V, TraversedTypes> = V extends Primitive ? `${K}` : true extends AnyIsEqual<TraversedTypes, V> ? `${K}` : `${K}` | `${K}.${PathInternal<V, TraversedTypes | V>}`;
-export type PathInternal<T, TraversedTypes = T> = T extends ReadonlyArray<infer V> ? IsTuple<T> extends true ? {
-    [K in TupleKeys<T>]-?: PathImpl<K & string, T[K], TraversedTypes>;
-}[TupleKeys<T>] : PathImpl<number, V, TraversedTypes> : {
-    [K in keyof T]-?: PathImpl<K & string, T[K], TraversedTypes>;
-}[keyof T];
-export type Path<T> = T extends any ? (PathInternal<T> extends never ? string : PathInternal<T>) : string;
+type CombineAll<T> = T extends {
+    [name in keyof T]: infer Type;
+} ? Type : never;
+type PropertyNameMap<T> = {
+    [name in keyof T]: T[name] extends object ? SubPathsOf<name, T> | name : name;
+};
+type SubPathsOf<key extends keyof T, T> = `${string & key}.${string & Path<T[key]>}`;
+export type Path<T> = CombineAll<PropertyNameMap<T>>;
 export type PathValue<T, P extends Path<T>> = T extends any ? P extends `${infer K}.${infer R}` ? K extends keyof T ? R extends Path<T[K]> ? PathValue<T[K], R> : never : K extends number ? T extends ReadonlyArray<infer V> ? PathValue<V, R & Path<V>> : never : never : P extends keyof T ? T[P] : P extends number ? T extends ReadonlyArray<infer V> ? V : never : never : never;
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
 export type UnionPick<T, K extends Path<T>> = K extends keyof T ? Pick<T, K> : K extends `${infer Key}.${infer Rest}` ? Key extends keyof T ? {
@@ -72,3 +73,4 @@ export interface NumberFormatOptions {
     suffix?: string;
     pattern?: string;
 }
+export {};
