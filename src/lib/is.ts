@@ -1,6 +1,6 @@
 'use strict';
 import { DateTime } from './datetime';
-import { CommonType, IsEqual, ObjectCommonType } from '../type';
+import { CommonType, IsEqual, ObjectCommonType, ObjectRecord } from '../type';
 export type ObjectRulesOptions = { rules: ObjectCommonType; suitable?: boolean };
 
 export type ArrayRulesOptions = { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean };
@@ -55,8 +55,12 @@ export type IsValidOptions<T> = {
 
 export type CreditCardType = 'VISA' | 'AMEX' | 'MASTERCARD' | 'DISCOVER' | 'DINERS' | 'JCB' | 'CHINA_UNION_PAY';
 export class IsError extends Error {}
+
+type ReturnIsString<Each> = Each extends true ? string[] : string;
+type ReturnIsNumber<Each> = Each extends true ? number[] : number;
+
 export class Is {
-   static typeOf(value: any, type: CommonType, each = false): boolean {
+   static typeOf(value: any, type: CommonType, each?: boolean): boolean {
       if (each) {
          if (!Array.isArray(value)) {
             return false;
@@ -261,27 +265,27 @@ export class Is {
       return a !== a && b !== b; // eslint-disable-line no-self-compare
    }
 
-   static emptyObject(value: any, each = false): boolean {
+   static emptyObject(value: any, each?: boolean): value is {} {
       return Is.each(each, value, (item: any) => Is.object(item) && !Object.keys(item).length);
    }
 
-   static date(d: any, each = false): boolean {
-      return Is.typeOf(d, 'date', each);
+   static date(value: any, each?: boolean): value is Date {
+      return Is.typeOf(value, 'date', each);
    }
 
-   static datetime(d: any, each = false): boolean {
-      return Is.typeOf(d, 'datetime', each);
+   static datetime(value: any, each?: boolean): value is DateTime {
+      return Is.typeOf(value, 'datetime', each);
    }
 
-   static dateString(d: any, each = false): boolean {
+   static dateString<E extends boolean = false>(d: any, each?: E): d is ReturnIsString<E> {
       return Is.typeOf(d, 'datestring', each);
    }
 
-   static primitive(value: any, each = false): boolean {
+   static primitive(value: any, each?: boolean): boolean {
       return Is.each(each, value, (item: any) => item === null || ['string', 'number', 'bigint', 'boolean', 'symbol', 'undefined'].includes(typeof item));
    }
 
-   static empty(value: any, each = false): boolean {
+   static empty(value: any, each?: boolean): boolean {
       return Is.each(each, value, (item: any) => {
          switch (typeof item) {
             case 'boolean':
@@ -315,11 +319,11 @@ export class Is {
       });
    }
 
-   static nothing(value: any, each = false): boolean {
+   static nothing(value: any, each?: boolean): value is (null | undefined | typeof NaN)[] {
       return Is.each(each, value, (item: any) => [null, undefined, NaN].includes(item));
    }
 
-   static object(value: any, options?: ObjectRulesOptions): boolean {
+   static object(value: any, options?: ObjectRulesOptions): value is ObjectRecord {
       const isObject = (o: any) => o !== null && !Array.isArray(o) && typeof o === 'object';
 
       if (!isObject(value)) {
@@ -352,7 +356,7 @@ export class Is {
       return true;
    }
 
-   static flatObject(value: any, allowArray?: FlatObjectRulesOptions['allowArray']): boolean {
+   static flatObject(value: any, allowArray?: FlatObjectRulesOptions['allowArray']): value is ObjectRecord {
       if (!Is.object(value)) {
          return false;
       }
@@ -404,11 +408,11 @@ export class Is {
       return true;
    }
 
-   static objectOrArray<T>(value: T): boolean {
+   static objectOrArray(value: any): value is ObjectRecord | any[] {
       return Is.object(value) || Is.array(value);
    }
 
-   static array(value: any, options?: ArrayRulesOptions): boolean {
+   static array(value: any, options?: ArrayRulesOptions): value is any[] {
       if (!Array.isArray(value) || (options?.notEmpty && !value.length)) {
          return false;
       }
@@ -429,87 +433,87 @@ export class Is {
       return true;
    }
 
-   static asyncFunc(value: any, each = false): boolean {
+   static asyncFunc(value: any, each?: boolean): boolean {
       return Is.each(each, value, (item: any) => item instanceof (async () => {}).constructor);
    }
 
-   static func(value: any, each = false): boolean {
+   static func(value: any, each?: boolean): boolean {
       return Is.typeOf(value, 'function', each);
    }
 
-   static callable(value: any, each = false): boolean {
+   static callable(value: any, each?: boolean): boolean {
       return Is.each(each, value, (item: any) => Is.func(item) || Is.asyncFunc(item));
    }
 
-   static number(value: any, each = false): boolean {
+   static number<E extends boolean = false>(value: any, each?: E): value is ReturnIsNumber<E> {
       return Is.typeOf(value, 'number', each);
    }
 
-   static sNumber(value: any, each = false): boolean {
+   static sNumber<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
       return Is.typeOf(value, 'snumber', each);
    }
 
-   static uNumber(value: any, each = false): boolean {
+   static uNumber<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
       return Is.typeOf(value, 'unumber', each);
    }
 
-   static int(value: any, each = false): boolean {
+   static int<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
       return Is.typeOf(value, 'int', each);
    }
 
-   static sInt(value: any, each = false): boolean {
+   static sInt<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
       return Is.typeOf(value, 'sint', each);
    }
 
-   static uInt(value: any, each = false): boolean {
+   static uInt<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
       return Is.typeOf(value, 'uint', each);
    }
 
-   static bigInt(value: any, each = false): boolean {
+   static bigInt<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
       return Is.typeOf(value, 'bigint', each);
    }
 
-   static sBigInt(value: any, each = false): boolean {
+   static sBigInt<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
       return Is.typeOf(value, 'sbigint', each);
    }
 
-   static uBigInt(value: any, each = false): boolean {
+   static uBigInt<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
       return Is.typeOf(value, 'ubigint', each);
    }
 
-   static boolean(value: any, each = false): boolean {
+   static boolean<E extends boolean = false, R = E extends true ? boolean[] : boolean>(value: any, each?: E): value is R {
       return Is.typeOf(value, 'boolean', each);
    }
 
-   static string(value: any, each = false): boolean {
+   static string<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
       return Is.typeOf(value, 'string', each);
    }
 
-   static null(value: any, each = false): boolean {
+   static null(value: any, each?: boolean): boolean {
       return Is.typeOf(value, 'null', each);
    }
 
-   static undefined(value: any, each = false): boolean {
+   static undefined(value: any, each?: boolean): boolean {
       return Is.typeOf(value, 'undefined', each);
    }
 
-   static nan(value: any, each = false): boolean {
+   static nan(value: any, each?: boolean): boolean {
       return Is.typeOf(value, 'NaN', each);
    }
 
-   static symbol(value: any, each = false): boolean {
+   static symbol(value: any, each?: boolean): boolean {
       return Is.typeOf(value, 'symbol', each);
    }
 
-   static map(value: any, each = false): boolean {
+   static map(value: any, each?: boolean): boolean {
       return Is.typeOf(value, 'map', each);
    }
 
-   static set(value: any, each = false): boolean {
+   static set(value: any, each?: boolean): boolean {
       return Is.typeOf(value, 'set', each);
    }
 
-   static regex(value: any, each = false): boolean {
+   static regex(value: any, each?: boolean): boolean {
       return Is.typeOf(value, 'regex', each);
    }
 
@@ -523,11 +527,11 @@ export class Is {
       );
    }
 
-   static nullOrUndefined(value: any, each = false): boolean {
+   static nullOrUndefined(value: any, each?: boolean): boolean {
       return Is.each(each, value, (item: any) => item === undefined || item === null);
    }
 
-   static strongPassword(value: any, options?: StrongPasswordOptions, each = false): boolean {
+   static strongPassword(value: any, options?: StrongPasswordOptions, each?: boolean): boolean {
       return Is.each(each, value, (item: any) => {
          if (typeof item !== 'string') {
             return false;
@@ -555,19 +559,19 @@ export class Is {
       });
    }
 
-   static promise(value: any, each = false): boolean {
+   static promise(value: any, each?: boolean): boolean {
       return Is.each(each, value, (item: any) => item !== null && typeof item === 'object' && typeof item.then === 'function');
    }
 
-   static email(value: any, each = false): boolean {
+   static email<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
       return Is.each(each, value, (item: any) => typeof item === 'string' && /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(item));
    }
 
-   static inArray(value: any, array: any[], each = false): boolean {
+   static inArray(value: any, array: any[], each?: boolean): boolean {
       return Is.each(each, value, (item: any) => array.includes(item));
    }
 
-   static includes(value: any, target: any, each = false): boolean {
+   static includes(value: any, target: any, each?: boolean): boolean {
       return Is.each(each, value, (item: any) => {
          if (Is.string(item)) {
             return Is.string(target) ? item.includes(target) : false;
@@ -604,7 +608,7 @@ export class Is {
       });
    }
 
-   static class(value: any, each = false): boolean {
+   static class(value: any, each?: boolean): boolean {
       return Is.each(each, value, (item: any) => Is.func(item) && item.toString()?.startsWith('class '));
    }
 
@@ -626,11 +630,11 @@ export class Is {
       return callback(value);
    }
 
-   static mongoId(value: any, each = false): boolean {
+   static mongoId<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
       return Is.each(each, value, (item: any) => typeof item === 'string' && /^[0-9a-fA-F]{24}$/.test(item));
    }
 
-   static creditCard(value: any, type?: CreditCardType, each = false): boolean {
+   static creditCard(value: any, type?: CreditCardType, each?: boolean): boolean {
       return Is.each(each, value, (item: any) => {
          const amex = new RegExp('^3[47][0-9]{13}$').test(item);
          const visa = new RegExp('^4[0-9]{12}(?:[0-9]{3})?$').test(item);

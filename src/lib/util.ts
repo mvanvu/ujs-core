@@ -4,7 +4,7 @@ import { NumberFormatOptions, ObjectRecord } from '../type';
 
 export class UtilRaceError extends Error {}
 export class Util {
-   static clone<T>(src: T): T {
+   static clone<T = any>(src: T): T {
       let newInst: any = src;
 
       if (Is.primitive(newInst)) {
@@ -29,11 +29,11 @@ export class Util {
       } else if (Is.object(src)) {
          newInst = {};
          Object.assign(newInst, ...Object.keys(src).map((key) => ({ [key]: Util.clone(src[key]) })));
-      } else if (typeof src?.constructor === 'function') {
-         const val = typeof src.valueOf === 'function' ? src.valueOf() : undefined;
+      } else if (typeof (src as any)?.constructor === 'function') {
+         const val = typeof (src as any).valueOf === 'function' ? (src as any).valueOf() : undefined;
 
          if (val && Object(val) !== val) {
-            newInst = new (src.constructor as any)(val);
+            newInst = new ((src as any).constructor as any)(val);
          }
       }
 
