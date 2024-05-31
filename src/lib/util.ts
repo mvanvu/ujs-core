@@ -4,45 +4,63 @@ import { NumberFormatOptions, ObjectRecord } from '../type';
 
 export class UtilRaceError extends Error {}
 export class Util {
-   static clone<T = any>(src: T): T {
-      let newInst: any = src;
-
-      if (Is.primitive(newInst)) {
-         return newInst;
+   static clone<T extends any>(src: T): typeof src {
+      if (Is.primitive(src)) {
+         return src;
       }
 
-      if (Is.object(src) && Is.func(src['clone'])) {
-         newInst = (src as any).clone();
-      } else if (src instanceof Date) {
-         newInst = new Date(src);
-      } else if (src instanceof RegExp) {
-         newInst = new RegExp(src.source, src.flags);
-      } else if (src instanceof Set) {
-         newInst = new Set();
-         src.forEach((val) => newInst.add(Util.clone(val)));
-      } else if (src instanceof Map) {
-         newInst = new Map();
-         src.forEach((val, key) => newInst.set(key, Util.clone(val)));
-      } else if (Array.isArray(src)) {
-         newInst = [];
-         src.forEach((val) => newInst.push(Util.clone(val)));
-      } else if (Is.object(src)) {
-         newInst = {};
-         Object.assign(newInst, ...Object.keys(src).map((key) => ({ [key]: Util.clone(src[key]) })));
-      } else if (typeof (src as any)?.constructor === 'function') {
-         const val = typeof (src as any).valueOf === 'function' ? (src as any).valueOf() : undefined;
+      const orgSrc = src as any;
+
+      if (Is.object(orgSrc) && Is.func(orgSrc.clone)) {
+         return orgSrc.clone();
+      }
+
+      if (orgSrc instanceof Date) {
+         return new Date(orgSrc) as typeof src;
+      }
+
+      if (orgSrc instanceof RegExp) {
+         return new RegExp(orgSrc.source, orgSrc.flags) as typeof src;
+      }
+
+      if (orgSrc instanceof Set) {
+         const set = new Set();
+         orgSrc.forEach((val) => set.add(Util.clone(val)));
+
+         return set as typeof src;
+      }
+
+      if (orgSrc instanceof Map) {
+         const map = new Map();
+         orgSrc.forEach((val, key) => map.set(key, Util.clone(val)));
+
+         return map as typeof src;
+      }
+
+      if (Is.array(orgSrc)) {
+         const array = [];
+         orgSrc.forEach((val) => array.push(Util.clone(val)));
+
+         return array as typeof src;
+      }
+
+      if (Is.object(orgSrc)) {
+         const obj = {};
+         Object.assign(obj, ...Object.keys(orgSrc).map((key) => ({ [key]: Util.clone(orgSrc[key]) })));
+
+         return obj as typeof src;
+      }
+
+      if (typeof (orgSrc as any)?.constructor === 'function') {
+         const val = typeof (orgSrc as any).valueOf === 'function' ? (orgSrc as any).valueOf() : undefined;
 
          if (val && Object(val) !== val) {
-            newInst = new ((src as any).constructor as any)(val);
+            return new ((orgSrc as any).constructor as any)(val);
          }
       }
 
-      return newInst;
-   }
-
-   /** @deprecated use call() instead */
-   static async callback<T>(fn: any, params: any[] = [], inst?: any): Promise<T> {
-      return Is.asyncFunc(fn) ? await fn.apply(inst, params) : fn instanceof Promise ? await fn : Is.func(fn) ? fn.apply(inst, params) : fn;
+      // Fallback just returns the original src
+      return orgSrc;
    }
 
    static call<T>(instanceThis: any, fn: any, ...params: any[]): T {
@@ -120,7 +138,7 @@ export class Util {
 
    static async race<T>(callback: any, maxMiliseconds: number): Promise<T> {
       return <T>await Promise.race([
-         Promise.resolve(Util.callback(callback)),
+         Promise.resolve(Util.callAsync(null, callback)),
          new Promise((_resolve, reject) => {
             setTimeout(() => reject(new UtilRaceError('Race timeout.')), maxMiliseconds);
          }),

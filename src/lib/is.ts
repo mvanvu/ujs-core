@@ -1,6 +1,6 @@
 'use strict';
 import { DateTime } from './datetime';
-import { CommonType, IsEqual, ObjectCommonType, ObjectRecord } from '../type';
+import { CommonType, IsEqual, ObjectCommonType, ObjectRecord, Primitive } from '../type';
 export type ObjectRulesOptions = { rules: ObjectCommonType; suitable?: boolean };
 
 export type ArrayRulesOptions = { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean };
@@ -58,6 +58,27 @@ export class IsError extends Error {}
 
 type ReturnIsString<Each> = Each extends true ? string[] : string;
 type ReturnIsNumber<Each> = Each extends true ? number[] : number;
+type ReturnIsBigInt<Each> = Each extends true ? bigint[] : bigint;
+type ReturnIsNull<Each> = Each extends true ? null[] : null;
+type ReturnIsUndefined<Each> = Each extends true ? undefined[] : undefined;
+type ReturnIsSymbol<Each> = Each extends true ? symbol[] : symbol;
+type ReturnIsPrimitive<Each, TPrimitive = unknown> = TPrimitive extends unknown
+   ? Each extends true
+      ? Primitive[]
+      : Primitive
+   : TPrimitive extends string
+     ? ReturnIsString<Each>
+     : TPrimitive extends number
+       ? ReturnIsNumber<Each>
+       : TPrimitive extends bigint
+         ? ReturnIsBigInt<Each>
+         : TPrimitive extends null
+           ? ReturnIsNull<Each>
+           : TPrimitive extends undefined
+             ? ReturnIsUndefined<Each>
+             : TPrimitive extends symbol
+               ? ReturnIsSymbol<Each>
+               : false;
 
 export class Is {
    static typeOf(value: any, type: CommonType, each?: boolean): boolean {
@@ -265,15 +286,15 @@ export class Is {
       return a !== a && b !== b; // eslint-disable-line no-self-compare
    }
 
-   static emptyObject(value: any, each?: boolean): value is {} {
+   static emptyObject<E extends boolean = false, R = E extends true ? {}[] : {}>(value: any, each?: E): value is R {
       return Is.each(each, value, (item: any) => Is.object(item) && !Object.keys(item).length);
    }
 
-   static date(value: any, each?: boolean): value is Date {
+   static date<E extends boolean = false, R = E extends true ? Date[] : Date>(value: any, each?: E): value is R {
       return Is.typeOf(value, 'date', each);
    }
 
-   static datetime(value: any, each?: boolean): value is DateTime {
+   static datetime<E extends boolean = false, R = E extends true ? DateTime[] : DateTime>(value: any, each?: boolean): value is R {
       return Is.typeOf(value, 'datetime', each);
    }
 
@@ -281,7 +302,7 @@ export class Is {
       return Is.typeOf(d, 'datestring', each);
    }
 
-   static primitive(value: any, each?: boolean): boolean {
+   static primitive<E extends boolean = false>(value: any, each?: E): value is ReturnIsPrimitive<E> {
       return Is.each(each, value, (item: any) => item === null || ['string', 'number', 'bigint', 'boolean', 'symbol', 'undefined'].includes(typeof item));
    }
 
@@ -469,15 +490,15 @@ export class Is {
       return Is.typeOf(value, 'uint', each);
    }
 
-   static bigInt<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
+   static bigInt<E extends boolean = false>(value: any, each?: E): value is ReturnIsBigInt<E> {
       return Is.typeOf(value, 'bigint', each);
    }
 
-   static sBigInt<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
+   static sBigInt<E extends boolean = false>(value: any, each?: E): value is ReturnIsBigInt<E> {
       return Is.typeOf(value, 'sbigint', each);
    }
 
-   static uBigInt<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
+   static uBigInt<E extends boolean = false>(value: any, each?: E): value is ReturnIsBigInt<E> {
       return Is.typeOf(value, 'ubigint', each);
    }
 
@@ -489,7 +510,7 @@ export class Is {
       return Is.typeOf(value, 'string', each);
    }
 
-   static null(value: any, each?: boolean): boolean {
+   static null<E extends boolean = false, R = E extends true ? null[] : null>(value: any, each?: E): value is R {
       return Is.typeOf(value, 'null', each);
    }
 

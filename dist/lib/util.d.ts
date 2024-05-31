@@ -2,8 +2,7 @@ import { NumberFormatOptions, ObjectRecord } from '../type';
 export declare class UtilRaceError extends Error {
 }
 export declare class Util {
-    static clone<T = any>(src: T): T;
-    static callback<T>(fn: any, params?: any[], inst?: any): Promise<T>;
+    static clone<T extends any>(src: T): typeof src;
     static call<T>(instanceThis: any, fn: any, ...params: any[]): T;
     static callAsync<T>(instanceThis: any, fn: any, ...params: any[]): Promise<T>;
     static sort<T extends any[] | ObjectRecord>(data: T, options?: {
@@ -22,6 +21,7 @@ export declare class Util {
     static toCamelCase(str: string): string;
     static camelToSnackCase(str: string): string;
     static snackToCamelCase(str: string): string;
+    static cloneObjectToCamelCase<TResult = ObjectRecord>(obj: ObjectRecord): TResult;
     static truncate(str: string, options?: {
         maxLength?: number;
         wordCount?: boolean;
