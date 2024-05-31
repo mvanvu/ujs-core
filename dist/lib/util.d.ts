@@ -2,7 +2,7 @@ import { NumberFormatOptions, ObjectRecord } from '../type';
 export declare class UtilRaceError extends Error {
 }
 export declare class Util {
-    static clone<T>(src: T): T;
+    static clone<T = any>(src: T): T;
     static callback<T>(fn: any, params?: any[], inst?: any): Promise<T>;
     static call<T>(instanceThis: any, fn: any, ...params: any[]): T;
     static callAsync<T>(instanceThis: any, fn: any, ...params: any[]): Promise<T>;
