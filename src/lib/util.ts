@@ -279,6 +279,30 @@ export class Util {
       return output.join('');
    }
 
+   static cloneObjectToCamelCase<TResult = ObjectRecord>(obj: ObjectRecord): TResult {
+      if (!Is.object(obj)) {
+         return obj;
+      }
+
+      const cloneObj: ObjectRecord = {};
+      const clone = (data: ObjectRecord, target: ObjectRecord) => {
+         for (const k in data) {
+            const ck = Util.snackToCamelCase(k);
+
+            if (Is.objectOrArray(data[k])) {
+               target[ck] = Is.array(data[k]) ? [] : {};
+               clone(data[k], target[ck]);
+            } else {
+               target[ck] = data[k];
+            }
+         }
+      };
+
+      clone(Util.clone(obj), cloneObj);
+
+      return cloneObj;
+   }
+
    static truncate(str: string, options?: { maxLength?: number; wordCount?: boolean; pad?: string }): string {
       const pad = options.pad || '...';
       const len = options.maxLength || 50;

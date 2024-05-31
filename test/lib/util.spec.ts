@@ -89,4 +89,16 @@ it('Core Util', async () => {
 
    // ## With pattern (the string that contains {value})
    expect(Util.numberFormat(1234.567, { decimals: 2, pattern: '$${value}' })).toEqual('$$1,234.57');
+
+   // # Util.cloneObjectToCamelCase<TResult = ObjectRecord>(obj: ObjectRecord): TResult
+   // ## Clone the object or deep array and change the snack key to camel case
+   const obj = {
+      foo_bar: { bar_foo: { num_type: { num_int: 123, num_float: 1.23, deep_array: [123, { child_element: { foo_bar: 123 } }] } }, str_type: 'string' },
+      bool_type: true,
+   };
+   const res = {
+      fooBar: { barFoo: { numType: { numInt: 123, numFloat: 1.23, deepArray: [123, { childElement: { fooBar: 123 } }] } }, strType: 'string' },
+      boolType: true,
+   };
+   expect(Util.cloneObjectToCamelCase(obj)).toMatchObject(res);
 });
