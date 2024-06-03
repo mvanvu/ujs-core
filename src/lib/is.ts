@@ -44,7 +44,7 @@ export type IsValidOptions<T> = {
               ? FlatObjectRulesOptions
               : IsEqual<T, 'strongPassword'> extends true
                 ? StrongPasswordOptions
-                : IsEqual<T, 'inArray'> extends true
+                : T extends 'inArray'
                   ? any[]
                   : IsEqual<T, 'includes'> extends true
                     ? any
@@ -649,6 +649,26 @@ export class Is {
       }
 
       return callback(value);
+   }
+
+   static arrayUnique(value: any, each?: boolean): value is any[] {
+      return Is.each(each, value, (item: any) => {
+         if (!Array.isArray(item)) {
+            return false;
+         }
+
+         const unique = [];
+
+         for (const val of item) {
+            if (unique.findIndex((uni) => Is.equals(uni, val)) !== -1) {
+               return false;
+            }
+
+            unique.push(val);
+         }
+
+         return true;
+      });
    }
 
    static mongoId<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {

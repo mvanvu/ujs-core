@@ -163,7 +163,7 @@ export class Transform {
          const unique = [];
 
          for (const val of value) {
-            if (!unique.length || !unique.find((uni) => Is.equals(uni, val))) {
+            if (!unique.length || unique.findIndex((uni) => Is.equals(uni, val)) === -1) {
                unique.push(val);
             }
          }
