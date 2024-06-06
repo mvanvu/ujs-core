@@ -79,6 +79,8 @@ type ReturnIsPrimitive<Each, TPrimitive = unknown> = TPrimitive extends unknown
              : TPrimitive extends symbol
                ? ReturnIsSymbol<Each>
                : false;
+type PromiseLike = Promise<any> | ((...args: any[]) => Promise<any>);
+type ClassConstructor<T> = new (...arg: any[]) => T;
 
 export class Is {
    static typeOf(value: any, type: CommonType, each?: boolean): boolean {
@@ -510,31 +512,31 @@ export class Is {
       return Is.typeOf(value, 'string', each);
    }
 
-   static null<E extends boolean = false, R = E extends true ? null[] : null>(value: any, each?: E): value is R {
+   static null<E extends boolean = false>(value: any, each?: E): value is ReturnIsNull<E> {
       return Is.typeOf(value, 'null', each);
    }
 
-   static undefined(value: any, each?: boolean): boolean {
+   static undefined<E extends boolean = false>(value: any, each?: E): value is ReturnIsUndefined<E> {
       return Is.typeOf(value, 'undefined', each);
    }
 
-   static nan(value: any, each?: boolean): boolean {
+   static nan<E extends boolean = false, R = E extends true ? (typeof NaN)[] : typeof NaN>(value: any, each?: E): value is R {
       return Is.typeOf(value, 'NaN', each);
    }
 
-   static symbol(value: any, each?: boolean): boolean {
+   static symbol<E extends boolean = false>(value: any, each?: E): value is ReturnIsSymbol<E> {
       return Is.typeOf(value, 'symbol', each);
    }
 
-   static map(value: any, each?: boolean): boolean {
+   static map<E extends boolean = false, R = E extends true ? Map<any, any>[] : Map<any, any>>(value: any, each?: E): value is R {
       return Is.typeOf(value, 'map', each);
    }
 
-   static set(value: any, each?: boolean): boolean {
+   static set<E extends boolean = false, R = E extends true ? Set<any>[] : Set<any>>(value: any, each?: E): value is R {
       return Is.typeOf(value, 'set', each);
    }
 
-   static regex(value: any, each?: boolean): boolean {
+   static regex<E extends boolean = false, R = E extends true ? RegExp[] : RegExp>(value: any, each?: E): value is R {
       return Is.typeOf(value, 'regex', each);
    }
 
@@ -548,11 +550,11 @@ export class Is {
       );
    }
 
-   static nullOrUndefined(value: any, each?: boolean): boolean {
+   static nullOrUndefined<E extends boolean = false>(value: any, each?: E): value is ReturnIsNull<E> | ReturnIsUndefined<E> {
       return Is.each(each, value, (item: any) => item === undefined || item === null);
    }
 
-   static strongPassword(value: any, options?: StrongPasswordOptions, each?: boolean): boolean {
+   static strongPassword<E extends boolean = false>(value: any, options?: StrongPasswordOptions, each?: E): value is ReturnIsString<E> {
       return Is.each(each, value, (item: any) => {
          if (typeof item !== 'string') {
             return false;
@@ -580,7 +582,7 @@ export class Is {
       });
    }
 
-   static promise(value: any, each?: boolean): boolean {
+   static promise<E extends boolean = false, R = E extends true ? PromiseLike[] : PromiseLike>(value: any, each?: E): value is R {
       return Is.each(each, value, (item: any) => item !== null && typeof item === 'object' && typeof item.then === 'function');
    }
 
@@ -629,7 +631,7 @@ export class Is {
       });
    }
 
-   static class(value: any, each?: boolean): boolean {
+   static class<E extends boolean = false, R = E extends true ? ClassConstructor<any>[] : ClassConstructor<any>>(value: any, each?: boolean): value is R {
       return Is.each(each, value, (item: any) => Is.func(item) && item.toString()?.startsWith('class '));
    }
 
