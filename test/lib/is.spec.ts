@@ -270,11 +270,14 @@ it('Core Is', () => {
    expect(Is.creditCard('36227206271667', 'DINERS')).toBeTruthy();
    expect(Is.creditCard('3566002020360505', 'JCB')).toBeTruthy();
 
-   // # Is.arrayUnique
+   // # Is.arrayUnique(value: any, each?: boolean): value is any[]
    expect(Is.arrayUnique([1, 2, 3])).toBeTruthy();
    expect(Is.arrayUnique([1, 1, 2])).toBeFalsy();
    expect(Is.arrayUnique([{ foo: 123 }, { foo: 456 }])).toBeTruthy();
    expect(Is.arrayUnique([{ foo: 123 }, { foo: 123 }])).toBeFalsy();
+
+   // # Is.matched<E extends boolean = false>(value: any, regex: RegExp, each?: E): value is ReturnIsString<E>
+   expect(Is.matched('507f1f77bcf86cd799439011', /^[0-9a-fA-F]{24}$/)).toBeTruthy();
 
    // # Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
    // ## Validate the value with the specific options
@@ -294,4 +297,6 @@ it('Core Is', () => {
    expect(Is.valid(['5555555555554444', '2223003122003222', '5105105105105100'], { type: 'creditCard', each: true, meta: 'MASTERCARD' })).toBeTruthy();
    expect(Is.valid(['6011111111111117', '6011000990139424', '6011981111111113'], { type: 'creditCard', each: true, meta: 'DISCOVER' })).toBeTruthy();
    expect(Is.valid(['3056930009020004', '36227206271667'], { type: 'creditCard', each: true, meta: 'DINERS' })).toBeTruthy();
+   expect(Is.valid(['507f1f77bcf86cd799439011', '507f191e810c19729de860ea'], { type: 'matched', each: true, meta: /^[0-9a-fA-F]{24}$/ })).toBeTruthy();
+   expect(Is.valid(['507f1f77bcf86cd799439011', '123@abc', 1], { type: 'matched', each: true, meta: /^[0-9a-fA-F]{24}$/ })).toBeFalsy();
 });

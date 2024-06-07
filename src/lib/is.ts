@@ -50,7 +50,9 @@ export type IsValidOptions<T> = {
                     ? any
                     : IsEqual<T, 'creditCard'> extends true
                       ? CreditCardType
-                      : undefined;
+                      : IsEqual<T, 'matched'> extends true
+                        ? RegExp
+                        : never;
 };
 
 export type CreditCardType = 'VISA' | 'AMEX' | 'MASTERCARD' | 'DISCOVER' | 'DINERS' | 'JCB' | 'CHINA_UNION_PAY';
@@ -677,6 +679,10 @@ export class Is {
       return Is.each(each, value, (item: any) => typeof item === 'string' && /^[0-9a-fA-F]{24}$/.test(item));
    }
 
+   static matched<E extends boolean = false>(value: any, regex: RegExp, each?: E): value is ReturnIsString<E> {
+      return Is.each(each, value, (item: any) => typeof item === 'string' && regex.test(item));
+   }
+
    static creditCard(value: any, type?: CreditCardType, each?: boolean): boolean {
       return Is.each(each, value, (item: any) => {
          const amex = new RegExp('^3[47][0-9]{13}$').test(item);
@@ -769,6 +775,9 @@ export class Is {
 
             case 'creditCard':
                return Is.creditCard(item, options.meta as CreditCardType);
+
+            case 'matched':
+               return Is.matched(item, options.meta as RegExp);
 
             default:
                return Is[method].call(null, item, false);

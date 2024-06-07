@@ -34,7 +34,7 @@ export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' 
 export type IsValidOptions<T> = {
     type: T;
     each?: boolean;
-    meta?: IsEqual<T, 'object'> extends true ? ObjectRulesOptions : IsEqual<T, 'array'> extends true ? ArrayRulesOptions : IsEqual<T, 'objectOrArray'> extends true ? ObjectArrayRulesOptions : IsEqual<T, 'equals'> extends true ? EqualsRulesOptions : IsEqual<T, 'flatObject'> extends true ? FlatObjectRulesOptions : IsEqual<T, 'strongPassword'> extends true ? StrongPasswordOptions : T extends 'inArray' ? any[] : IsEqual<T, 'includes'> extends true ? any : IsEqual<T, 'creditCard'> extends true ? CreditCardType : undefined;
+    meta?: IsEqual<T, 'object'> extends true ? ObjectRulesOptions : IsEqual<T, 'array'> extends true ? ArrayRulesOptions : IsEqual<T, 'objectOrArray'> extends true ? ObjectArrayRulesOptions : IsEqual<T, 'equals'> extends true ? EqualsRulesOptions : IsEqual<T, 'flatObject'> extends true ? FlatObjectRulesOptions : IsEqual<T, 'strongPassword'> extends true ? StrongPasswordOptions : T extends 'inArray' ? any[] : IsEqual<T, 'includes'> extends true ? any : IsEqual<T, 'creditCard'> extends true ? CreditCardType : IsEqual<T, 'matched'> extends true ? RegExp : never;
 };
 export type CreditCardType = 'VISA' | 'AMEX' | 'MASTERCARD' | 'DISCOVER' | 'DINERS' | 'JCB' | 'CHINA_UNION_PAY';
 export declare class IsError extends Error {
@@ -94,6 +94,7 @@ export declare class Is {
     static each(each: boolean, value: any, callback: (item: any) => boolean): boolean;
     static arrayUnique(value: any, each?: boolean): value is any[];
     static mongoId<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>;
+    static matched<E extends boolean = false>(value: any, regex: RegExp, each?: E): value is ReturnIsString<E>;
     static creditCard(value: any, type?: CreditCardType, each?: boolean): boolean;
     static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean;
 }
