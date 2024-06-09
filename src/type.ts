@@ -191,3 +191,85 @@ export interface NumberFormatOptions {
    suffix?: string;
    pattern?: string;
 }
+
+export type ObjectRulesOptions = { rules: ObjectCommonType; suitable?: boolean };
+
+export type ArrayRulesOptions = { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean };
+
+export type ObjectArrayRulesOptions = {
+   object?: ObjectRulesOptions; // For type Is.object only
+   array?: ArrayRulesOptions; // For type Is.array only
+};
+
+export type EqualsRulesOptions = {
+   equalsTo: any;
+};
+
+export type StrongPasswordOptions = {
+   minLength?: number;
+   noSpaces?: boolean;
+   minSpecialChars?: number;
+   minUpper?: number;
+   minLower?: number;
+   minNumber?: number;
+};
+
+export type FlatObjectRulesOptions = {
+   allowArray?: boolean | { root?: boolean; deep?: boolean };
+};
+
+export type IsValidOptions<T> = {
+   type: T;
+   each?: boolean;
+   meta?: IsEqual<T, 'object'> extends true
+      ? ObjectRulesOptions
+      : IsEqual<T, 'array'> extends true
+        ? ArrayRulesOptions
+        : IsEqual<T, 'objectOrArray'> extends true
+          ? ObjectArrayRulesOptions
+          : IsEqual<T, 'equals'> extends true
+            ? EqualsRulesOptions
+            : IsEqual<T, 'flatObject'> extends true
+              ? FlatObjectRulesOptions
+              : IsEqual<T, 'strongPassword'> extends true
+                ? StrongPasswordOptions
+                : T extends 'inArray'
+                  ? any[]
+                  : IsEqual<T, 'includes'> extends true
+                    ? any
+                    : IsEqual<T, 'creditCard'> extends true
+                      ? CreditCardType
+                      : IsEqual<T, 'matched'> extends true
+                        ? RegExp
+                        : T extends 'min' | 'max'
+                          ? number
+                          : never;
+};
+
+export type CreditCardType = 'VISA' | 'AMEX' | 'MASTERCARD' | 'DISCOVER' | 'DINERS' | 'JCB' | 'CHINA_UNION_PAY';
+export class IsError extends Error {}
+export type ReturnIsString<Each> = Each extends true ? string[] : string;
+export type ReturnIsNumber<Each> = Each extends true ? number[] : number;
+export type ReturnIsBigInt<Each> = Each extends true ? bigint[] : bigint;
+export type ReturnIsNull<Each> = Each extends true ? null[] : null;
+export type ReturnIsUndefined<Each> = Each extends true ? undefined[] : undefined;
+export type ReturnIsSymbol<Each> = Each extends true ? symbol[] : symbol;
+export type ReturnIsPrimitive<Each, TPrimitive = unknown> = TPrimitive extends unknown
+   ? Each extends true
+      ? Primitive[]
+      : Primitive
+   : TPrimitive extends string
+     ? ReturnIsString<Each>
+     : TPrimitive extends number
+       ? ReturnIsNumber<Each>
+       : TPrimitive extends bigint
+         ? ReturnIsBigInt<Each>
+         : TPrimitive extends null
+           ? ReturnIsNull<Each>
+           : TPrimitive extends undefined
+             ? ReturnIsUndefined<Each>
+             : TPrimitive extends symbol
+               ? ReturnIsSymbol<Each>
+               : false;
+export type PromiseLike = Promise<any> | ((...args: any[]) => Promise<any>);
+export type ClassConstructor<T> = new (...arg: any[]) => T;

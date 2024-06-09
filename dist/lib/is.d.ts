@@ -1,53 +1,6 @@
 import { DateTime } from './datetime';
-import { CommonType, IsEqual, ObjectCommonType, ObjectRecord, Primitive } from '../type';
-export type ObjectRulesOptions = {
-    rules: ObjectCommonType;
-    suitable?: boolean;
-};
-export type ArrayRulesOptions = {
-    rules: CommonType | ObjectCommonType;
-    suitable?: boolean;
-    notEmpty?: boolean;
-};
-export type ObjectArrayRulesOptions = {
-    object?: ObjectRulesOptions;
-    array?: ArrayRulesOptions;
-};
-export type EqualsRulesOptions = {
-    equalsTo: any;
-};
-export type StrongPasswordOptions = {
-    minLength?: number;
-    noSpaces?: boolean;
-    minSpecialChars?: number;
-    minUpper?: number;
-    minLower?: number;
-    minNumber?: number;
-};
-export type FlatObjectRulesOptions = {
-    allowArray?: boolean | {
-        root?: boolean;
-        deep?: boolean;
-    };
-};
+import { ArrayRulesOptions, ClassConstructor, CommonType, CreditCardType, FlatObjectRulesOptions, IsValidOptions, ObjectRecord, ObjectRulesOptions, ReturnIsBigInt, ReturnIsNull, ReturnIsNumber, ReturnIsPrimitive, ReturnIsString, ReturnIsSymbol, ReturnIsUndefined, StrongPasswordOptions } from '../type';
 export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' | 'nodeJs' | 'valid' | 'each' ? never : T;
-export type IsValidOptions<T> = {
-    type: T;
-    each?: boolean;
-    meta?: IsEqual<T, 'object'> extends true ? ObjectRulesOptions : IsEqual<T, 'array'> extends true ? ArrayRulesOptions : IsEqual<T, 'objectOrArray'> extends true ? ObjectArrayRulesOptions : IsEqual<T, 'equals'> extends true ? EqualsRulesOptions : IsEqual<T, 'flatObject'> extends true ? FlatObjectRulesOptions : IsEqual<T, 'strongPassword'> extends true ? StrongPasswordOptions : T extends 'inArray' ? any[] : IsEqual<T, 'includes'> extends true ? any : IsEqual<T, 'creditCard'> extends true ? CreditCardType : IsEqual<T, 'matched'> extends true ? RegExp : never;
-};
-export type CreditCardType = 'VISA' | 'AMEX' | 'MASTERCARD' | 'DISCOVER' | 'DINERS' | 'JCB' | 'CHINA_UNION_PAY';
-export declare class IsError extends Error {
-}
-type ReturnIsString<Each> = Each extends true ? string[] : string;
-type ReturnIsNumber<Each> = Each extends true ? number[] : number;
-type ReturnIsBigInt<Each> = Each extends true ? bigint[] : bigint;
-type ReturnIsNull<Each> = Each extends true ? null[] : null;
-type ReturnIsUndefined<Each> = Each extends true ? undefined[] : undefined;
-type ReturnIsSymbol<Each> = Each extends true ? symbol[] : symbol;
-type ReturnIsPrimitive<Each, TPrimitive = unknown> = TPrimitive extends unknown ? Each extends true ? Primitive[] : Primitive : TPrimitive extends string ? ReturnIsString<Each> : TPrimitive extends number ? ReturnIsNumber<Each> : TPrimitive extends bigint ? ReturnIsBigInt<Each> : TPrimitive extends null ? ReturnIsNull<Each> : TPrimitive extends undefined ? ReturnIsUndefined<Each> : TPrimitive extends symbol ? ReturnIsSymbol<Each> : false;
-type PromiseLike = Promise<any> | ((...args: any[]) => Promise<any>);
-type ClassConstructor<T> = new (...arg: any[]) => T;
 export declare class Is {
     static typeOf(value: any, type: CommonType, each?: boolean): boolean;
     static equals(a: any, b: any): boolean;
@@ -86,7 +39,7 @@ export declare class Is {
     static nodeJs(): boolean;
     static nullOrUndefined<E extends boolean = false>(value: any, each?: E): value is ReturnIsNull<E> | ReturnIsUndefined<E>;
     static strongPassword<E extends boolean = false>(value: any, options?: StrongPasswordOptions, each?: E): value is ReturnIsString<E>;
-    static promise<E extends boolean = false, R = E extends true ? PromiseLike[] : PromiseLike>(value: any, each?: E): value is R;
+    static promise<E extends boolean = false, R = E extends true ? PromiseLike<any>[] : PromiseLike<any>>(value: any, each?: E): value is R;
     static email<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>;
     static inArray(value: any, array: any[], each?: boolean): boolean;
     static includes(value: any, target: any, each?: boolean): boolean;
@@ -96,6 +49,7 @@ export declare class Is {
     static mongoId<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>;
     static matched<E extends boolean = false>(value: any, regex: RegExp, each?: E): value is ReturnIsString<E>;
     static creditCard(value: any, type?: CreditCardType, each?: boolean): boolean;
+    static min<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E>;
+    static max<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E>;
     static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean;
 }
-export {};

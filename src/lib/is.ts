@@ -1,88 +1,28 @@
 'use strict';
 import { DateTime } from './datetime';
-import { CommonType, IsEqual, ObjectCommonType, ObjectRecord, Primitive } from '../type';
-export type ObjectRulesOptions = { rules: ObjectCommonType; suitable?: boolean };
-
-export type ArrayRulesOptions = { rules: CommonType | ObjectCommonType; suitable?: boolean; notEmpty?: boolean };
-
-export type ObjectArrayRulesOptions = {
-   object?: ObjectRulesOptions; // For type Is.object only
-   array?: ArrayRulesOptions; // For type Is.array only
-};
-
-export type EqualsRulesOptions = {
-   equalsTo: any;
-};
-
-export type StrongPasswordOptions = {
-   minLength?: number;
-   noSpaces?: boolean;
-   minSpecialChars?: number;
-   minUpper?: number;
-   minLower?: number;
-   minNumber?: number;
-};
-
-export type FlatObjectRulesOptions = {
-   allowArray?: boolean | { root?: boolean; deep?: boolean };
-};
-
+import {
+   ArrayRulesOptions,
+   ClassConstructor,
+   CommonType,
+   CreditCardType,
+   EqualsRulesOptions,
+   FlatObjectRulesOptions,
+   IsError,
+   IsValidOptions,
+   ObjectArrayRulesOptions,
+   ObjectCommonType,
+   ObjectRecord,
+   ObjectRulesOptions,
+   ReturnIsBigInt,
+   ReturnIsNull,
+   ReturnIsNumber,
+   ReturnIsPrimitive,
+   ReturnIsString,
+   ReturnIsSymbol,
+   ReturnIsUndefined,
+   StrongPasswordOptions,
+} from '../type';
 export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' | 'nodeJs' | 'valid' | 'each' ? never : T;
-
-export type IsValidOptions<T> = {
-   type: T;
-   each?: boolean;
-   meta?: IsEqual<T, 'object'> extends true
-      ? ObjectRulesOptions
-      : IsEqual<T, 'array'> extends true
-        ? ArrayRulesOptions
-        : IsEqual<T, 'objectOrArray'> extends true
-          ? ObjectArrayRulesOptions
-          : IsEqual<T, 'equals'> extends true
-            ? EqualsRulesOptions
-            : IsEqual<T, 'flatObject'> extends true
-              ? FlatObjectRulesOptions
-              : IsEqual<T, 'strongPassword'> extends true
-                ? StrongPasswordOptions
-                : T extends 'inArray'
-                  ? any[]
-                  : IsEqual<T, 'includes'> extends true
-                    ? any
-                    : IsEqual<T, 'creditCard'> extends true
-                      ? CreditCardType
-                      : IsEqual<T, 'matched'> extends true
-                        ? RegExp
-                        : never;
-};
-
-export type CreditCardType = 'VISA' | 'AMEX' | 'MASTERCARD' | 'DISCOVER' | 'DINERS' | 'JCB' | 'CHINA_UNION_PAY';
-export class IsError extends Error {}
-
-type ReturnIsString<Each> = Each extends true ? string[] : string;
-type ReturnIsNumber<Each> = Each extends true ? number[] : number;
-type ReturnIsBigInt<Each> = Each extends true ? bigint[] : bigint;
-type ReturnIsNull<Each> = Each extends true ? null[] : null;
-type ReturnIsUndefined<Each> = Each extends true ? undefined[] : undefined;
-type ReturnIsSymbol<Each> = Each extends true ? symbol[] : symbol;
-type ReturnIsPrimitive<Each, TPrimitive = unknown> = TPrimitive extends unknown
-   ? Each extends true
-      ? Primitive[]
-      : Primitive
-   : TPrimitive extends string
-     ? ReturnIsString<Each>
-     : TPrimitive extends number
-       ? ReturnIsNumber<Each>
-       : TPrimitive extends bigint
-         ? ReturnIsBigInt<Each>
-         : TPrimitive extends null
-           ? ReturnIsNull<Each>
-           : TPrimitive extends undefined
-             ? ReturnIsUndefined<Each>
-             : TPrimitive extends symbol
-               ? ReturnIsSymbol<Each>
-               : false;
-type PromiseLike = Promise<any> | ((...args: any[]) => Promise<any>);
-type ClassConstructor<T> = new (...arg: any[]) => T;
 
 export class Is {
    static typeOf(value: any, type: CommonType, each?: boolean): boolean {
@@ -584,7 +524,7 @@ export class Is {
       });
    }
 
-   static promise<E extends boolean = false, R = E extends true ? PromiseLike[] : PromiseLike>(value: any, each?: E): value is R {
+   static promise<E extends boolean = false, R = E extends true ? PromiseLike<any>[] : PromiseLike<any>>(value: any, each?: E): value is R {
       return Is.each(each, value, (item: any) => item !== null && typeof item === 'object' && typeof item.then === 'function');
    }
 
@@ -726,6 +666,14 @@ export class Is {
       });
    }
 
+   static min<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E> {
+      return Is.each(each, value, (item: any) => typeof item === 'number' && item >= number);
+   }
+
+   static max<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E> {
+      return Is.each(each, value, (item: any) => typeof item === 'number' && item <= number);
+   }
+
    static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean {
       const { type: method } = options;
       const invalidMethods = ['typeOf', 'prototype', 'nodeJs', 'valid', 'each'];
@@ -778,6 +726,12 @@ export class Is {
 
             case 'matched':
                return Is.matched(item, options.meta as RegExp);
+
+            case 'min':
+               return Is.min(item, options.meta as number);
+
+            case 'max':
+               return Is.max(item, options.meta as number);
 
             default:
                return Is[method].call(null, item, false);

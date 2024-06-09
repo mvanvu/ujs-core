@@ -279,6 +279,14 @@ it('Core Is', () => {
    // # Is.matched<E extends boolean = false>(value: any, regex: RegExp, each?: E): value is ReturnIsString<E>
    expect(Is.matched('507f1f77bcf86cd799439011', /^[0-9a-fA-F]{24}$/)).toBeTruthy();
 
+   // # Is.min<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E>
+   expect(Is.min(0, 0)).toBeTruthy();
+   expect(Is.min('0', 0)).toBeFalsy(); // Value must be a number
+
+   // # Is.max<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E>
+   expect(Is.max(10, 9)).toBeFalsy();
+   expect(Is.max('10', 9)).toBeFalsy(); // Value must be a number
+
    // # Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
    // ## Validate the value with the specific options
    expect(Is.valid('I am a string', { type: 'string' })).toBeTruthy();
