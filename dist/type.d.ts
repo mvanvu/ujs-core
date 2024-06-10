@@ -1,6 +1,7 @@
-export type CommonType = 'string' | 'number' | 'snumber' | 'unumber' | 'int' | 'sint' | 'uint' | 'bigint' | 'sbigint' | 'ubigint' | 'object' | 'array' | 'boolean' | 'undefined' | 'symbol' | 'function' | 'null' | 'regex' | 'set' | 'map' | 'NaN' | 'datestring' | 'date' | 'datetime' | 'primitive';
+import { type Is } from './lib/is';
+export type IsValidType<T = keyof typeof Is> = T extends 'prototype' | 'nodeJs' | 'valid' | 'each' ? never : T;
 export interface ObjectCommonType {
-    [key: string]: CommonType | ObjectCommonType;
+    [key: string]: IsValidType | ObjectCommonType;
 }
 export type Primitive = null | undefined | string | number | boolean | symbol | bigint;
 export type IsEqual<T1, T2> = T1 extends T2 ? ((<G>() => G extends T1 ? 1 : 2) extends <G>() => G extends T2 ? 1 : 2 ? true : false) : false;
@@ -78,7 +79,7 @@ export type ObjectRulesOptions = {
     suitable?: boolean;
 };
 export type ArrayRulesOptions = {
-    rules: CommonType | ObjectCommonType;
+    rules: IsValidType | ObjectCommonType;
     suitable?: boolean;
     notEmpty?: boolean;
 };

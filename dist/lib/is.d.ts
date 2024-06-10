@@ -1,13 +1,11 @@
 import { DateTime } from './datetime';
-import { ArrayRulesOptions, ClassConstructor, CommonType, CreditCardType, FlatObjectRulesOptions, IsValidOptions, ObjectRecord, ObjectRulesOptions, ReturnIsBigInt, ReturnIsNull, ReturnIsNumber, ReturnIsPrimitive, ReturnIsString, ReturnIsSymbol, ReturnIsUndefined, StrongPasswordOptions } from '../type';
-export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' | 'nodeJs' | 'valid' | 'each' ? never : T;
+import { ArrayRulesOptions, ClassConstructor, CreditCardType, FlatObjectRulesOptions, IsValidOptions, IsValidType, ObjectRecord, ObjectRulesOptions, ReturnIsBigInt, ReturnIsNull, ReturnIsNumber, ReturnIsPrimitive, ReturnIsString, ReturnIsSymbol, ReturnIsUndefined, StrongPasswordOptions } from '../type';
 export declare class Is {
-    static typeOf(value: any, type: CommonType, each?: boolean): boolean;
     static equals(a: any, b: any): boolean;
     static emptyObject<E extends boolean = false, R = E extends true ? {}[] : {}>(value: any, each?: E): value is R;
     static date<E extends boolean = false, R = E extends true ? Date[] : Date>(value: any, each?: E): value is R;
     static datetime<E extends boolean = false, R = E extends true ? DateTime[] : DateTime>(value: any, each?: boolean): value is R;
-    static dateString<E extends boolean = false>(d: any, each?: E): d is ReturnIsString<E>;
+    static dateString<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>;
     static primitive<E extends boolean = false>(value: any, each?: E): value is ReturnIsPrimitive<E>;
     static empty(value: any, each?: boolean): boolean;
     static nothing(value: any, each?: boolean): value is (null | undefined | typeof NaN)[];

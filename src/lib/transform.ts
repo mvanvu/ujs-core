@@ -1,5 +1,5 @@
 'use strict';
-import { CommonType, LastElement, ObjectRecord, DefaultObject } from '../type';
+import { IsValidType, LastElement, ObjectRecord, DefaultObject } from '../type';
 import { Is } from './is';
 
 export class Transform {
@@ -372,9 +372,9 @@ export class Transform {
       return value;
    }
 
-   static cleanIfType(value: any, typeTransform: string | string[], typeValue: CommonType | CommonType[]): any {
-      for (const type of Is.array(typeValue) ? <CommonType[]>typeValue : [<CommonType>typeValue]) {
-         if (Is.typeOf(value, type)) {
+   static cleanIfType(value: any, typeTransform: string | string[], typeValue: IsValidType | IsValidType[]): any {
+      for (const type of Is.array(typeValue) ? <IsValidType[]>typeValue : [<IsValidType>typeValue]) {
+         if (Is.valid(value, { type })) {
             return Transform.clean(value, typeTransform);
          }
       }

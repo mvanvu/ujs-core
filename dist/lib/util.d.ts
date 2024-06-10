@@ -12,8 +12,6 @@ export declare class Util {
     static baseName(path: string, suffix?: string): string;
     static dirName(path: string): string;
     static race<T>(callback: any, maxMiliseconds: number): Promise<T>;
-    static debug(...entries: any[]): void;
-    static debugDev(...entries: any[]): void;
     static numberFormat(number: number, options?: NumberFormatOptions): string;
     static uFirst(str: string): string;
     static lFirst(str: string): string;

@@ -6,37 +6,6 @@
 import { Is, DateTime } from '@mvanvu/ujs';
 ```
 
-#### Common Type
-
-```javascript
-/**
-   'string'       -> String (native)
-   'number'       -> Number (native)
-   'snumber'      -> Signed number
-   'unumber'      -> Unsigned number
-   'int'          -> Integer
-   'sint'         -> Signed integer
-   'uint'         -> Unsigned integer
-   'bigint'       -> Bigint (native)
-   'sbigint'      -> Signed bigint
-   'ubigint'      -> Unsigned bigint
-   'object'       -> Object (native)
-   'array'        -> Array (native)
-   'boolean'      -> Boolean (native)
-   'undefined'    -> undefined (primitive)
-   'symbol'       -> Symbol (native)
-   'function'     -> Function (native)
-   'null'         -> null (primitive)
-   'regex'        -> Regex (native)
-   'set'          -> Set (native)
-   'map'          -> Map (native)
-   'NaN'          -> NaN (native)
-   'date'         -> Date (native)
-   'datetime'     -> [DateTime](/Datetime.md)
-   'datestring'   -> String date
-*/
-```
-
 #### Is.emptyObject(obj: any): boolean
 
 ```javascript
@@ -184,8 +153,8 @@ Is.array({}); // It returns: false
 Is.array([1, 2, 3]); // It returns: true
 
 // Check and validate each element of the array
-Is.array([1, 2, 3], { rules: 'uint' }); // It returns: true
-Is.array([1, 2, -3], { rules: 'sint' }); // It returns: false
+Is.array([1, 2, 3], { rules: 'uInt' }); // It returns: true
+Is.array([1, 2, -3], { rules: 'sInt' }); // It returns: false
 Is.array([{ foo: 123, bar: 456 }], { rules: { foo: 'number', bar: 'string' } }); // It returns: false
 Is.array([{ foo: 123, bar: 456 }], { rules: { foo: 'number' } }); // It returns: false
 
@@ -264,7 +233,7 @@ Is.nothing(NaN); // It returns: true
 Is.nothing(false); // It returns: false
 
 const arr = [{ foo: 123, bar: { number: { digit: 123 } } }];
-Is.array(arr, { rules: { foo: 'number', bar: { number: { digit: 'uint' } } } }); // It returns: true
+Is.array(arr, { rules: { foo: 'number', bar: { number: { digit: 'uInt' } } } }); // It returns: true
 ```
 
 #### Is.strongPassword(value: string, options?: { minLength?: number; noSpaces?: boolean; minSpecialChars?: number; minUpper?: number; minLower?: number; minNumber?: number; }): boolean
@@ -327,7 +296,7 @@ Is.class([class Foo {}, class Bar {}], true); // It returns: true
 Is.class(function () {}); // It returns: false
 ```
 
-#### static mongoId(value: any, each = false): boolean
+#### Is.mongoId(value: any, each = false): boolean
 
 ```javascript
 Is.mongoId('507f1f77bcf86cd799439011'); // It returns: true
@@ -336,7 +305,7 @@ Is.mongoId(1); // It returns: false
 Is.mongoId([1, 2], true); // It returns: false
 ```
 
-#### static creditCard(value: any, type?: CreditCardType, each = false): boolean\
+#### Is.creditCard(value: any, type?: CreditCardType, each = false): boolean\
 
 ```javascript
 Is.creditCard('4000056655665556', 'VISA'); // It returns: true
@@ -344,6 +313,35 @@ Is.creditCard('2223003122003222', 'MASTERCARD'); // It returns: true
 Is.creditCard('6011111111111117', 'DISCOVER'); // It returns: true
 Is.creditCard('36227206271667', 'DINERS'); // It returns: true
 Is.creditCard('3566002020360505', 'JCB'); // It returns: true
+```
+
+#### Is.arrayUnique(value: any, each?: boolean): value is any[]
+
+```javascript
+Is.arrayUnique([1, 2, 3]); // It returns: true
+Is.arrayUnique([1, 1, 2]); // It returns: false
+Is.arrayUnique([{ foo: 123 }, { foo: 456 }]); // It returns: true
+Is.arrayUnique([{ foo: 123 }, { foo: 123 }]); // It returns: false
+```
+
+#### Is.matched<E extends boolean = false>(value: any, regex: RegExp, each?: E): value is ReturnIsString<E>
+
+```javascript
+Is.matched('507f1f77bcf86cd799439011', /^[0-9a-fA-F]{24}$/); // It returns: true
+```
+
+#### Is.min<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E>
+
+```javascript
+Is.min(0, 0); // It returns: true
+expect(Is.min('0', 0)).toBeFalsy(); // Value must be a number
+```
+
+#### Is.max<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E>
+
+```javascript
+Is.max(10, 9); // It returns: false
+expect(Is.max('10', 9)).toBeFalsy(); // Value must be a number
 ```
 
 #### Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
@@ -366,4 +364,6 @@ Is.valid(['4242424242424242', '4000056655665556'], { type: 'creditCard', each: t
 Is.valid(['5555555555554444', '2223003122003222', '5105105105105100'], { type: 'creditCard', each: true, meta: 'MASTERCARD' }); // It returns: true
 Is.valid(['6011111111111117', '6011000990139424', '6011981111111113'], { type: 'creditCard', each: true, meta: 'DISCOVER' }); // It returns: true
 Is.valid(['3056930009020004', '36227206271667'], { type: 'creditCard', each: true, meta: 'DINERS' }); // It returns: true
+Is.valid(['507f1f77bcf86cd799439011', '507f191e810c19729de860ea'], { type: 'matched', each: true, meta: /^[0-9a-fA-F]{24}$/ }); // It returns: true
+Is.valid(['507f1f77bcf86cd799439011', '123@abc', 1], { type: 'matched', each: true, meta: /^[0-9a-fA-F]{24}$/ }); // It returns: false
 ```

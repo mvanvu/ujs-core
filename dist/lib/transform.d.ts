@@ -1,4 +1,4 @@
-import { CommonType, LastElement, ObjectRecord, DefaultObject } from '../type';
+import { IsValidType, LastElement, ObjectRecord, DefaultObject } from '../type';
 export declare class Transform {
     static trim(value: any, options?: {
         specialChars?: string;
@@ -27,5 +27,5 @@ export declare class Transform {
     static toLowerCase(value: any): string;
     static toUpperCase(value: any): string;
     static clean(value: any, typeTransform: string | string[], ...params: any[]): any;
-    static cleanIfType(value: any, typeTransform: string | string[], typeValue: CommonType | CommonType[]): any;
+    static cleanIfType(value: any, typeTransform: string | string[], typeValue: IsValidType | IsValidType[]): any;
 }

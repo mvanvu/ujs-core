@@ -1,33 +1,6 @@
 import { Is, DateTime } from '../../src';
 
 it('Core Is', () => {
-   // # Common Type
-   /**
-   -- 'string'       -> String (native)
-   -- 'number'       -> Number (native)
-   -- 'snumber'      -> Signed number
-   -- 'unumber'      -> Unsigned number
-   -- 'int'          -> Integer
-   -- 'sint'         -> Signed integer
-   -- 'uint'         -> Unsigned integer
-   -- 'bigint'       -> Bigint (native)
-   -- 'sbigint'      -> Signed bigint
-   -- 'ubigint'      -> Unsigned bigint
-   -- 'object'       -> Object (native)
-   -- 'array'        -> Array (native)
-   -- 'boolean'      -> Boolean (native)
-   -- 'undefined'    -> undefined (primitive)
-   -- 'symbol'       -> Symbol (native)
-   -- 'function'     -> Function (native)
-   -- 'null'         -> null (primitive)
-   -- 'regex'        -> Regex (native)
-   -- 'set'          -> Set (native)
-   -- 'map'          -> Map (native)
-   -- 'NaN'          -> NaN (native)
-   -- 'date'         -> Date (native)
-   -- 'datetime'     -> [DateTime](/Datetime.md)
-   -- 'datestring'   -> String date
-    */
    // # Is.emptyObject(obj: any): boolean
    // ## Check the object is empty, returns false if the value is not an object
    expect(Is.emptyObject(null)).toBeFalsy();
@@ -139,8 +112,8 @@ it('Core Is', () => {
    expect(Is.array([1, 2, 3])).toBeTruthy();
 
    // ## Check and validate each element of the array
-   expect(Is.array([1, 2, 3], { rules: 'uint' })).toBeTruthy();
-   expect(Is.array([1, 2, -3], { rules: 'sint' })).toBeFalsy();
+   expect(Is.array([1, 2, 3], { rules: 'uInt' })).toBeTruthy();
+   expect(Is.array([1, 2, -3], { rules: 'sInt' })).toBeFalsy();
    expect(Is.array([{ foo: 123, bar: 456 }], { rules: { foo: 'number', bar: 'string' } })).toBeFalsy();
    expect(Is.array([{ foo: 123, bar: 456 }], { rules: { foo: 'number' } })).toBeFalsy();
 
@@ -207,7 +180,7 @@ it('Core Is', () => {
    expect(Is.nothing(false)).toBeFalsy();
 
    const arr = [{ foo: 123, bar: { number: { digit: 123 } } }];
-   expect(Is.array(arr, { rules: { foo: 'number', bar: { number: { digit: 'uint' } } } })).toBeTruthy();
+   expect(Is.array(arr, { rules: { foo: 'number', bar: { number: { digit: 'uInt' } } } })).toBeTruthy();
 
    // # Is.strongPassword(value: string, options?: { minLength?: number; noSpaces?: boolean; minSpecialChars?: number; minUpper?: number; minLower?: number; minNumber?: number; }): boolean
    // ## Check the value is a strong password, returns false if the value is not a string

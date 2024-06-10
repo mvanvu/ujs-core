@@ -3,12 +3,12 @@ import { DateTime } from './datetime';
 import {
    ArrayRulesOptions,
    ClassConstructor,
-   CommonType,
    CreditCardType,
    EqualsRulesOptions,
    FlatObjectRulesOptions,
    IsError,
    IsValidOptions,
+   IsValidType,
    ObjectArrayRulesOptions,
    ObjectCommonType,
    ObjectRecord,
@@ -22,87 +22,8 @@ import {
    ReturnIsUndefined,
    StrongPasswordOptions,
 } from '../type';
-export type IsValidType<T = keyof typeof Is> = T extends 'typeOf' | 'prototype' | 'nodeJs' | 'valid' | 'each' ? never : T;
 
 export class Is {
-   static typeOf(value: any, type: CommonType, each?: boolean): boolean {
-      if (each) {
-         if (!Array.isArray(value)) {
-            return false;
-         }
-
-         for (const val of value) {
-            if (!Is.typeOf(val, type, false)) {
-               return false;
-            }
-         }
-
-         return true;
-      }
-
-      const typeValue = typeof value;
-
-      switch (type) {
-         case 'string':
-         case 'undefined':
-         case 'boolean':
-         case 'function':
-         case 'symbol':
-            return typeValue === type;
-
-         case 'int':
-         case 'sint':
-         case 'uint':
-            return !Number.isInteger(value) || (type === 'sint' && value >= 0) || (type === 'uint' && value < 0) ? false : true;
-
-         case 'number':
-         case 'snumber':
-         case 'unumber':
-            return typeValue !== 'number' || !Number(value) || (type === 'snumber' && value >= 0) || (type === 'unumber' && value < 0) ? false : true;
-
-         case 'bigint':
-         case 'sbigint':
-         case 'ubigint':
-            return typeValue !== 'bigint' || (type === 'sbigint' && value >= 0) || (type === 'ubigint' && value < 0) ? false : true;
-
-         case 'object':
-            return Is.object(value);
-
-         case 'array':
-            return Array.isArray(value);
-
-         case 'null':
-            return value === null;
-
-         case 'NaN':
-            return Number.isNaN(value);
-
-         case 'map':
-            return value instanceof Map;
-
-         case 'set':
-            return value instanceof Set;
-
-         case 'regex':
-            return value instanceof RegExp;
-
-         case 'date':
-            return value instanceof Date;
-
-         case 'datetime':
-            return value instanceof DateTime;
-
-         case 'datestring':
-            return typeValue === 'string' && !!DateTime.parse(value);
-
-         case 'primitive':
-            return Is.primitive(value);
-
-         default:
-            return false;
-      }
-   }
-
    static equals(a: any, b: any): boolean {
       if (a === b) {
          return true;
@@ -235,15 +156,15 @@ export class Is {
    }
 
    static date<E extends boolean = false, R = E extends true ? Date[] : Date>(value: any, each?: E): value is R {
-      return Is.typeOf(value, 'date', each);
+      return Is.each(each, value, (item: any) => item instanceof Date);
    }
 
    static datetime<E extends boolean = false, R = E extends true ? DateTime[] : DateTime>(value: any, each?: boolean): value is R {
-      return Is.typeOf(value, 'datetime', each);
+      return Is.each(each, value, (item: any) => item instanceof DateTime);
    }
 
-   static dateString<E extends boolean = false>(d: any, each?: E): d is ReturnIsString<E> {
-      return Is.typeOf(d, 'datestring', each);
+   static dateString<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
+      return Is.each(each, value, (item: any) => typeof item === 'string' && !!DateTime.parse(value));
    }
 
    static primitive<E extends boolean = false>(value: any, each?: E): value is ReturnIsPrimitive<E> {
@@ -306,7 +227,7 @@ export class Is {
                for (const key in rules) {
                   validate(v[key], rules[key]);
                }
-            } else if (!Is.typeOf(v, rules)) {
+            } else if (!Is.valid(v, { type: rules })) {
                throw new IsError();
             }
          };
@@ -389,7 +310,10 @@ export class Is {
          for (const val of value) {
             const isRulesObject = Is.object(rules);
 
-            if ((isRulesObject && !Is.object(val, { rules: <ObjectCommonType>rules, suitable })) || (!isRulesObject && !Is.typeOf(val, <CommonType>rules))) {
+            if (
+               (isRulesObject && !Is.object(val, { rules: <ObjectCommonType>rules, suitable })) ||
+               (!isRulesObject && !Is.valid(val, { type: rules as any }))
+            ) {
                return false;
             }
          }
@@ -403,7 +327,7 @@ export class Is {
    }
 
    static func(value: any, each?: boolean): boolean {
-      return Is.typeOf(value, 'function', each);
+      return Is.each(each, value, (item: any) => typeof item === 'function');
    }
 
    static callable(value: any, each?: boolean): boolean {
@@ -411,75 +335,75 @@ export class Is {
    }
 
    static number<E extends boolean = false>(value: any, each?: E): value is ReturnIsNumber<E> {
-      return Is.typeOf(value, 'number', each);
+      return Is.each(each, value, (item: any) => typeof item === 'number');
    }
 
    static sNumber<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
-      return Is.typeOf(value, 'snumber', each);
+      return Is.each(each, value, (item: any) => typeof item === 'number' && item < 0);
    }
 
    static uNumber<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
-      return Is.typeOf(value, 'unumber', each);
+      return Is.each(each, value, (item: any) => typeof item === 'number' && item >= 0);
    }
 
    static int<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
-      return Is.typeOf(value, 'int', each);
+      return Is.each(each, value, (item: any) => typeof item === 'number' && Number.isInteger(item));
    }
 
    static sInt<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
-      return Is.typeOf(value, 'sint', each);
+      return Is.each(each, value, (item: any) => typeof item === 'number' && Number.isInteger(item) && item < 0);
    }
 
    static uInt<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
-      return Is.typeOf(value, 'uint', each);
+      return Is.each(each, value, (item: any) => typeof item === 'number' && Number.isInteger(item) && item >= 0);
    }
 
    static bigInt<E extends boolean = false>(value: any, each?: E): value is ReturnIsBigInt<E> {
-      return Is.typeOf(value, 'bigint', each);
+      return Is.each(each, value, (item: any) => typeof item === 'bigint');
    }
 
    static sBigInt<E extends boolean = false>(value: any, each?: E): value is ReturnIsBigInt<E> {
-      return Is.typeOf(value, 'sbigint', each);
+      return Is.each(each, value, (item: any) => typeof item === 'bigint' && item < 0);
    }
 
    static uBigInt<E extends boolean = false>(value: any, each?: E): value is ReturnIsBigInt<E> {
-      return Is.typeOf(value, 'ubigint', each);
+      return Is.each(each, value, (item: any) => typeof item === 'bigint' && item >= 0);
    }
 
    static boolean<E extends boolean = false, R = E extends true ? boolean[] : boolean>(value: any, each?: E): value is R {
-      return Is.typeOf(value, 'boolean', each);
+      return Is.each(each, value, (item: any) => typeof item === 'boolean');
    }
 
    static string<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
-      return Is.typeOf(value, 'string', each);
+      return Is.each(each, value, (item: any) => typeof item === 'string');
    }
 
    static null<E extends boolean = false>(value: any, each?: E): value is ReturnIsNull<E> {
-      return Is.typeOf(value, 'null', each);
+      return Is.each(each, value, (item: any) => item === null);
    }
 
    static undefined<E extends boolean = false>(value: any, each?: E): value is ReturnIsUndefined<E> {
-      return Is.typeOf(value, 'undefined', each);
+      return Is.each(each, value, (item: any) => typeof item === 'undefined');
    }
 
    static nan<E extends boolean = false, R = E extends true ? (typeof NaN)[] : typeof NaN>(value: any, each?: E): value is R {
-      return Is.typeOf(value, 'NaN', each);
+      return Is.each(each, value, (item: any) => isNaN(item));
    }
 
    static symbol<E extends boolean = false>(value: any, each?: E): value is ReturnIsSymbol<E> {
-      return Is.typeOf(value, 'symbol', each);
+      return Is.each(each, value, (item: any) => typeof item === 'symbol');
    }
 
    static map<E extends boolean = false, R = E extends true ? Map<any, any>[] : Map<any, any>>(value: any, each?: E): value is R {
-      return Is.typeOf(value, 'map', each);
+      return Is.each(each, value, (item: any) => item instanceof Map);
    }
 
    static set<E extends boolean = false, R = E extends true ? Set<any>[] : Set<any>>(value: any, each?: E): value is R {
-      return Is.typeOf(value, 'set', each);
+      return Is.each(each, value, (item: any) => item instanceof Set);
    }
 
    static regex<E extends boolean = false, R = E extends true ? RegExp[] : RegExp>(value: any, each?: E): value is R {
-      return Is.typeOf(value, 'regex', each);
+      return Is.each(each, value, (item: any) => item instanceof RegExp);
    }
 
    static nodeJs(): boolean {
@@ -676,7 +600,7 @@ export class Is {
 
    static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean {
       const { type: method } = options;
-      const invalidMethods = ['typeOf', 'prototype', 'nodeJs', 'valid', 'each'];
+      const invalidMethods = ['prototype', 'nodeJs', 'valid', 'each'];
       const each: boolean = options.each === true;
 
       return Is.each(each, value, (item: any) => {
