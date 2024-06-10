@@ -27,18 +27,26 @@ export class Registry<TData = unknown, TPath = PathOf<TData>> {
       return new Registry<TData, TPath>(data, options);
    }
 
-   extends(data: any, validate?: boolean): this {
+   extends(data: any): this {
       const deepExtends = (data: any, path?: string) => {
          if (Is.array(data)) {
+            if (path && !Is.array(this.get(path as TPath))) {
+               this.set(path as TPath, []);
+            }
+
             for (let i = 0, n = data.length; i < n; i++) {
                deepExtends(data[i], `${path ? `${path}.` : ''}${i}`);
             }
          } else if (Is.object(data)) {
+            if (path && !Is.object(this.get(path as TPath))) {
+               this.set(path as TPath, {});
+            }
+
             for (const p in data) {
                deepExtends(data[p], `${path ? `${path}.` : ''}${p}`);
             }
-         } else if (Is.string(path)) {
-            this.set(path as TPath, data, validate);
+         } else if (Is.primitive(data) && path) {
+            this.set(path as TPath, data);
          }
       };
 

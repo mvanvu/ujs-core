@@ -66,13 +66,11 @@ it('Util Registry', () => {
    expect(registry.get('foo')).toEqual(123);
 
    // # extends(data: any, validate?: boolean): Registry
-   registry.extends({ bar: { foo3: 'bar3' }, foo2: 456 });
+   registry.extends({ bar: { foo3: 'bar3' }, foo2: 456, array: [{ foo3: 789 }] });
    expect(registry.get('foo2')).toEqual(456);
    expect(registry.get('bar.foo1')).toEqual('bar1');
    expect(registry.get('bar.foo3')).toEqual('bar3');
-   registry.extends({ bar: 456, fn: () => 1 });
-   expect(registry.get('bar')).toEqual(456);
-   expect(registry.isValidData()).toBeFalsy();
+   expect(registry.get('array[0].foo3')).toEqual(789);
 
    // # merge(data: any, validate?: boolean): Registry => @deprecated use extends instead
    // # parse(data?: any, options?: { validate?: boolean; clone?: boolean }): Registry

@@ -104,13 +104,11 @@ registry.get('foo'); // It returns: 123
 #### extends(data: any, validate?: boolean): Registry
 
 ```javascript
-registry.extends({ bar: { foo3: 'bar3' }, foo2: 456 });
+registry.extends({ bar: { foo3: 'bar3' }, foo2: 456, array: [{ foo3: 789 }] });
 registry.get('foo2'); // It returns: 456
 registry.get('bar.foo1'); // It returns: 'bar1'
 registry.get('bar.foo3'); // It returns: 'bar3'
-registry.extends({ bar: 456, fn: () => 1 });
-registry.get('bar'); // It returns: 456
-registry.isValidData(); // It returns: false
+registry.get('array[0].foo3'); // It returns: 789
 ```
 
 #### merge(data: any, validate?: boolean): Registry => @deprecated use extends instead

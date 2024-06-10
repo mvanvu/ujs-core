@@ -17,7 +17,7 @@ export declare class Registry<TData = unknown, TPath = PathOf<TData>> {
     private data;
     constructor(data?: any, options?: RegistryOptions);
     static from<TData = unknown, TPath = PathOf<TData>>(data?: any, options?: RegistryOptions): Registry<TData, TPath>;
-    extends(data: any, validate?: boolean): this;
+    extends(data: any): this;
     parse(data?: any, options?: {
         validate?: boolean;
         clone?: boolean;
