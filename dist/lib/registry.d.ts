@@ -1,4 +1,4 @@
-import { ObjectRecord, EventHandler, PathValue, Path, IsEqual } from '../type';
+import { ObjectRecord, EventHandler, PathValue, Path, IsEqual, NestedOmit, NestedPick } from '../type';
 export type RegistryDataType = ObjectRecord | any[];
 export declare class RegistryDataError extends Error {
 }
@@ -10,13 +10,13 @@ export type RegistryOptions = {
     consistent?: boolean;
 };
 type PathOf<T> = T extends object ? Path<T> : string;
-export declare class Registry<TData = unknown, TPath = PathOf<TData>> {
+export declare class Registry<TData extends any, TPath = PathOf<TData>> {
     private consistent;
     private eventEmitter;
     private cached;
     private data;
-    constructor(data?: any, options?: RegistryOptions);
-    static from<TData = unknown, TPath = PathOf<TData>>(data?: any, options?: RegistryOptions): Registry<TData, TPath>;
+    constructor(data?: TData, options?: RegistryOptions);
+    static from<TData extends any, TPath = PathOf<TData>>(data?: TData, options?: RegistryOptions): Registry<TData, TPath>;
     extends(data: any): this;
     parse(data?: any, options?: {
         validate?: boolean;
@@ -38,10 +38,10 @@ export declare class Registry<TData = unknown, TPath = PathOf<TData>> {
     isPathFlat(path: TPath): boolean;
     remove(path: TPath): this;
     toString(): string;
-    valueOf<T extends RegistryDataType>(): T;
-    clone(): Registry<TPath>;
-    pick(paths: TPath[] | TPath): Registry<TPath>;
-    omit(paths: TPath[] | TPath): Registry<TPath>;
+    valueOf<T extends RegistryDataType = TData>(): T;
+    clone(): Registry<TData, TPath>;
+    pick<TInclude extends TPath>(paths: TInclude[] | TInclude): Registry<NestedPick<TData, TInclude>>;
+    omit<TExclude extends TPath>(paths: TExclude[] | TExclude): Registry<NestedOmit<TData, TExclude>>;
     watch(paths: TPath[] | TPath, callback: EventHandler['handler']): void;
     isEmpty(): boolean;
 }

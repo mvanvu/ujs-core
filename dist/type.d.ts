@@ -35,16 +35,16 @@ type SubPathsOf<key extends keyof T, T> = `${string & key}.${string & Path<T[key
 export type Path<T> = CombineAll<PropertyNameMap<T>>;
 export type PathValue<T, P extends Path<T>> = T extends any ? P extends `${infer K}.${infer R}` ? K extends keyof T ? R extends Path<T[K]> ? PathValue<T[K], R> : never : K extends number ? T extends ReadonlyArray<infer V> ? PathValue<V, R & Path<V>> : never : never : P extends keyof T ? T[P] : P extends number ? T extends ReadonlyArray<infer V> ? V : never : never : never;
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
-export type UnionPick<T, K extends Path<T>> = K extends keyof T ? Pick<T, K> : K extends `${infer Key}.${infer Rest}` ? Key extends keyof T ? {
+export type UnionPick<T, K> = K extends keyof T ? Pick<T, K> : K extends `${infer Key}.${infer Rest}` ? Key extends keyof T ? {
     [P in Key]: Rest extends Path<T[P]> ? UnionPick<T[P], Rest> : never;
 } : never : never;
-export type NestedPick<T extends object, K extends Path<T>> = UnionToIntersection<UnionPick<T, K>>;
+export type NestedPick<T, K> = UnionToIntersection<UnionPick<T, K>>;
 export type ObjectRecord = Record<PropertyKey, any>;
 export type NonNeverProps<T extends object> = {
     [K in keyof T as T[K] extends never ? never : K]: T[K];
 };
 export type DeepPropsOmit<T, P, K> = T extends object ? K extends `${infer Key}.${infer Rest}` ? IsEqual<P, Key> extends true ? Rest extends Path<T> ? NestedOmit<T, Rest> : T : T : T : T;
-export type NestedOmit<T extends object, K extends Path<T>> = {
+export type NestedOmit<T, K> = {
     [P in Exclude<keyof T, K>]: DeepPropsOmit<T[P], P, Exclude<K, keyof T>>;
 };
 export type SpreadObjects<T> = UnionToIntersection<T extends Array<infer Item> ? (Item extends object ? Item : never) : never>;

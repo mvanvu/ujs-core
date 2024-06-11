@@ -52,9 +52,9 @@ it('Util Registry', () => {
    registry.valueOf();
 
    // # pick(paths: string[] | string): Registry
-   expect(registry.pick('bar.foo2').has('foo')).toBeFalsy();
-   expect(registry.pick('bar.foo2').has('bar.foo1')).toBeFalsy();
-   expect(registry.pick('bar.foo2').has('bar.foo2')).toBeTruthy();
+   expect(registry.pick('bar.foo2').has('foo' as any)).toBeFalsy();
+   expect(registry.pick('bar.foo2').has('bar.foo1' as any)).toBeFalsy();
+   expect(registry.pick('bar.foo2').has('bar.foo2' as any)).toBeTruthy();
 
    // # omit(paths: string[] | string): Registry
    expect(registry.omit('bar.foo2').has('bar.foo2')).toBeFalsy();

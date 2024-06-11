@@ -1,5 +1,5 @@
 'use strict';
-import { ObjectRecord, EventHandler, PathValue, Path, IsEqual } from '../type';
+import { ObjectRecord, EventHandler, PathValue, Path, IsEqual, NestedOmit, NestedPick } from '../type';
 import { Is } from './is';
 import { Transform } from './transform';
 import { EventEmitter } from './event-emitter';
@@ -11,20 +11,20 @@ export type RegistryOptions = { validate?: boolean; clone?: boolean; consistent?
 
 type PathOf<T> = T extends object ? Path<T> : string;
 
-export class Registry<TData = unknown, TPath = PathOf<TData>> {
+export class Registry<TData extends any, TPath = PathOf<TData>> {
    private consistent: boolean = false;
    private eventEmitter = new EventEmitter();
 
    private cached: Record<string, any> = {};
    private data: RegistryDataType;
 
-   constructor(data?: any, options?: RegistryOptions) {
+   constructor(data?: TData, options?: RegistryOptions) {
       this.parse(data, options);
       this.consistent = options?.consistent === true;
    }
 
-   static from<TData = unknown, TPath = PathOf<TData>>(data?: any, options?: RegistryOptions): Registry<TData, TPath> {
-      return new Registry<TData, TPath>(data, options);
+   static from<TData extends any, TPath = PathOf<TData>>(data?: TData, options?: RegistryOptions): Registry<TData, TPath> {
+      return new Registry(data, options);
    }
 
    extends(data: any): this {
@@ -311,38 +311,38 @@ export class Registry<TData = unknown, TPath = PathOf<TData>> {
       return JSON.stringify(this.data);
    }
 
-   valueOf<T extends RegistryDataType>(): T {
+   valueOf<T extends RegistryDataType = TData>(): T {
       return <T>this.data;
    }
 
-   clone(): Registry<TPath> {
+   clone(): Registry<TData, TPath> {
       return Registry.from(this.data, { clone: true, consistent: this.consistent });
    }
 
-   pick(paths: TPath[] | TPath): Registry<TPath> {
-      const registry = Registry.from<TPath>();
+   pick<TInclude extends TPath>(paths: TInclude[] | TInclude): Registry<NestedPick<TData, TInclude>> {
+      const registry = Registry.from();
 
-      for (const path of (Is.array(paths) ? paths : [paths]) as TPath[]) {
+      for (const path of Is.array(paths) ? paths : [paths]) {
          const p = this.preparePath(path as string);
          registry.set(p as any, this.get(p as any));
       }
 
       registry.consistent = this.consistent;
 
-      return registry;
+      return registry as Registry<NestedPick<TData, TInclude>>;
    }
 
-   omit(paths: TPath[] | TPath): Registry<TPath> {
+   omit<TExclude extends TPath>(paths: TExclude[] | TExclude): Registry<NestedOmit<TData, TExclude>> {
       const registry = this.clone();
       registry.consistent = false;
 
-      for (const path of (Is.array(paths) ? paths : [paths]) as TPath[]) {
+      for (const path of Is.array(paths) ? paths : [paths]) {
          registry.remove(this.preparePath(path as string) as any);
       }
 
       registry.consistent = this.consistent;
 
-      return registry;
+      return registry as Registry<NestedOmit<TData, TExclude>>;
    }
 
    watch(paths: TPath[] | TPath, callback: EventHandler['handler']) {

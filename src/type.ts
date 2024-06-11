@@ -81,7 +81,7 @@ export type PathValue<T, P extends Path<T>> = T extends any
 
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
 
-export type UnionPick<T, K extends Path<T>> = K extends keyof T
+export type UnionPick<T, K> = K extends keyof T
    ? Pick<T, K>
    : K extends `${infer Key}.${infer Rest}`
      ? Key extends keyof T
@@ -89,7 +89,7 @@ export type UnionPick<T, K extends Path<T>> = K extends keyof T
         : never
      : never;
 
-export type NestedPick<T extends object, K extends Path<T>> = UnionToIntersection<UnionPick<T, K>>;
+export type NestedPick<T, K> = UnionToIntersection<UnionPick<T, K>>;
 
 export type ObjectRecord = Record<PropertyKey, any>;
 
@@ -105,7 +105,7 @@ export type DeepPropsOmit<T, P, K> = T extends object
       : T
    : T;
 
-export type NestedOmit<T extends object, K extends Path<T>> = {
+export type NestedOmit<T, K> = {
    [P in Exclude<keyof T, K>]: DeepPropsOmit<T[P], P, Exclude<K, keyof T>>;
 };
 
