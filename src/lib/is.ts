@@ -17,12 +17,14 @@ import {
    ReturnIsNull,
    ReturnIsNumber,
    ReturnIsPrimitive,
+   ReturnIsPromise,
    ReturnIsString,
    ReturnIsSymbol,
    ReturnIsUndefined,
    StrongPasswordOptions,
 } from '../type';
 
+const ruleProto = '__IS_RULES__';
 export class Is {
    static equals(a: any, b: any): boolean {
       if (a === b) {
@@ -227,7 +229,7 @@ export class Is {
                for (const key in rules) {
                   validate(v[key], rules[key]);
                }
-            } else if (!Is.valid(v, { type: rules })) {
+            } else if (!Is.valid(v, { rule: rules })) {
                throw new IsError();
             }
          };
@@ -312,7 +314,7 @@ export class Is {
 
             if (
                (isRulesObject && !Is.object(val, { rules: <ObjectCommonType>rules, suitable })) ||
-               (!isRulesObject && !Is.valid(val, { type: rules as any }))
+               (!isRulesObject && !Is.valid(val, { rule: rules as any }))
             ) {
                return false;
             }
@@ -322,15 +324,18 @@ export class Is {
       return true;
    }
 
-   static asyncFunc(value: any, each?: boolean): boolean {
+   static asyncFunc<E extends boolean = false>(value: any, each?: E): value is ReturnIsPromise<E> {
       return Is.each(each, value, (item: any) => item instanceof (async () => {}).constructor);
    }
 
-   static func(value: any, each?: boolean): boolean {
+   static func<E extends boolean = false, R = E extends true ? Function[] : Function>(value: any, each?: E): value is R {
       return Is.each(each, value, (item: any) => typeof item === 'function');
    }
 
-   static callable(value: any, each?: boolean): boolean {
+   static callable<E extends boolean = false, R = E extends true ? Array<Function & PromiseLike<any>> : Function & PromiseLike<any>>(
+      value: any,
+      each?: E,
+   ): value is R {
       return Is.each(each, value, (item: any) => Is.func(item) || Is.asyncFunc(item));
    }
 
@@ -448,7 +453,7 @@ export class Is {
       });
    }
 
-   static promise<E extends boolean = false, R = E extends true ? PromiseLike<any>[] : PromiseLike<any>>(value: any, each?: E): value is R {
+   static promise<E extends boolean = false>(value: any, each?: E): value is ReturnIsPromise<E> {
       return Is.each(each, value, (item: any) => item !== null && typeof item === 'object' && typeof item.then === 'function');
    }
 
@@ -598,13 +603,42 @@ export class Is {
       return Is.each(each, value, (item: any) => typeof item === 'number' && item <= number);
    }
 
+   static minLength<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsString<E> {
+      return Is.each(each, value, (item: any) => typeof item === 'string' && item.length >= number);
+   }
+
+   static maxLength<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsString<E> {
+      return Is.each(each, value, (item: any) => typeof item === 'string' && item.length <= number);
+   }
+
+   static trim<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
+      return Is.each(each, value, (item: any) => typeof item === 'string' && !/^\s+|\s+$/.test(item));
+   }
+
+   static addRule(rule: string, handler: (value: any) => boolean): void {
+      if (Is.callable(handler)) {
+         if (!Is.prototype[ruleProto]) {
+            Is.prototype[ruleProto] = {};
+         }
+
+         Is.prototype[ruleProto][rule] = handler;
+      }
+   }
+
    static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean {
-      const { type: method } = options;
-      const invalidMethods = ['prototype', 'nodeJs', 'valid', 'each'];
+      const { rule: method } = options;
+      const invalidMethods = ['prototype', 'nodeJs', 'valid', 'each', 'addRule'];
       const each: boolean = options.each === true;
 
       return Is.each(each, value, (item: any) => {
-         if (invalidMethods.includes(method) || !Is.callable(Is[method])) {
+         const rules = Is.prototype[ruleProto];
+         const ruleHandler = rules?.[method];
+
+         if (Is.callable(ruleHandler)) {
+            return ruleHandler.call(null, item);
+         }
+
+         if (invalidMethods.includes(method)) {
             return false;
          }
 
@@ -658,7 +692,9 @@ export class Is {
                return Is.max(item, options.meta as number);
 
             default:
-               return Is[method].call(null, item, false);
+               const handler = Is[method as any];
+
+               return Is.callable(handler) ? handler.call(null, item, false) : false;
          }
       });
    }

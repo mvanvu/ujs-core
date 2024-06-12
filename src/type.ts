@@ -1,6 +1,6 @@
 import { type Is } from './lib/is';
 
-export type IsValidType<T = keyof typeof Is> = T extends 'prototype' | 'nodeJs' | 'valid' | 'each' ? never : T;
+export type IsValidType<T = keyof typeof Is> = T extends 'prototype' | 'nodeJs' | 'valid' | 'each' | 'addRule' ? never : T;
 export interface ObjectCommonType {
    [key: string]: IsValidType | ObjectCommonType;
 }
@@ -195,7 +195,7 @@ export type FlatObjectRulesOptions = {
 };
 
 export type IsValidOptions<T> = {
-   type: T;
+   rule: T;
    each?: boolean;
    meta?: IsEqual<T, 'object'> extends true
       ? ObjectRulesOptions
@@ -222,6 +222,7 @@ export type IsValidOptions<T> = {
                           : never;
 };
 
+export type ClassConstructor<T> = new (...arg: any[]) => T;
 export type CreditCardType = 'VISA' | 'AMEX' | 'MASTERCARD' | 'DISCOVER' | 'DINERS' | 'JCB' | 'CHINA_UNION_PAY';
 export class IsError extends Error {}
 export type ReturnIsString<Each> = Each extends true ? string[] : string;
@@ -230,6 +231,7 @@ export type ReturnIsBigInt<Each> = Each extends true ? bigint[] : bigint;
 export type ReturnIsNull<Each> = Each extends true ? null[] : null;
 export type ReturnIsUndefined<Each> = Each extends true ? undefined[] : undefined;
 export type ReturnIsSymbol<Each> = Each extends true ? symbol[] : symbol;
+export type ReturnIsPromise<Each> = Each extends true ? PromiseLike<any>[] : PromiseLike<any>;
 export type ReturnIsPrimitive<Each, TPrimitive = unknown> = TPrimitive extends unknown
    ? Each extends true
       ? Primitive[]
@@ -247,5 +249,3 @@ export type ReturnIsPrimitive<Each, TPrimitive = unknown> = TPrimitive extends u
              : TPrimitive extends symbol
                ? ReturnIsSymbol<Each>
                : false;
-export type PromiseLike = Promise<any> | ((...args: any[]) => Promise<any>);
-export type ClassConstructor<T> = new (...arg: any[]) => T;

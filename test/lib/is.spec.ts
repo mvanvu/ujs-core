@@ -21,11 +21,17 @@ it('Core Is', () => {
    // ## Check the value is a valid string date, returns false if the value is not a string
    expect(Is.dateString('2024-02-28')).toBeTruthy();
 
-   // # Is.asyncFunc(value: any): boolean
+   // # Is.func<E extends boolean = false, R = E extends true ? Function[] : Function>(value: any, each?: E): value is R
    // ## Check the value is an async function
+   expect(Is.asyncFunc(async () => {})).toBeTruthy();
    expect(Is.asyncFunc(null)).toBeFalsy();
    expect(Is.asyncFunc(() => {})).toBeFalsy();
-   expect(Is.asyncFunc(async () => {})).toBeTruthy();
+
+   // # promise<E extends boolean = false>(value: any, each?: E): value is ReturnIsPromise<E>
+   // ## Check the value is a promise instance
+   expect(Is.promise((async () => {})())).toBeTruthy();
+   expect(Is.promise(Promise.resolve(1))).toBeTruthy();
+   expect(Is.asyncFunc(() => {})).toBeFalsy();
 
    // # Is.int(value: any, each = false): boolean
    // ## Check the value is an integer number
@@ -254,30 +260,54 @@ it('Core Is', () => {
 
    // # Is.min<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E>
    expect(Is.min(0, 0)).toBeTruthy();
+   expect(Is.min([0, 1], 0, true)).toBeTruthy();
    expect(Is.min('0', 0)).toBeFalsy(); // Value must be a number
 
    // # Is.max<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E>
    expect(Is.max(10, 9)).toBeFalsy();
+   expect(Is.max(9, 9, true)).toBeFalsy(); // Value must be array when each=true
    expect(Is.max('10', 9)).toBeFalsy(); // Value must be a number
+
+   // # Is.trim<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsString<E>
+   expect(Is.trim('Hello Word')).toBeTruthy();
+   expect(Is.trim('Hello Word  ')).toBeFalsy();
+   expect(Is.trim('   Hello Word')).toBeFalsy();
+   expect(Is.trim('\r\nHello Word')).toBeFalsy();
+
+   // # Is.minLength<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsString<E>
+   expect(Is.minLength('1234', 4)).toBeTruthy();
+   expect(Is.minLength('1234', 5)).toBeFalsy();
+
+   // # Is.maxLength<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsString<E>
+   expect(Is.maxLength('1234', 4)).toBeTruthy();
+   expect(Is.maxLength('1234', 3)).toBeFalsy();
 
    // # Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
    // ## Validate the value with the specific options
-   expect(Is.valid('I am a string', { type: 'string' })).toBeTruthy();
-   expect(Is.valid(['Str 1', 'Str 2'], { type: 'string', each: true })).toBeTruthy();
-   expect(Is.valid(['Str 1', 'Str 2', 3], { type: 'string', each: true })).toBeFalsy();
-   expect(Is.valid({}, { type: 'object' })).toBeTruthy();
-   expect(Is.valid({ foo: 1, bar: false }, { type: 'object', meta: { suitable: true, rules: { foo: 'number', bar: 'boolean' } } })).toBeTruthy();
-   expect(Is.valid({ foo: 1, bar: false }, { type: 'flatObject' })).toBeTruthy();
-   expect(Is.valid({ foo: 1, bar: false }, { type: 'objectOrArray', meta: { object: { rules: { foo: 'number', bar: 'boolean' } } } })).toBeTruthy();
-   expect(Is.valid([{ foo: 1, bar: false }], { type: 'objectOrArray', meta: { array: { rules: { foo: 'number', bar: 'boolean' } } } })).toBeTruthy();
-   expect(Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: false } })).toBeTruthy();
-   expect(Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: true } })).toBeFalsy();
-   expect(Is.valid({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, { type: 'includes', meta: { deep: { foo: 123, bar: 456 } } })).toBeTruthy();
-   expect(Is.valid(class Foo {}, { type: 'class' })).toBeTruthy();
-   expect(Is.valid(['4242424242424242', '4000056655665556'], { type: 'creditCard', each: true, meta: 'VISA' })).toBeTruthy();
-   expect(Is.valid(['5555555555554444', '2223003122003222', '5105105105105100'], { type: 'creditCard', each: true, meta: 'MASTERCARD' })).toBeTruthy();
-   expect(Is.valid(['6011111111111117', '6011000990139424', '6011981111111113'], { type: 'creditCard', each: true, meta: 'DISCOVER' })).toBeTruthy();
-   expect(Is.valid(['3056930009020004', '36227206271667'], { type: 'creditCard', each: true, meta: 'DINERS' })).toBeTruthy();
-   expect(Is.valid(['507f1f77bcf86cd799439011', '507f191e810c19729de860ea'], { type: 'matched', each: true, meta: /^[0-9a-fA-F]{24}$/ })).toBeTruthy();
-   expect(Is.valid(['507f1f77bcf86cd799439011', '123@abc', 1], { type: 'matched', each: true, meta: /^[0-9a-fA-F]{24}$/ })).toBeFalsy();
+   expect(Is.valid('I am a string', { rule: 'string' })).toBeTruthy();
+   expect(Is.valid(['Str 1', 'Str 2'], { rule: 'string', each: true })).toBeTruthy();
+   expect(Is.valid(['Str 1', 'Str 2', 3], { rule: 'string', each: true })).toBeFalsy();
+   expect(Is.valid({}, { rule: 'object' })).toBeTruthy();
+   expect(Is.valid({ foo: 1, bar: false }, { rule: 'object', meta: { suitable: true, rules: { foo: 'number', bar: 'boolean' } } })).toBeTruthy();
+   expect(Is.valid({ foo: 1, bar: false }, { rule: 'flatObject' })).toBeTruthy();
+   expect(Is.valid({ foo: 1, bar: false }, { rule: 'objectOrArray', meta: { object: { rules: { foo: 'number', bar: 'boolean' } } } })).toBeTruthy();
+   expect(Is.valid([{ foo: 1, bar: false }], { rule: 'objectOrArray', meta: { array: { rules: { foo: 'number', bar: 'boolean' } } } })).toBeTruthy();
+   expect(Is.valid([{ foo: 123, bar: 456 }], { rule: 'array', meta: { rules: { foo: 'number' }, suitable: false } })).toBeTruthy();
+   expect(Is.valid([{ foo: 123, bar: 456 }], { rule: 'array', meta: { rules: { foo: 'number' }, suitable: true } })).toBeFalsy();
+   expect(Is.valid({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, { rule: 'includes', meta: { deep: { foo: 123, bar: 456 } } })).toBeTruthy();
+   expect(Is.valid(class Foo {}, { rule: 'class' })).toBeTruthy();
+   expect(Is.valid(['4242424242424242', '4000056655665556'], { rule: 'creditCard', each: true, meta: 'VISA' })).toBeTruthy();
+   expect(Is.valid(['5555555555554444', '2223003122003222', '5105105105105100'], { rule: 'creditCard', each: true, meta: 'MASTERCARD' })).toBeTruthy();
+   expect(Is.valid(['6011111111111117', '6011000990139424', '6011981111111113'], { rule: 'creditCard', each: true, meta: 'DISCOVER' })).toBeTruthy();
+   expect(Is.valid(['3056930009020004', '36227206271667'], { rule: 'creditCard', each: true, meta: 'DINERS' })).toBeTruthy();
+   expect(Is.valid(['507f1f77bcf86cd799439011', '507f191e810c19729de860ea'], { rule: 'matched', each: true, meta: /^[0-9a-fA-F]{24}$/ })).toBeTruthy();
+   expect(Is.valid(['507f1f77bcf86cd799439011', '123@abc', 1], { rule: 'matched', each: true, meta: /^[0-9a-fA-F]{24}$/ })).toBeFalsy();
+
+   // # Is.addRule(rule: string, handler: (value: any) => boolean): void
+   // ## Add a custom rule
+   Is.addRule('stringOrNumber', (value: any) => ['string', 'number'].includes(typeof value));
+   expect(Is.valid('abc', { rule: 'stringOrNumber' as any })).toBeTruthy();
+   expect(Is.valid(123, { rule: 'stringOrNumber' as any })).toBeTruthy();
+   expect(Is.valid(['abc, 123'], { rule: 'stringOrNumber' as any, each: true })).toBeTruthy();
+   expect(Is.valid(true, { rule: 'stringOrNumber' as any })).toBeFalsy();
 });

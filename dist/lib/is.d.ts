@@ -1,5 +1,5 @@
 import { DateTime } from './datetime';
-import { ArrayRulesOptions, ClassConstructor, CreditCardType, FlatObjectRulesOptions, IsValidOptions, IsValidType, ObjectRecord, ObjectRulesOptions, ReturnIsBigInt, ReturnIsNull, ReturnIsNumber, ReturnIsPrimitive, ReturnIsString, ReturnIsSymbol, ReturnIsUndefined, StrongPasswordOptions } from '../type';
+import { ArrayRulesOptions, ClassConstructor, CreditCardType, FlatObjectRulesOptions, IsValidOptions, IsValidType, ObjectRecord, ObjectRulesOptions, ReturnIsBigInt, ReturnIsNull, ReturnIsNumber, ReturnIsPrimitive, ReturnIsPromise, ReturnIsString, ReturnIsSymbol, ReturnIsUndefined, StrongPasswordOptions } from '../type';
 export declare class Is {
     static equals(a: any, b: any): boolean;
     static emptyObject<E extends boolean = false, R = E extends true ? {}[] : {}>(value: any, each?: E): value is R;
@@ -13,9 +13,9 @@ export declare class Is {
     static flatObject(value: any, allowArray?: FlatObjectRulesOptions['allowArray']): value is ObjectRecord;
     static objectOrArray(value: any): value is ObjectRecord | any[];
     static array(value: any, options?: ArrayRulesOptions): value is any[];
-    static asyncFunc(value: any, each?: boolean): boolean;
-    static func(value: any, each?: boolean): boolean;
-    static callable(value: any, each?: boolean): boolean;
+    static asyncFunc<E extends boolean = false>(value: any, each?: E): value is ReturnIsPromise<E>;
+    static func<E extends boolean = false, R = E extends true ? Function[] : Function>(value: any, each?: E): value is R;
+    static callable<E extends boolean = false, R = E extends true ? Array<Function & PromiseLike<any>> : Function & PromiseLike<any>>(value: any, each?: E): value is R;
     static number<E extends boolean = false>(value: any, each?: E): value is ReturnIsNumber<E>;
     static sNumber<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E>;
     static uNumber<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E>;
@@ -37,7 +37,7 @@ export declare class Is {
     static nodeJs(): boolean;
     static nullOrUndefined<E extends boolean = false>(value: any, each?: E): value is ReturnIsNull<E> | ReturnIsUndefined<E>;
     static strongPassword<E extends boolean = false>(value: any, options?: StrongPasswordOptions, each?: E): value is ReturnIsString<E>;
-    static promise<E extends boolean = false, R = E extends true ? PromiseLike<any>[] : PromiseLike<any>>(value: any, each?: E): value is R;
+    static promise<E extends boolean = false>(value: any, each?: E): value is ReturnIsPromise<E>;
     static email<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>;
     static inArray(value: any, array: any[], each?: boolean): boolean;
     static includes(value: any, target: any, each?: boolean): boolean;
@@ -49,5 +49,9 @@ export declare class Is {
     static creditCard(value: any, type?: CreditCardType, each?: boolean): boolean;
     static min<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E>;
     static max<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E>;
+    static minLength<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsString<E>;
+    static maxLength<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsString<E>;
+    static trim<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>;
+    static addRule(rule: string, handler: (value: any) => boolean): void;
     static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean;
 }

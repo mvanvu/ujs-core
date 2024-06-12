@@ -38,13 +38,22 @@ Is.datetime(DateTime.now()); // It returns: true
 Is.dateString('2024-02-28'); // It returns: true
 ```
 
-#### Is.asyncFunc(value: any): boolean
+#### Is.func<E extends boolean = false, R = E extends true ? Function[] : Function>(value: any, each?: E): value is R
 
 ```javascript
 // Check the value is an async function
+Is.asyncFunc(async () => {}); // It returns: true
 Is.asyncFunc(null); // It returns: false
 Is.asyncFunc(() => {}); // It returns: false
-Is.asyncFunc(async () => {}); // It returns: true
+```
+
+#### promise<E extends boolean = false>(value: any, each?: E): value is ReturnIsPromise<E>
+
+```javascript
+// Check the value is a promise instance
+Is.promise((async () => {})()); // It returns: true
+Is.promise(Promise.resolve(1)); // It returns: true
+Is.asyncFunc(() => {}); // It returns: false
 ```
 
 #### Is.int(value: any, each = false): boolean
@@ -334,6 +343,7 @@ Is.matched('507f1f77bcf86cd799439011', /^[0-9a-fA-F]{24}$/); // It returns: true
 
 ```javascript
 Is.min(0, 0); // It returns: true
+Is.min([0, 1], 0, true); // It returns: true
 expect(Is.min('0', 0)).toBeFalsy(); // Value must be a number
 ```
 
@@ -341,29 +351,64 @@ expect(Is.min('0', 0)).toBeFalsy(); // Value must be a number
 
 ```javascript
 Is.max(10, 9); // It returns: false
+expect(Is.max(9, 9, true)).toBeFalsy(); // Value must be array when each=true
 expect(Is.max('10', 9)).toBeFalsy(); // Value must be a number
+```
+
+#### Is.trim<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsString<E>
+
+```javascript
+Is.trim('Hello Word'); // It returns: true
+Is.trim('Hello Word  '); // It returns: false
+Is.trim('   Hello Word'); // It returns: false
+Is.trim('\r\nHello Word'); // It returns: false
+```
+
+#### Is.minLength<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsString<E>
+
+```javascript
+Is.minLength('1234', 4); // It returns: true
+Is.minLength('1234', 5); // It returns: false
+```
+
+#### Is.maxLength<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsString<E>
+
+```javascript
+Is.maxLength('1234', 4); // It returns: true
+Is.maxLength('1234', 3); // It returns: false
 ```
 
 #### Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
 
 ```javascript
 // Validate the value with the specific options
-Is.valid('I am a string', { type: 'string' }); // It returns: true
-Is.valid(['Str 1', 'Str 2'], { type: 'string', each: true }); // It returns: true
-Is.valid(['Str 1', 'Str 2', 3], { type: 'string', each: true }); // It returns: false
-Is.valid({}, { type: 'object' }); // It returns: true
-Is.valid({ foo: 1, bar: false }, { type: 'object', meta: { suitable: true, rules: { foo: 'number', bar: 'boolean' } } }); // It returns: true
-Is.valid({ foo: 1, bar: false }, { type: 'flatObject' }); // It returns: true
-Is.valid({ foo: 1, bar: false }, { type: 'objectOrArray', meta: { object: { rules: { foo: 'number', bar: 'boolean' } } } }); // It returns: true
-Is.valid([{ foo: 1, bar: false }], { type: 'objectOrArray', meta: { array: { rules: { foo: 'number', bar: 'boolean' } } } }); // It returns: true
-Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: false } }); // It returns: true
-Is.valid([{ foo: 123, bar: 456 }], { type: 'array', meta: { rules: { foo: 'number' }, suitable: true } }); // It returns: false
-Is.valid({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, { type: 'includes', meta: { deep: { foo: 123, bar: 456 } } }); // It returns: true
-Is.valid(class Foo {}, { type: 'class' }); // It returns: true
-Is.valid(['4242424242424242', '4000056655665556'], { type: 'creditCard', each: true, meta: 'VISA' }); // It returns: true
-Is.valid(['5555555555554444', '2223003122003222', '5105105105105100'], { type: 'creditCard', each: true, meta: 'MASTERCARD' }); // It returns: true
-Is.valid(['6011111111111117', '6011000990139424', '6011981111111113'], { type: 'creditCard', each: true, meta: 'DISCOVER' }); // It returns: true
-Is.valid(['3056930009020004', '36227206271667'], { type: 'creditCard', each: true, meta: 'DINERS' }); // It returns: true
-Is.valid(['507f1f77bcf86cd799439011', '507f191e810c19729de860ea'], { type: 'matched', each: true, meta: /^[0-9a-fA-F]{24}$/ }); // It returns: true
-Is.valid(['507f1f77bcf86cd799439011', '123@abc', 1], { type: 'matched', each: true, meta: /^[0-9a-fA-F]{24}$/ }); // It returns: false
+Is.valid('I am a string', { rule: 'string' }); // It returns: true
+Is.valid(['Str 1', 'Str 2'], { rule: 'string', each: true }); // It returns: true
+Is.valid(['Str 1', 'Str 2', 3], { rule: 'string', each: true }); // It returns: false
+Is.valid({}, { rule: 'object' }); // It returns: true
+Is.valid({ foo: 1, bar: false }, { rule: 'object', meta: { suitable: true, rules: { foo: 'number', bar: 'boolean' } } }); // It returns: true
+Is.valid({ foo: 1, bar: false }, { rule: 'flatObject' }); // It returns: true
+Is.valid({ foo: 1, bar: false }, { rule: 'objectOrArray', meta: { object: { rules: { foo: 'number', bar: 'boolean' } } } }); // It returns: true
+Is.valid([{ foo: 1, bar: false }], { rule: 'objectOrArray', meta: { array: { rules: { foo: 'number', bar: 'boolean' } } } }); // It returns: true
+Is.valid([{ foo: 123, bar: 456 }], { rule: 'array', meta: { rules: { foo: 'number' }, suitable: false } }); // It returns: true
+Is.valid([{ foo: 123, bar: 456 }], { rule: 'array', meta: { rules: { foo: 'number' }, suitable: true } }); // It returns: false
+Is.valid({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, { rule: 'includes', meta: { deep: { foo: 123, bar: 456 } } }); // It returns: true
+Is.valid(class Foo {}, { rule: 'class' }); // It returns: true
+Is.valid(['4242424242424242', '4000056655665556'], { rule: 'creditCard', each: true, meta: 'VISA' }); // It returns: true
+Is.valid(['5555555555554444', '2223003122003222', '5105105105105100'], { rule: 'creditCard', each: true, meta: 'MASTERCARD' }); // It returns: true
+Is.valid(['6011111111111117', '6011000990139424', '6011981111111113'], { rule: 'creditCard', each: true, meta: 'DISCOVER' }); // It returns: true
+Is.valid(['3056930009020004', '36227206271667'], { rule: 'creditCard', each: true, meta: 'DINERS' }); // It returns: true
+Is.valid(['507f1f77bcf86cd799439011', '507f191e810c19729de860ea'], { rule: 'matched', each: true, meta: /^[0-9a-fA-F]{24}$/ }); // It returns: true
+Is.valid(['507f1f77bcf86cd799439011', '123@abc', 1], { rule: 'matched', each: true, meta: /^[0-9a-fA-F]{24}$/ }); // It returns: false
+```
+
+#### Is.addRule(rule: string, handler: (value: any) => boolean): void
+
+```javascript
+// Add a custom rule
+Is.addRule('stringOrNumber', (value: any) => ['string', 'number'].includes(typeof value));
+Is.valid('abc', { rule: 'stringOrNumber' as any }); // It returns: true
+Is.valid(123, { rule: 'stringOrNumber' as any }); // It returns: true
+Is.valid(['abc, 123'], { rule: 'stringOrNumber' as any, each: true }); // It returns: true
+Is.valid(true, { rule: 'stringOrNumber' as any }); // It returns: false
 ```

@@ -373,8 +373,8 @@ export class Transform {
    }
 
    static cleanIfType(value: any, typeTransform: string | string[], typeValue: IsValidType | IsValidType[]): any {
-      for (const type of Is.array(typeValue) ? <IsValidType[]>typeValue : [<IsValidType>typeValue]) {
-         if (Is.valid(value, { type })) {
+      for (const rule of Is.array(typeValue) ? <IsValidType[]>typeValue : [<IsValidType>typeValue]) {
+         if (Is.valid(value, { rule })) {
             return Transform.clean(value, typeTransform);
          }
       }

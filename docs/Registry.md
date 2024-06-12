@@ -81,9 +81,10 @@ registry.valueOf();
 #### pick(paths: string[] | string): Registry
 
 ```javascript
-registry.pick('bar.foo2').has('foo'); // It returns: false
-registry.pick('bar.foo2').has('bar.foo1'); // It returns: false
-registry.pick('bar.foo2').has('bar.foo2'); // It returns: true
+registry.pick('bar.foo2').has('foo' as any); // It returns: false
+registry.pick('bar.foo2').has('bar.foo1' as any); // It returns: false
+registry.pick('bar.foo2').has('bar.foo2' as any); // It returns: true
+
 ```
 
 #### omit(paths: string[] | string): Registry
