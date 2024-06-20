@@ -615,6 +615,18 @@ export class Is {
       return Is.each(each, value, (item: any) => typeof item === 'string' && !/^\s+|\s+$/.test(item));
    }
 
+   static ipV4<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
+      return Is.each(
+         each,
+         value,
+         (item: any) =>
+            typeof item === 'string' &&
+            /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
+               item,
+            ),
+      );
+   }
+
    static addRule(rule: string, handler: (value: any) => boolean): void {
       if (Is.callable(handler)) {
          if (!Is.prototype[ruleProto]) {

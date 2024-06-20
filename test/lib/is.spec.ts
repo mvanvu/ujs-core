@@ -282,6 +282,12 @@ it('Core Is', () => {
    expect(Is.maxLength('1234', 4)).toBeTruthy();
    expect(Is.maxLength('1234', 3)).toBeFalsy();
 
+   // # Is.ipV4<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>
+   expect(Is.ipV4('192.168.1.1')).toBeTruthy();
+   expect(Is.ipV4('10.0.0.255')).toBeTruthy();
+   expect(Is.ipV4('256.256.256.256')).toBeFalsy();
+   expect(Is.ipV4('127.0.0.1.1')).toBeFalsy();
+
    // # Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
    // ## Validate the value with the specific options
    expect(Is.valid('I am a string', { rule: 'string' })).toBeTruthy();

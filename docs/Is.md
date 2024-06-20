@@ -378,6 +378,15 @@ Is.maxLength('1234', 4); // It returns: true
 Is.maxLength('1234', 3); // It returns: false
 ```
 
+#### Is.ipV4<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>
+
+```javascript
+Is.ipV4('192.168.1.1'); // It returns: true
+Is.ipV4('10.0.0.255'); // It returns: true
+Is.ipV4('256.256.256.256'); // It returns: false
+Is.ipV4('127.0.0.1.1'); // It returns: false
+```
+
 #### Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
 
 ```javascript
