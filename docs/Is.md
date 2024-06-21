@@ -387,6 +387,19 @@ Is.ipV4('256.256.256.256'); // It returns: false
 Is.ipV4('127.0.0.1.1'); // It returns: false
 ```
 
+#### Is.email<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>
+
+```javascript
+const validEmail1 = 'user@example.com';
+const validEmail2 = 'user_name@subdomain.example.co.uk';
+const invalidEmail1 = 'user'; // Missing domain
+const invalidEmail2 = 'user@example'; // Missing top-level domain
+Is.email(validEmail1); // It returns: true
+Is.email(validEmail2); // It returns: true
+Is.email(invalidEmail1); // It returns: false
+Is.email(invalidEmail2); // It returns: false
+```
+
 #### Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
 
 ```javascript

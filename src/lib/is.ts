@@ -458,7 +458,15 @@ export class Is {
    }
 
    static email<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'string' && /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(item));
+      return Is.each(
+         each,
+         value,
+         (item: any) =>
+            typeof item === 'string' &&
+            /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+               item,
+            ),
+      );
    }
 
    static inArray(value: any, array: any[], each?: boolean): boolean {

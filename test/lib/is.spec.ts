@@ -288,6 +288,16 @@ it('Core Is', () => {
    expect(Is.ipV4('256.256.256.256')).toBeFalsy();
    expect(Is.ipV4('127.0.0.1.1')).toBeFalsy();
 
+   // # Is.email<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>
+   const validEmail1 = 'user@example.com';
+   const validEmail2 = 'user_name@subdomain.example.co.uk';
+   const invalidEmail1 = 'user'; // Missing domain
+   const invalidEmail2 = 'user@example'; // Missing top-level domain
+   expect(Is.email(validEmail1)).toBeTruthy();
+   expect(Is.email(validEmail2)).toBeTruthy();
+   expect(Is.email(invalidEmail1)).toBeFalsy();
+   expect(Is.email(invalidEmail2)).toBeFalsy();
+
    // # Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
    // ## Validate the value with the specific options
    expect(Is.valid('I am a string', { rule: 'string' })).toBeTruthy();
