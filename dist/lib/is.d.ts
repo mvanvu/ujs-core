@@ -53,6 +53,7 @@ export declare class Is {
     static maxLength<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsString<E>;
     static trim<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>;
     static ipV4<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>;
+    static url<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>;
     static addRule(rule: string, handler: (value: any) => boolean): void;
     static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean;
 }

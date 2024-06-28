@@ -30,7 +30,7 @@ export declare class Registry<TData extends any, TPath = PathOf<TData>> {
     private validateConsistent;
     set(path: TPath, value: any, validate?: boolean): this;
     initPathValue<T = any>(path: TPath, value: T, validate?: boolean): T;
-    has(path: TPath): boolean;
+    has<Path extends TPath>(path: Path): boolean;
     is(path: TPath, compareValue?: any): boolean;
     isCached(path: string): boolean;
     isPathArray(path?: TPath): boolean;

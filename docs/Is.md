@@ -400,6 +400,16 @@ Is.email(invalidEmail1); // It returns: false
 Is.email(invalidEmail2); // It returns: false
 ```
 
+#### Is.url<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>
+
+```javascript
+Is.url('invalidURL'); // It returns: false
+Is.url('htt//jsowl'); // It returns: false
+Is.url('www.jsowl.com'); // It returns: false
+Is.url('tcp://www.jsowl.com'); // It returns: true
+Is.url('https://www.jsowl.com/remove-an-item-from-an-array-in-javascript/'); // It returns: true
+```
+
 #### Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
 
 ```javascript

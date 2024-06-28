@@ -298,6 +298,13 @@ it('Core Is', () => {
    expect(Is.email(invalidEmail1)).toBeFalsy();
    expect(Is.email(invalidEmail2)).toBeFalsy();
 
+   // # Is.url<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E>
+   expect(Is.url('invalidURL')).toBeFalsy();
+   expect(Is.url('htt//jsowl')).toBeFalsy();
+   expect(Is.url('www.jsowl.com')).toBeFalsy();
+   expect(Is.url('tcp://www.jsowl.com')).toBeTruthy();
+   expect(Is.url('https://www.jsowl.com/remove-an-item-from-an-array-in-javascript/')).toBeTruthy();
+
    // # Is.valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean
    // ## Validate the value with the specific options
    expect(Is.valid('I am a string', { rule: 'string' })).toBeTruthy();

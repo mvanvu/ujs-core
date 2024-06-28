@@ -268,7 +268,7 @@ export class Registry<TData extends any, TPath = PathOf<TData>> {
       return value;
    }
 
-   has(path: TPath): boolean {
+   has<Path extends TPath>(path: Path): boolean {
       return !Is.undefined(this.get(path, undefined));
    }
 

@@ -276,7 +276,7 @@ export class Is {
             for (const k in data) {
                deepCheck(data[k]);
             }
-         } else if (Is.func(data)) {
+         } else if (!Is.primitive(data)) {
             throw new Error();
          }
       };
@@ -633,6 +633,16 @@ export class Is {
                item,
             ),
       );
+   }
+
+   static url<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
+      return Is.each(each, value, (item: any) => {
+         try {
+            return typeof item === 'string' ? Boolean(new URL(item)) : false;
+         } catch (e) {
+            return false;
+         }
+      });
    }
 
    static addRule(rule: string, handler: (value: any) => boolean): void {
