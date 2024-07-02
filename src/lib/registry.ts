@@ -66,7 +66,7 @@ export class Registry<TData extends any, TPath = PathOf<TData>> {
          } catch {
             throw new RegistryDataError('Invalid JSON string data');
          }
-      } else if (Is.objectOrArray(data) && options?.clone !== false) {
+      } else if (!Is.primitive(data) && options?.clone !== false) {
          // Renew data to ignore the Object reference
          data = Util.clone(data);
       }
@@ -102,13 +102,13 @@ export class Registry<TData extends any, TPath = PathOf<TData>> {
 
       if (Is.array(data)) {
          for (const datum of data) {
-            if (Is.object(datum) && !Is.flatObject(datum)) {
+            if (Is.object(datum) && !Is.json(datum)) {
                return false;
             }
          }
 
          return true;
-      } else if (Is.object(data) && !Is.flatObject(data)) {
+      } else if (Is.object(data) && !Is.json(data)) {
          return false;
       }
 
@@ -145,7 +145,7 @@ export class Registry<TData extends any, TPath = PathOf<TData>> {
                const path = paths[i];
                data = data[path];
 
-               if (!Is.objectOrArray(data)) {
+               if (!Is.json(data)) {
                   data = i + 1 === n ? data : defaultValue;
                   break;
                }
@@ -206,7 +206,7 @@ export class Registry<TData extends any, TPath = PathOf<TData>> {
          for (let i = 0; i < n; i++) {
             const key = keys[i];
 
-            if (!Is.objectOrArray(data[key])) {
+            if (!Is.json(data[key])) {
                // Invalid path, return this if the value === undefined (remove path)
                if (value === undefined) {
                   if (this.isPathNum(key) && Is.array(data[key])) {
@@ -269,13 +269,13 @@ export class Registry<TData extends any, TPath = PathOf<TData>> {
    }
 
    has<Path extends TPath>(path: Path): boolean {
-      return !Is.undefined(this.get(path, undefined));
+      return !Is.primitive(this.get(path, undefined), { type: 'undefined' });
    }
 
    is(path: TPath, compareValue?: any): boolean {
       const value = this.get(path);
 
-      if (Is.undefined(compareValue)) {
+      if (Is.primitive(compareValue, { type: 'undefined' })) {
          return Transform.toBoolean(value);
       }
 

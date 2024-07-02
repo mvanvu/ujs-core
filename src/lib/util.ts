@@ -240,7 +240,7 @@ export class Util {
          for (const k in data) {
             const ck = Util.snackToCamelCase(k);
 
-            if (Is.objectOrArray(data[k])) {
+            if (Is.array(data[k]) || Is.object(data[k])) {
                target[ck] = Is.array(data[k]) ? [] : {};
                clone(data[k], target[ck]);
             } else {

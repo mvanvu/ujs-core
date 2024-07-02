@@ -1,34 +1,23 @@
 'use strict';
 import { DateTime } from './datetime';
 import {
-   ArrayRulesOptions,
-   ClassConstructor,
    CreditCardType,
-   EqualsRulesOptions,
-   FlatObjectRulesOptions,
    IsBaseOptions,
-   IsBooleanOptions,
-   IsError,
+   IsEnumOptions,
+   IsIncludesOptions,
    IsNumberOptions,
+   IsPrimitiveOptions,
    IsStringOptions,
-   IsValidOptions,
-   IsValidType,
-   ObjectArrayRulesOptions,
-   ObjectCommonType,
-   ObjectRecord,
-   ObjectRulesOptions,
-   ReturnIsBigInt,
-   ReturnIsNull,
-   ReturnIsNumber,
-   ReturnIsPrimitive,
-   ReturnIsPromise,
-   ReturnIsString,
-   ReturnIsSymbol,
-   ReturnIsUndefined,
-   StrongPasswordOptions,
+   IsStrongPasswordOptions,
+   ReturnsIsArray,
+   ReturnsIsBoolean,
+   ReturnsIsClass,
+   ReturnsIsNumber,
+   ReturnsIsObject,
+   ReturnsIsPrimitive,
+   ReturnsIsString,
 } from '../type';
 
-const ruleProto = '__IS_RULES__';
 export class Is {
    static equals(a: any, b: any): boolean {
       if (a === b) {
@@ -157,8 +146,17 @@ export class Is {
       return a !== a && b !== b; // eslint-disable-line no-self-compare
    }
 
-   static primitive(value: any, options?: IsBaseOptions): boolean {
-      return Is.each(options, value, (item: any) => item === null || ['string', 'number', 'bigint', 'boolean', 'symbol', 'undefined'].includes(typeof item));
+   static primitive<O extends IsPrimitiveOptions>(value: any, options?: O): value is ReturnsIsPrimitive<O> {
+      return Is.each(options, value, (item: any) => {
+         const typeOf = typeof item;
+         const isPrimitive = item === null || ['string', 'number', 'bigint', 'boolean', 'symbol', 'undefined'].includes(typeOf);
+
+         if (options?.type) {
+            return (options.type === 'null' && item === null) || options.type === typeOf;
+         }
+
+         return isPrimitive;
+      });
    }
 
    static empty(value: any, options?: IsBaseOptions): boolean {
@@ -169,7 +167,7 @@ export class Is {
 
             case 'number':
             case 'bigint':
-               return item === 0;
+               return item === 0 || !item;
 
             case 'string':
                return !item.trim().length;
@@ -195,11 +193,11 @@ export class Is {
       });
    }
 
-   static object(value: any, options?: IsBaseOptions): value is ObjectRecord {
+   static object<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsObject<O> {
       return Is.each(options, value, (item: any) => item !== null && typeof item === 'object' && !Array.isArray(item));
    }
 
-   static json(value: any, options?: IsBaseOptions): boolean {
+   static json<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsObject<O> {
       return Is.each(options, value, (item: any) => {
          if (!Is.object(item) || !Is.array(item)) {
             return false;
@@ -233,26 +231,23 @@ export class Is {
       });
    }
 
-   static array<T>(value: any, options?: IsBaseOptions): value is T[] {
+   static array<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsArray<O> {
       return Is.each(options, value, (item: any) => Array.isArray(item));
    }
 
-   static asyncFunc<E extends boolean = false>(value: any, each?: E): value is ReturnIsPromise<E> {
-      return Is.each(each, value, (item: any) => item instanceof (async () => {}).constructor);
+   static asyncFunc(value: any, options?: IsBaseOptions): boolean {
+      return Is.each(options, value, (item: any) => item instanceof (async () => {}).constructor);
    }
 
-   static func<E extends boolean = false, R = E extends true ? Function[] : Function>(value: any, each?: E): value is R {
-      return Is.each(each, value, (item: any) => typeof item === 'function');
+   static func(value: any, options?: IsBaseOptions): boolean {
+      return Is.each(options, value, (item: any) => typeof item === 'function');
    }
 
-   static callable<E extends boolean = false, R = E extends true ? Array<Function & PromiseLike<any>> : Function & PromiseLike<any>>(
-      value: any,
-      each?: E,
-   ): value is R {
-      return Is.each(each, value, (item: any) => Is.func(item) || Is.asyncFunc(item));
+   static callable(value: any, options?: IsBaseOptions): boolean {
+      return Is.each(options, value, (item: any) => Is.func(item) || Is.asyncFunc(item));
    }
 
-   static number(value: any, options?: IsNumberOptions): boolean {
+   static number<O extends IsNumberOptions>(value: any, options?: O): value is ReturnsIsNumber<O> {
       return Is.each(options, value, (item: any) => {
          if (
             typeof item !== 'number' ||
@@ -268,11 +263,11 @@ export class Is {
       });
    }
 
-   static boolean(value: any, options?: IsBooleanOptions): boolean {
+   static boolean<O extends IsBaseOptions>(value: any, options?: IsBaseOptions): value is ReturnsIsBoolean<O> {
       return Is.each(options, value, (item: any) => typeof item === 'boolean');
    }
 
-   static string(value: any, options?: IsStringOptions): boolean {
+   static string<O extends IsStringOptions>(value: any, options?: O): value is ReturnsIsString<O> {
       return Is.each(options, value, (item: any) => {
          if (
             typeof item !== 'string' ||
@@ -300,14 +295,6 @@ export class Is {
       });
    }
 
-   static null<E extends boolean = false>(value: any, each?: E): value is ReturnIsNull<E> {
-      return Is.each(each, value, (item: any) => item === null);
-   }
-
-   static undefined<E extends boolean = false>(value: any, each?: E): value is ReturnIsUndefined<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'undefined');
-   }
-
    static nodeJs(): boolean {
       return (
          typeof global !== 'undefined' &&
@@ -318,18 +305,13 @@ export class Is {
       );
    }
 
-   static nullOrUndefined<E extends boolean = false>(value: any, each?: E): value is ReturnIsNull<E> | ReturnIsUndefined<E> {
-      return Is.each(each, value, (item: any) => item === undefined || item === null);
-   }
-
-   static strongPassword<E extends boolean = false>(value: any, options?: StrongPasswordOptions, each?: E): value is ReturnIsString<E> {
-      return Is.each(each, value, (item: any) => {
+   static strongPassword<O extends IsStrongPasswordOptions>(value: any, options?: O): value is ReturnsIsString<O> {
+      return Is.each(options, value, (item: any) => {
          if (typeof item !== 'string') {
             return false;
          }
 
          const minLength = options?.minLength ?? 8;
-         const noSpaces = options?.noSpaces ?? true;
          const minSpecialChars = options?.minSpecialChars ?? 1;
          const minUpper = options?.minUpper ?? 1;
          const minLower = options?.minLower ?? 1;
@@ -337,7 +319,6 @@ export class Is {
 
          if (
             item.length < minLength ||
-            (noSpaces && item.match(/\s+/)) ||
             (item.match(/[._-~`@#$%^&*()+=,]/g) || []).length < minSpecialChars ||
             (item.match(/[A-Z]/g) || []).length < minUpper ||
             (item.match(/[a-z]/g) || []).length < minLower ||
@@ -350,16 +331,14 @@ export class Is {
       });
    }
 
-   static promise<E extends boolean = false>(value: any, each?: E): value is ReturnIsPromise<E> {
-      return Is.each(each, value, (item: any) => item !== null && typeof item === 'object' && typeof item.then === 'function');
+   static enum(value: any, options: IsEnumOptions): boolean {
+      return Is.each(options, value, (item: any) => options.enumArray.includes(item));
    }
 
-   static inArray(value: any, array: any[], each?: boolean): boolean {
-      return Is.each(each, value, (item: any) => array.includes(item));
-   }
+   static includes(value: any, options: IsIncludesOptions): boolean {
+      return Is.each(options, value, (item: any) => {
+         const { target } = options;
 
-   static includes(value: any, target: any, each?: boolean): boolean {
-      return Is.each(each, value, (item: any) => {
          if (Is.string(item)) {
             return Is.string(target) ? item.includes(target) : false;
          }
@@ -395,11 +374,11 @@ export class Is {
       });
    }
 
-   static class<E extends boolean = false, R = E extends true ? ClassConstructor<any>[] : ClassConstructor<any>>(value: any, each?: boolean): value is R {
-      return Is.each(each, value, (item: any) => Is.func(item) && item.toString()?.startsWith('class '));
+   static class<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsClass<O> {
+      return Is.each(options, value, (item: any) => Is.func(item) && item.toString()?.startsWith('class '));
    }
 
-   static each(options: IsBaseOptions | undefined, value: any, callback: (item: any) => boolean): boolean {
+   private static each(options: IsBaseOptions | undefined, value: any, callback: (item: any) => boolean): boolean {
       try {
          if (options?.isArray) {
             if (!Array.isArray(value)) {
@@ -425,7 +404,7 @@ export class Is {
       }
    }
 
-   static creditCard(value: string, type?: CreditCardType): boolean {
+   private static creditCard(value: string, type?: CreditCardType): boolean {
       const amex = new RegExp('^3[47][0-9]{13}$').test(value);
       const visa = new RegExp('^4[0-9]{12}(?:[0-9]{3})?$').test(value);
       const cup1 = new RegExp('^62[0-9]{14}[0-9]*$').test(value);
@@ -464,99 +443,5 @@ export class Is {
       }
 
       return amex || visa || cup1 || cup2 || mastercard || mastercard2 || disco1 || disco2 || disco3 || diners || jcb;
-   }
-
-   static url<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
-      return Is.each(each, value, (item: any) => {
-         try {
-            return typeof item === 'string' ? Boolean(new URL(item)) : false;
-         } catch (e) {
-            return false;
-         }
-      });
-   }
-
-   static addRule(rule: string, handler: (value: any) => boolean): void {
-      if (Is.callable(handler)) {
-         if (!Is.prototype[ruleProto]) {
-            Is.prototype[ruleProto] = {};
-         }
-
-         Is.prototype[ruleProto][rule] = handler;
-      }
-   }
-
-   static valid<T extends IsValidType>(value: any, options: IsValidOptions<T>): boolean {
-      const { rule: method } = options;
-      const invalidMethods = ['prototype', 'nodeJs', 'valid', 'each', 'addRule'];
-      const each: boolean = options.each === true;
-
-      return Is.each(each, value, (item: any) => {
-         const rules = Is.prototype[ruleProto];
-         const ruleHandler = rules?.[method];
-
-         if (Is.callable(ruleHandler)) {
-            return ruleHandler.call(null, item);
-         }
-
-         if (invalidMethods.includes(method)) {
-            return false;
-         }
-
-         switch (method) {
-            case 'object':
-               return Is.object(item, options.meta as ObjectRulesOptions);
-
-            case 'array':
-               return Is.array(item, options.meta as ArrayRulesOptions);
-
-            case 'objectOrArray':
-               if (!Is.objectOrArray(item)) {
-                  return false;
-               }
-
-               if (Array.isArray(item)) {
-                  return Is.array(item, (options.meta as ObjectArrayRulesOptions)?.array);
-               }
-
-               return Is.object(item, (options.meta as ObjectArrayRulesOptions)?.object);
-
-            case 'equals':
-               const { equalsTo } = (options.meta as EqualsRulesOptions) ?? {};
-
-               return equalsTo === undefined ? false : Is.equals(item, equalsTo);
-
-            case 'flatObject':
-               const { allowArray } = (options.meta as FlatObjectRulesOptions) ?? {};
-
-               return Is.flatObject(item, allowArray);
-
-            case 'strongPassword':
-               return Is.strongPassword(item, options.meta as StrongPasswordOptions);
-
-            case 'inArray':
-               return Is.inArray(item, options.meta as any[]);
-
-            case 'includes':
-               return Is.includes(item, options.meta as any);
-
-            case 'creditCard':
-               return Is.creditCard(item, options.meta as CreditCardType);
-
-            case 'matched':
-               return Is.matched(item, options.meta as RegExp);
-
-            case 'min':
-               return Is.min(item, options.meta as number);
-
-            case 'max':
-               return Is.max(item, options.meta as number);
-
-            default:
-               const handler = Is[method as any];
-
-               return Is.callable(handler) ? handler.call(null, item, false) : false;
-         }
-      });
    }
 }

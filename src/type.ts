@@ -1,6 +1,6 @@
 import { type Is } from './lib/is';
 
-export type IsValidType<T = keyof typeof Is> = T extends 'prototype' | 'nodeJs' | 'valid' | 'each' | 'addRule' ? never : T;
+export type IsValidType<T = keyof typeof Is> = T extends 'prototype' | 'nodeJs' | 'valid' | 'each' ? never : T;
 export interface ObjectCommonType {
    [key: string]: IsValidType | ObjectCommonType;
 }
@@ -177,82 +177,16 @@ export type ObjectArrayRulesOptions = {
    array?: ArrayRulesOptions; // For type Is.array only
 };
 
-export type EqualsRulesOptions = {
-   equalsTo: any;
-};
-
-export type StrongPasswordOptions = {
-   minLength?: number;
-   noSpaces?: boolean;
-   minSpecialChars?: number;
-   minUpper?: number;
-   minLower?: number;
-   minNumber?: number;
-};
-
-export type FlatObjectRulesOptions = {
-   allowArray?: boolean | { root?: boolean; deep?: boolean };
-};
-
-export type IsValidOptions<T> = {
-   rule: T;
-   each?: boolean;
-   meta?: IsEqual<T, 'object'> extends true
-      ? ObjectRulesOptions
-      : IsEqual<T, 'array'> extends true
-        ? ArrayRulesOptions
-        : IsEqual<T, 'objectOrArray'> extends true
-          ? ObjectArrayRulesOptions
-          : IsEqual<T, 'equals'> extends true
-            ? EqualsRulesOptions
-            : IsEqual<T, 'flatObject'> extends true
-              ? FlatObjectRulesOptions
-              : IsEqual<T, 'strongPassword'> extends true
-                ? StrongPasswordOptions
-                : T extends 'inArray'
-                  ? any[]
-                  : IsEqual<T, 'includes'> extends true
-                    ? any
-                    : IsEqual<T, 'creditCard'> extends true
-                      ? CreditCardType
-                      : IsEqual<T, 'matched'> extends true
-                        ? RegExp
-                        : T extends 'min' | 'max'
-                          ? number
-                          : never;
-};
-
 export type ClassConstructor<T> = new (...arg: any[]) => T;
 export type CreditCardType = 'VISA' | 'AMEX' | 'MASTERCARD' | 'DISCOVER' | 'DINERS' | 'JCB' | 'CHINA_UNION_PAY';
 export class IsError extends Error {}
-export type ReturnIsString<Each> = Each extends true ? string[] : string;
-export type ReturnIsNumber<Each> = Each extends true ? number[] : number;
-export type ReturnIsBigInt<Each> = Each extends true ? bigint[] : bigint;
-export type ReturnIsNull<Each> = Each extends true ? null[] : null;
-export type ReturnIsUndefined<Each> = Each extends true ? undefined[] : undefined;
-export type ReturnIsSymbol<Each> = Each extends true ? symbol[] : symbol;
-export type ReturnIsPromise<Each> = Each extends true ? PromiseLike<any>[] : PromiseLike<any>;
-export type ReturnIsPrimitive<Each, TPrimitive = unknown> = TPrimitive extends unknown
-   ? Each extends true
-      ? Primitive[]
-      : Primitive
-   : TPrimitive extends string
-     ? ReturnIsString<Each>
-     : TPrimitive extends number
-       ? ReturnIsNumber<Each>
-       : TPrimitive extends bigint
-         ? ReturnIsBigInt<Each>
-         : TPrimitive extends null
-           ? ReturnIsNull<Each>
-           : TPrimitive extends undefined
-             ? ReturnIsUndefined<Each>
-             : TPrimitive extends symbol
-               ? ReturnIsSymbol<Each>
-               : false;
 
 // === BIG REFACTOR ===
+export type IsArrayOption = boolean | 'unique';
+export type IsArrayValue = true | 'unique';
+
 export interface IsBaseOptions {
-   isArray?: boolean | 'unique';
+   isArray?: IsArrayOption;
 }
 
 export interface IsStringOptions extends IsBaseOptions {
@@ -268,6 +202,78 @@ export interface IsNumberOptions extends IsBaseOptions {
    max?: number;
 }
 
-export interface IsBooleanOptions extends IsBaseOptions {}
+export type IsPrimitiveType = 'null' | 'undefined' | 'string' | 'number' | 'boolean' | 'symbol' | 'bigint';
 
-export interface IsJsonOptions extends IsBaseOptions {}
+export interface IsPrimitiveOptions extends IsBaseOptions {
+   type?: IsPrimitiveType;
+}
+
+export interface IsStrongPasswordOptions extends IsBaseOptions {
+   minLength?: number;
+   minSpecialChars?: number;
+   minUpper?: number;
+   minLower?: number;
+   minNumber?: number;
+}
+
+export interface IsEnumOptions extends IsBaseOptions {
+   enumArray: any[];
+}
+
+export interface IsIncludesOptions extends IsBaseOptions {
+   target: any;
+}
+
+export type ReturnsIsString<O extends IsStringOptions | undefined> = O extends IsStringOptions
+   ? O['isArray'] extends IsArrayValue
+      ? string[]
+      : string
+   : string;
+
+export type ReturnsIsNumber<O extends IsNumberOptions | undefined> = O extends IsStringOptions
+   ? O['isArray'] extends IsArrayValue
+      ? number[]
+      : number
+   : number;
+
+export type ReturnsIsBoolean<O extends IsBaseOptions | undefined> = O extends IsStringOptions
+   ? O['isArray'] extends IsArrayValue
+      ? boolean[]
+      : boolean
+   : boolean;
+
+export type ReturnsIsObject<O extends IsBaseOptions | undefined> = O extends IsStringOptions
+   ? O['isArray'] extends IsArrayValue
+      ? ObjectRecord[]
+      : ObjectRecord
+   : ObjectRecord;
+
+export type ReturnsIsClass<O extends IsBaseOptions | undefined> = O extends IsStringOptions
+   ? O['isArray'] extends IsArrayValue
+      ? ClassConstructor<any>[]
+      : ClassConstructor<any>
+   : ClassConstructor<any>;
+
+export type ReturnsIsArray<O extends IsBaseOptions | undefined> = O extends IsStringOptions ? (O['isArray'] extends IsArrayValue ? any[][] : any[]) : any[];
+
+type ReturnsIsPrimitiveType<T> = T extends 'null'
+   ? null
+   : T extends 'undefined'
+     ? undefined
+     : T extends 'string'
+       ? string
+       : T extends 'boolean'
+         ? boolean
+         : T extends 'number'
+           ? number
+           : T extends 'symbol'
+             ? symbol
+             : T extends 'bigint'
+               ? bigint
+               : Primitive;
+
+export type ReturnsIsPrimitive<O extends IsPrimitiveOptions | undefined> = O extends IsStringOptions
+   ? O['isArray'] extends IsArrayValue
+      ? ReturnsIsPrimitiveType<O['type']>[]
+      : ReturnsIsPrimitiveType<O['type']>
+   : ReturnsIsPrimitiveType<O['type']>;
