@@ -249,3 +249,25 @@ export type ReturnIsPrimitive<Each, TPrimitive = unknown> = TPrimitive extends u
              : TPrimitive extends symbol
                ? ReturnIsSymbol<Each>
                : false;
+
+// === BIG REFACTOR ===
+export interface IsBaseOptions {
+   isArray?: boolean | 'unique';
+}
+
+export interface IsStringOptions extends IsBaseOptions {
+   format?: 'email' | 'mongoId' | 'date-time' | 'ipV4' | 'creditCard' | 'url' | RegExp;
+   minLength?: number;
+   maxLength?: number;
+   notEmpty?: boolean;
+}
+
+export interface IsNumberOptions extends IsBaseOptions {
+   integer?: boolean;
+   min?: number;
+   max?: number;
+}
+
+export interface IsBooleanOptions extends IsBaseOptions {}
+
+export interface IsJsonOptions extends IsBaseOptions {}

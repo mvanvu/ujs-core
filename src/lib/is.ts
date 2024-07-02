@@ -6,7 +6,11 @@ import {
    CreditCardType,
    EqualsRulesOptions,
    FlatObjectRulesOptions,
+   IsBaseOptions,
+   IsBooleanOptions,
    IsError,
+   IsNumberOptions,
+   IsStringOptions,
    IsValidOptions,
    IsValidType,
    ObjectArrayRulesOptions,
@@ -153,28 +157,12 @@ export class Is {
       return a !== a && b !== b; // eslint-disable-line no-self-compare
    }
 
-   static emptyObject<E extends boolean = false, R = E extends true ? {}[] : {}>(value: any, each?: E): value is R {
-      return Is.each(each, value, (item: any) => Is.object(item) && !Object.keys(item).length);
+   static primitive(value: any, options?: IsBaseOptions): boolean {
+      return Is.each(options, value, (item: any) => item === null || ['string', 'number', 'bigint', 'boolean', 'symbol', 'undefined'].includes(typeof item));
    }
 
-   static date<E extends boolean = false, R = E extends true ? Date[] : Date>(value: any, each?: E): value is R {
-      return Is.each(each, value, (item: any) => item instanceof Date);
-   }
-
-   static datetime<E extends boolean = false, R = E extends true ? DateTime[] : DateTime>(value: any, each?: boolean): value is R {
-      return Is.each(each, value, (item: any) => item instanceof DateTime);
-   }
-
-   static dateString<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'string' && !!DateTime.parse(value));
-   }
-
-   static primitive<E extends boolean = false>(value: any, each?: E): value is ReturnIsPrimitive<E> {
-      return Is.each(each, value, (item: any) => item === null || ['string', 'number', 'bigint', 'boolean', 'symbol', 'undefined'].includes(typeof item));
-   }
-
-   static empty(value: any, each?: boolean): boolean {
-      return Is.each(each, value, (item: any) => {
+   static empty(value: any, options?: IsBaseOptions): boolean {
+      return Is.each(options, value, (item: any) => {
          switch (typeof item) {
             case 'boolean':
                return item === false;
@@ -195,7 +183,7 @@ export class Is {
             return !item.size;
          }
 
-         if (Is.object(item)) {
+         if (item !== null && typeof item === 'object') {
             return !Object.keys(item).length;
          }
 
@@ -207,121 +195,46 @@ export class Is {
       });
    }
 
-   static nothing(value: any, each?: boolean): value is (null | undefined | typeof NaN)[] {
-      return Is.each(each, value, (item: any) => [null, undefined, NaN].includes(item));
+   static object(value: any, options?: IsBaseOptions): value is ObjectRecord {
+      return Is.each(options, value, (item: any) => item !== null && typeof item === 'object' && !Array.isArray(item));
    }
 
-   static object(value: any, options?: ObjectRulesOptions): value is ObjectRecord {
-      const isObject = (o: any) => o !== null && !Array.isArray(o) && typeof o === 'object';
+   static json(value: any, options?: IsBaseOptions): boolean {
+      return Is.each(options, value, (item: any) => {
+         if (!Is.object(item) || !Is.array(item)) {
+            return false;
+         }
 
-      if (!isObject(value)) {
-         return false;
-      }
-
-      if (options) {
-         const suitable = options.suitable ?? true;
-         const validate = (v: any, rules?: any) => {
-            if (isObject(rules)) {
-               if (!isObject(v) || (suitable && !Is.equals(Object.keys(v).sort(), Object.keys(rules).sort()))) {
-                  throw new IsError();
+         const deepCheck = (data: any) => {
+            if (Is.array(data)) {
+               for (const datum of data) {
+                  deepCheck(datum);
+               }
+            } else if (Is.object(data)) {
+               if (Object.prototype.toString.call(data) !== '[object Object]') {
+                  throw new Error();
                }
 
-               for (const key in rules) {
-                  validate(v[key], rules[key]);
+               for (const k in data) {
+                  deepCheck(data[k]);
                }
-            } else if (!Is.valid(v, { rule: rules })) {
-               throw new IsError();
+            } else if (!Is.primitive(data)) {
+               throw new Error();
             }
          };
 
          try {
-            validate(value, options?.rules);
+            deepCheck(item);
          } catch {
             return false;
          }
-      }
 
-      return true;
+         return true;
+      });
    }
 
-   static flatObject(value: any, allowArray?: FlatObjectRulesOptions['allowArray']): value is ObjectRecord {
-      if (!Is.object(value)) {
-         return false;
-      }
-
-      let rootArray = true;
-      let deepArray = true;
-
-      if (allowArray === false) {
-         rootArray = deepArray = false;
-      } else if (Is.object(allowArray)) {
-         rootArray = allowArray['root'] !== false;
-         deepArray = allowArray['deep'] !== false;
-      }
-
-      const deepCheck = (data: any) => {
-         if (Array.isArray(data)) {
-            if (!deepArray) {
-               throw new Error();
-            }
-
-            for (const datum of data) {
-               deepCheck(datum);
-            }
-         } else if (Is.object(data)) {
-            if (Object.prototype.toString.call(data) !== '[object Object]') {
-               throw new Error();
-            }
-
-            for (const k in data) {
-               deepCheck(data[k]);
-            }
-         } else if (!Is.primitive(data)) {
-            throw new Error();
-         }
-      };
-
-      try {
-         for (const k in value) {
-            if (!rootArray && Array.isArray(value[k])) {
-               throw new Error();
-            }
-
-            deepCheck(value[k]);
-         }
-      } catch {
-         return false;
-      }
-
-      return true;
-   }
-
-   static objectOrArray(value: any): value is ObjectRecord | any[] {
-      return Is.object(value) || Is.array(value);
-   }
-
-   static array(value: any, options?: ArrayRulesOptions): value is any[] {
-      if (!Array.isArray(value) || (options?.notEmpty && !value.length)) {
-         return false;
-      }
-
-      const rules = options?.rules;
-      const suitable = options?.suitable;
-
-      if (rules) {
-         for (const val of value) {
-            const isRulesObject = Is.object(rules);
-
-            if (
-               (isRulesObject && !Is.object(val, { rules: <ObjectCommonType>rules, suitable })) ||
-               (!isRulesObject && !Is.valid(val, { rule: rules as any }))
-            ) {
-               return false;
-            }
-         }
-      }
-
-      return true;
+   static array<T>(value: any, options?: IsBaseOptions): value is T[] {
+      return Is.each(options, value, (item: any) => Array.isArray(item));
    }
 
    static asyncFunc<E extends boolean = false>(value: any, each?: E): value is ReturnIsPromise<E> {
@@ -339,48 +252,52 @@ export class Is {
       return Is.each(each, value, (item: any) => Is.func(item) || Is.asyncFunc(item));
    }
 
-   static number<E extends boolean = false>(value: any, each?: E): value is ReturnIsNumber<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'number');
+   static number(value: any, options?: IsNumberOptions): boolean {
+      return Is.each(options, value, (item: any) => {
+         if (
+            typeof item !== 'number' ||
+            isNaN(item) ||
+            (options?.integer && !Number.isInteger(item)) ||
+            (options?.min && item < options.min) ||
+            (options?.max && item > options.max)
+         ) {
+            return false;
+         }
+
+         return true;
+      });
    }
 
-   static sNumber<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'number' && item < 0);
+   static boolean(value: any, options?: IsBooleanOptions): boolean {
+      return Is.each(options, value, (item: any) => typeof item === 'boolean');
    }
 
-   static uNumber<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'number' && item >= 0);
-   }
+   static string(value: any, options?: IsStringOptions): boolean {
+      return Is.each(options, value, (item: any) => {
+         if (
+            typeof item !== 'string' ||
+            (Is.number(options?.minLength) && item.length < options.minLength) ||
+            (Is.number(options?.maxLength) && item.length > options.maxLength) ||
+            (options?.notEmpty && !!item.length) ||
+            (options?.format === 'email' &&
+               !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+                  item,
+               )) ||
+            (options?.format === 'date-time' && !DateTime.parse(item)) ||
+            (options?.format === 'creditCard' && !Is.creditCard(item)) ||
+            (options?.format === 'ipV4' &&
+               !/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
+                  item,
+               )) ||
+            (options?.format === 'mongoId' && !/^[0-9a-fA-F]{24}$/.test(item)) ||
+            (options?.format === 'url' && !Boolean(new URL(item))) ||
+            (options?.format instanceof RegExp && !options.format.test(item))
+         ) {
+            return false;
+         }
 
-   static int<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'number' && Number.isInteger(item));
-   }
-
-   static sInt<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'number' && Number.isInteger(item) && item < 0);
-   }
-
-   static uInt<E extends boolean = false>(value: any, each?: boolean): value is ReturnIsNumber<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'number' && Number.isInteger(item) && item >= 0);
-   }
-
-   static bigInt<E extends boolean = false>(value: any, each?: E): value is ReturnIsBigInt<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'bigint');
-   }
-
-   static sBigInt<E extends boolean = false>(value: any, each?: E): value is ReturnIsBigInt<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'bigint' && item < 0);
-   }
-
-   static uBigInt<E extends boolean = false>(value: any, each?: E): value is ReturnIsBigInt<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'bigint' && item >= 0);
-   }
-
-   static boolean<E extends boolean = false, R = E extends true ? boolean[] : boolean>(value: any, each?: E): value is R {
-      return Is.each(each, value, (item: any) => typeof item === 'boolean');
-   }
-
-   static string<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'string');
+         return true;
+      });
    }
 
    static null<E extends boolean = false>(value: any, each?: E): value is ReturnIsNull<E> {
@@ -389,26 +306,6 @@ export class Is {
 
    static undefined<E extends boolean = false>(value: any, each?: E): value is ReturnIsUndefined<E> {
       return Is.each(each, value, (item: any) => typeof item === 'undefined');
-   }
-
-   static nan<E extends boolean = false, R = E extends true ? (typeof NaN)[] : typeof NaN>(value: any, each?: E): value is R {
-      return Is.each(each, value, (item: any) => isNaN(item));
-   }
-
-   static symbol<E extends boolean = false>(value: any, each?: E): value is ReturnIsSymbol<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'symbol');
-   }
-
-   static map<E extends boolean = false, R = E extends true ? Map<any, any>[] : Map<any, any>>(value: any, each?: E): value is R {
-      return Is.each(each, value, (item: any) => item instanceof Map);
-   }
-
-   static set<E extends boolean = false, R = E extends true ? Set<any>[] : Set<any>>(value: any, each?: E): value is R {
-      return Is.each(each, value, (item: any) => item instanceof Set);
-   }
-
-   static regex<E extends boolean = false, R = E extends true ? RegExp[] : RegExp>(value: any, each?: E): value is R {
-      return Is.each(each, value, (item: any) => item instanceof RegExp);
    }
 
    static nodeJs(): boolean {
@@ -457,18 +354,6 @@ export class Is {
       return Is.each(each, value, (item: any) => item !== null && typeof item === 'object' && typeof item.then === 'function');
    }
 
-   static email<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
-      return Is.each(
-         each,
-         value,
-         (item: any) =>
-            typeof item === 'string' &&
-            /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-               item,
-            ),
-      );
-   }
-
    static inArray(value: any, array: any[], each?: boolean): boolean {
       return Is.each(each, value, (item: any) => array.includes(item));
    }
@@ -514,125 +399,71 @@ export class Is {
       return Is.each(each, value, (item: any) => Is.func(item) && item.toString()?.startsWith('class '));
    }
 
-   static each(each: boolean, value: any, callback: (item: any) => boolean): boolean {
-      if (each) {
-         if (!Array.isArray(value)) {
-            return false;
-         }
-
-         for (const val of value) {
-            if (!callback(val)) {
+   static each(options: IsBaseOptions | undefined, value: any, callback: (item: any) => boolean): boolean {
+      try {
+         if (options?.isArray) {
+            if (!Array.isArray(value)) {
                return false;
             }
+
+            const unique = [];
+
+            for (const val of value) {
+               if (!callback(val) || (options.isArray === 'unique' && unique.findIndex((uni) => Is.equals(uni, val)) !== -1)) {
+                  return false;
+               }
+
+               unique.push(val);
+            }
+
+            return true;
          }
 
-         return true;
+         return callback(value);
+      } catch {
+         return false;
+      }
+   }
+
+   static creditCard(value: string, type?: CreditCardType): boolean {
+      const amex = new RegExp('^3[47][0-9]{13}$').test(value);
+      const visa = new RegExp('^4[0-9]{12}(?:[0-9]{3})?$').test(value);
+      const cup1 = new RegExp('^62[0-9]{14}[0-9]*$').test(value);
+      const cup2 = new RegExp('^81[0-9]{14}[0-9]*$').test(value);
+      const mastercard = new RegExp('^5[1-5][0-9]{14}$').test(value);
+      const mastercard2 = new RegExp('^2[2-7][0-9]{14}$').test(value);
+      const disco1 = new RegExp('^6011[0-9]{12}[0-9]*$').test(value);
+      const disco2 = new RegExp('^62[24568][0-9]{13}[0-9]*$').test(value);
+      const disco3 = new RegExp('^6[45][0-9]{14}[0-9]*$').test(value);
+      const diners = new RegExp('^3[0689][0-9]{12}[0-9]*$').test(value);
+      const jcb = new RegExp('^35[0-9]{14}[0-9]*$').test(value);
+
+      if (type) {
+         switch (type) {
+            case 'VISA':
+               return visa;
+
+            case 'AMEX':
+               return amex;
+
+            case 'MASTERCARD':
+               return mastercard || mastercard2;
+
+            case 'DISCOVER':
+               return disco1 || disco2 || disco3;
+
+            case 'DINERS':
+               return diners;
+
+            case 'JCB':
+               return jcb;
+
+            case 'CHINA_UNION_PAY':
+               return cup1 || cup2;
+         }
       }
 
-      return callback(value);
-   }
-
-   static arrayUnique(value: any, each?: boolean): value is any[] {
-      return Is.each(each, value, (item: any) => {
-         if (!Array.isArray(item)) {
-            return false;
-         }
-
-         const unique = [];
-
-         for (const val of item) {
-            if (unique.findIndex((uni) => Is.equals(uni, val)) !== -1) {
-               return false;
-            }
-
-            unique.push(val);
-         }
-
-         return true;
-      });
-   }
-
-   static mongoId<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'string' && /^[0-9a-fA-F]{24}$/.test(item));
-   }
-
-   static matched<E extends boolean = false>(value: any, regex: RegExp, each?: E): value is ReturnIsString<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'string' && regex.test(item));
-   }
-
-   static creditCard(value: any, type?: CreditCardType, each?: boolean): boolean {
-      return Is.each(each, value, (item: any) => {
-         const amex = new RegExp('^3[47][0-9]{13}$').test(item);
-         const visa = new RegExp('^4[0-9]{12}(?:[0-9]{3})?$').test(item);
-         const cup1 = new RegExp('^62[0-9]{14}[0-9]*$').test(item);
-         const cup2 = new RegExp('^81[0-9]{14}[0-9]*$').test(item);
-         const mastercard = new RegExp('^5[1-5][0-9]{14}$').test(item);
-         const mastercard2 = new RegExp('^2[2-7][0-9]{14}$').test(item);
-         const disco1 = new RegExp('^6011[0-9]{12}[0-9]*$').test(item);
-         const disco2 = new RegExp('^62[24568][0-9]{13}[0-9]*$').test(item);
-         const disco3 = new RegExp('^6[45][0-9]{14}[0-9]*$').test(item);
-         const diners = new RegExp('^3[0689][0-9]{12}[0-9]*$').test(item);
-         const jcb = new RegExp('^35[0-9]{14}[0-9]*$').test(item);
-
-         if (type) {
-            switch (type) {
-               case 'VISA':
-                  return visa;
-
-               case 'AMEX':
-                  return amex;
-
-               case 'MASTERCARD':
-                  return mastercard || mastercard2;
-
-               case 'DISCOVER':
-                  return disco1 || disco2 || disco3;
-
-               case 'DINERS':
-                  return diners;
-
-               case 'JCB':
-                  return jcb;
-
-               case 'CHINA_UNION_PAY':
-                  return cup1 || cup2;
-            }
-         }
-
-         return amex || visa || cup1 || cup2 || mastercard || mastercard2 || disco1 || disco2 || disco3 || diners || jcb;
-      });
-   }
-
-   static min<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'number' && item >= number);
-   }
-
-   static max<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsNumber<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'number' && item <= number);
-   }
-
-   static minLength<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsString<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'string' && item.length >= number);
-   }
-
-   static maxLength<E extends boolean = false>(value: any, number: number, each?: E): value is ReturnIsString<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'string' && item.length <= number);
-   }
-
-   static trim<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
-      return Is.each(each, value, (item: any) => typeof item === 'string' && !/^\s+|\s+$/.test(item));
-   }
-
-   static ipV4<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
-      return Is.each(
-         each,
-         value,
-         (item: any) =>
-            typeof item === 'string' &&
-            /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
-               item,
-            ),
-      );
+      return amex || visa || cup1 || cup2 || mastercard || mastercard2 || disco1 || disco2 || disco3 || diners || jcb;
    }
 
    static url<E extends boolean = false>(value: any, each?: E): value is ReturnIsString<E> {
