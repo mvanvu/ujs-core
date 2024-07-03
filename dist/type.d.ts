@@ -1,5 +1,4 @@
-import { type Is } from './lib/is';
-export type IsValidType<T = keyof typeof Is> = T extends 'prototype' | 'nodeJs' | 'each' ? never : T;
+export type IsValidType = 'string' | 'number' | 'boolean' | 'json' | 'object' | 'array' | 'primitive';
 export interface ObjectCommonType {
     [key: string]: IsValidType | ObjectCommonType;
 }
