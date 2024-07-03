@@ -272,7 +272,7 @@ export class Is {
             typeof item !== 'string' ||
             (Is.number(options?.minLength) && item.length < options.minLength) ||
             (Is.number(options?.maxLength) && item.length > options.maxLength) ||
-            (options?.notEmpty && !!item.length) ||
+            (options?.notEmpty && !item.length) ||
             (options?.format === 'email' &&
                !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
                   item,
