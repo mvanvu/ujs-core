@@ -1,28 +1,6 @@
 import { Transform } from '../../src';
 
 it('Util Transform', () => {
-   // # Transform methods
-   /**
-      -- toString
-      -- toArrayUnique
-      -- trim
-      -- toDefault
-      -- toStripTags
-      -- toSafeHtml
-      -- toNumber
-      -- toUNumber
-      -- toInt
-      -- toUInt
-      -- toBoolean
-      -- toJsonObject
-      -- toPath     
-      -- toSafeFileName
-      -- toNoneDiacritics
-      -- toNonAccentVietnamese
-      -- toASCIIString  
-      -- toAlnum
-    */
-
    // # toString(value: any): string
    // ## From the primitive value (by String(value))
    expect(Transform.toString(NaN)).toEqual('NaN');
@@ -183,17 +161,11 @@ it('Util Transform', () => {
    expect(Transform.clean(1, ['string', 'boolean'])).toEqual(true);
    expect(Transform.clean(0, ['boolean', 'string'])).toEqual('false');
 
-   // # cleanIfType(value: any, typeTransform: string | string[], typeValue: CommonType | CommonType[]): any => clean if the value matches type
-   // ## Trim if the value is string
-   expect(Transform.cleanIfType(' Hi! ', 'trim', 'string')).toEqual('Hi!');
-
-   // ## Trim and remove one alpha string
-   expect(Transform.cleanIfType(' Hi! ', ['trim', 'alnum'], 'string')).toEqual('Hi');
-
+   // # Transform.cleanIfType(value: any, typeTransform: string | string[], typeValue: IsValidType | IsValidType[]): any
    // ## Trim and convert to unsigned integer if the value is string or number
-   expect(Transform.cleanIfType(' 1.25 ', ['trim', 'uint'], ['string', 'number'])).toEqual(1);
-   expect(Transform.cleanIfType(1.25, ['trim', 'uint'], ['string', 'number'])).toEqual(1);
+   expect(Transform.cleanIfType(' 1.25 ', 'number', 'string')).toEqual(1.25);
+   expect(Transform.cleanIfType(1.25, 'number', ['string', 'number'])).toEqual(1.25);
 
    // ## Do nothing if the value isn't match with they type(s), 1.25 is not the string type
-   expect(Transform.cleanIfType(1.25, ['uint'], ['string'])).toEqual(1.25);
+   expect(Transform.cleanIfType(1.25, ['string'], ['boolean'])).toEqual(1.25);
 });

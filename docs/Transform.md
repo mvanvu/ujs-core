@@ -6,31 +6,6 @@
 import { Transform } from '@mvanvu/ujs';
 ```
 
-#### Transform methods
-
-```javascript
-/**
-   toString
-   toArrayUnique
-   trim
-   toDefault
-   toStripTags
-   toSafeHtml
-   toNumber
-   toUNumber
-   toInt
-   toUInt
-   toBoolean
-   toJsonObject
-   toPath
-   toSafeFileName
-   toNoneDiacritics
-   toNonAccentVietnamese
-   toASCIIString
-   toAlnum
-*/
-```
-
 #### toString(value: any): string
 
 ```javascript
@@ -251,19 +226,13 @@ Transform.clean(1, ['string', 'boolean']); // It returns: true
 Transform.clean(0, ['boolean', 'string']); // It returns: 'false'
 ```
 
-#### cleanIfType(value: any, typeTransform: string | string[], typeValue: CommonType | CommonType[]): any => clean if the value matches type
+#### Transform.cleanIfType(value: any, typeTransform: string | string[], typeValue: IsValidType | IsValidType[]): any
 
 ```javascript
-// Trim if the value is string
-Transform.cleanIfType(' Hi! ', 'trim', 'string'); // It returns: 'Hi!'
-
-// Trim and remove one alpha string
-Transform.cleanIfType(' Hi! ', ['trim', 'alnum'], 'string'); // It returns: 'Hi'
-
 // Trim and convert to unsigned integer if the value is string or number
-Transform.cleanIfType(' 1.25 ', ['trim', 'uint'], ['string', 'number']); // It returns: 1
-Transform.cleanIfType(1.25, ['trim', 'uint'], ['string', 'number']); // It returns: 1
+Transform.cleanIfType(' 1.25 ', 'number', 'string'); // It returns: 1.25
+Transform.cleanIfType(1.25, 'number', ['string', 'number']); // It returns: 1.25
 
 // Do nothing if the value isn't match with they type(s), 1.25 is not the string type
-Transform.cleanIfType(1.25, ['uint'], ['string']); // It returns: 1.25
+Transform.cleanIfType(1.25, ['string'], ['boolean']); // It returns: 1.25
 ```

@@ -1,6 +1,6 @@
 import { type Is } from './lib/is';
 
-export type IsValidType<T = keyof typeof Is> = T extends 'prototype' | 'nodeJs' | 'valid' | 'each' ? never : T;
+export type IsValidType<T = keyof typeof Is> = T extends 'prototype' | 'nodeJs' | 'each' ? never : T;
 export interface ObjectCommonType {
    [key: string]: IsValidType | ObjectCommonType;
 }
@@ -190,7 +190,19 @@ export interface IsBaseOptions {
 }
 
 export interface IsStringOptions extends IsBaseOptions {
-   format?: 'email' | 'mongoId' | 'date-time' | 'ipV4' | 'creditCard' | 'url' | RegExp;
+   format?:
+      | 'email'
+      | 'mongoId'
+      | 'date-time'
+      | 'ipV4'
+      | 'creditCard'
+      | 'url'
+      | 'number'
+      | 'integer'
+      | 'unsignedNumber'
+      | 'unsignedInteger'
+      | 'boolean'
+      | RegExp;
    minLength?: number;
    maxLength?: number;
    notEmpty?: boolean;
@@ -247,6 +259,24 @@ export type ReturnsIsObject<O extends IsBaseOptions | undefined> = O extends IsS
       ? ObjectRecord[]
       : ObjectRecord
    : ObjectRecord;
+
+export type IsFunc = (...agrs: any[]) => any;
+export type IsAsyncFunc = (...agrs: any[]) => Promise<any>;
+export type IsCallable = (...agrs: any[]) => any | Promise<any>;
+
+export type ReturnsIsFunc<O extends IsBaseOptions | undefined> = O extends IsStringOptions ? (O['isArray'] extends IsArrayValue ? IsFunc[] : IsFunc) : IsFunc;
+
+export type ReturnsIsAsyncFunc<O extends IsBaseOptions | undefined> = O extends IsStringOptions
+   ? O['isArray'] extends IsArrayValue
+      ? IsAsyncFunc[]
+      : IsAsyncFunc
+   : IsAsyncFunc;
+
+export type ReturnsIsCallable<O extends IsBaseOptions | undefined> = O extends IsStringOptions
+   ? O['isArray'] extends IsArrayValue
+      ? IsCallable[]
+      : IsCallable
+   : IsCallable;
 
 export type ReturnsIsClass<O extends IsBaseOptions | undefined> = O extends IsStringOptions
    ? O['isArray'] extends IsArrayValue

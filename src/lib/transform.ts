@@ -74,7 +74,7 @@ export class Transform {
 
    // Convert to JSON
    static toJsonObject<T extends any[] | ObjectRecord>(value: any, defaultJson?: T): DefaultObject<T> {
-      if (Is.objectOrArray(value)) {
+      if (Is.object(value) || Is.array(value)) {
          // The Json object must be a flat key-pair value
          value = JSON.stringify(value);
       }
@@ -85,7 +85,7 @@ export class Transform {
          } catch {}
       }
 
-      return <T>(Is.object(defaultJson) ? defaultJson : Is.nothing(value) ? {} : [value]);
+      return <T>(Is.object(defaultJson) ? defaultJson : Is.primitive(value, { type: 'null' }) || Is.primitive(value, { type: 'undefined' }) ? {} : [value]);
    }
 
    // Convert to boolean
@@ -374,7 +374,7 @@ export class Transform {
 
    static cleanIfType(value: any, typeTransform: string | string[], typeValue: IsValidType | IsValidType[]): any {
       for (const rule of Is.array(typeValue) ? <IsValidType[]>typeValue : [<IsValidType>typeValue]) {
-         if (Is.valid(value, { rule })) {
+         if (Is.func(Is[rule]) && Is[rule].call(null, value)) {
             return Transform.clean(value, typeTransform);
          }
       }

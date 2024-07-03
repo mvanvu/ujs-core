@@ -10,8 +10,11 @@ import {
    IsStringOptions,
    IsStrongPasswordOptions,
    ReturnsIsArray,
+   ReturnsIsAsyncFunc,
    ReturnsIsBoolean,
+   ReturnsIsCallable,
    ReturnsIsClass,
+   ReturnsIsFunc,
    ReturnsIsNumber,
    ReturnsIsObject,
    ReturnsIsPrimitive,
@@ -199,7 +202,7 @@ export class Is {
 
    static json<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsObject<O> {
       return Is.each(options, value, (item: any) => {
-         if (!Is.object(item) || !Is.array(item)) {
+         if (!Is.object(item) && !Is.array(item)) {
             return false;
          }
 
@@ -216,16 +219,12 @@ export class Is {
                for (const k in data) {
                   deepCheck(data[k]);
                }
-            } else if (!Is.primitive(data)) {
+            } else if (!['string', 'boolean', 'null', 'undefined', 'number'].includes(typeof data)) {
                throw new Error();
             }
          };
 
-         try {
-            deepCheck(item);
-         } catch {
-            return false;
-         }
+         deepCheck(item);
 
          return true;
       });
@@ -235,15 +234,15 @@ export class Is {
       return Is.each(options, value, (item: any) => Array.isArray(item));
    }
 
-   static asyncFunc(value: any, options?: IsBaseOptions): boolean {
+   static asyncFunc<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsAsyncFunc<O> {
       return Is.each(options, value, (item: any) => item instanceof (async () => {}).constructor);
    }
 
-   static func(value: any, options?: IsBaseOptions): boolean {
+   static func<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsFunc<O> {
       return Is.each(options, value, (item: any) => typeof item === 'function');
    }
 
-   static callable(value: any, options?: IsBaseOptions): boolean {
+   static callable<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsCallable<O> {
       return Is.each(options, value, (item: any) => Is.func(item) || Is.asyncFunc(item));
    }
 
@@ -253,8 +252,8 @@ export class Is {
             typeof item !== 'number' ||
             isNaN(item) ||
             (options?.integer && !Number.isInteger(item)) ||
-            (options?.min && item < options.min) ||
-            (options?.max && item > options.max)
+            (typeof options?.min === 'number' && item < options.min) ||
+            (typeof options?.max === 'number' && item > options.max)
          ) {
             return false;
          }
@@ -286,6 +285,11 @@ export class Is {
                )) ||
             (options?.format === 'mongoId' && !/^[0-9a-fA-F]{24}$/.test(item)) ||
             (options?.format === 'url' && !Boolean(new URL(item))) ||
+            (options?.format === 'number' && !/^-?[0-9]+(\.[0-9]+)?$/.test(item)) ||
+            (options?.format === 'unsignedNumber' && !/^[0-9]+(\.[0-9]+)?$/.test(item)) ||
+            (options?.format === 'integer' && !/^-?[0-9]+(\.[0]+)?$/.test(item)) ||
+            (options?.format === 'unsignedInteger' && !/^[0-9]+(\.[0]+)?$/.test(item)) ||
+            (options?.format === 'boolean' && !['true', 'false'].includes(item)) ||
             (options?.format instanceof RegExp && !options.format.test(item))
          ) {
             return false;
@@ -344,7 +348,7 @@ export class Is {
          }
 
          if (Is.array(item)) {
-            return item.includes(target);
+            return !!item.find((it) => Is.equals(it, target));
          }
 
          if (Is.object(item) && (Is.object(target) || Is.string(target))) {
@@ -371,6 +375,8 @@ export class Is {
 
             return true;
          }
+
+         return Is.equals(item, target);
       });
    }
 
@@ -404,7 +410,7 @@ export class Is {
       }
    }
 
-   private static creditCard(value: string, type?: CreditCardType): boolean {
+   static creditCard(value: string, type?: CreditCardType): boolean {
       const amex = new RegExp('^3[47][0-9]{13}$').test(value);
       const visa = new RegExp('^4[0-9]{12}(?:[0-9]{3})?$').test(value);
       const cup1 = new RegExp('^62[0-9]{14}[0-9]*$').test(value);
