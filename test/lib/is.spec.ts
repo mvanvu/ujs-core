@@ -129,7 +129,12 @@ it('Core Is', () => {
    expect(Is.string(123)).toBeFalsy();
    expect(Is.string('123')).toBeTruthy();
 
-   // ## Format validator: 'email' | 'mongoId' | 'date-time' | 'ipV4' | 'creditCard' | 'url' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | RegExp;
+   // ## Not empty string
+   expect(Is.string('A', { notEmpty: true })).toBeTruthy();
+   expect(Is.string('', { notEmpty: true })).toBeFalsy();
+   expect(Is.string('  ', { notEmpty: true })).toBeTruthy(); // Multi-space not an empty string
+
+   // ## Format validator: 'email' | 'mongoId' | 'date-time' | 'ipV4' | ipV6 | 'creditCard' | 'url' | 'image' | base64 | 'md5' | 'sha1' | 'sha256' | uuid | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | trim | json | RegExp;
    // ## Email
    expect(Is.string('user@example.com', { format: 'email' })).toBeTruthy();
    expect(Is.string('user.example.com', { format: 'email' })).toBeFalsy();
@@ -144,7 +149,13 @@ it('Core Is', () => {
 
    // ## IPv4
    expect(Is.string('192.168.1.1', { format: 'ipV4' })).toBeTruthy();
+   expect(Is.string('1.1.1.1', { format: 'ipV4' })).toBeTruthy();
    expect(Is.string('256.256.256.256', { format: 'ipV4' })).toBeFalsy();
+
+   // ## IPv6
+   expect(Is.string('2001:0db8:85a3:0000:0000:8a2e:0370:7334', { format: 'ipV6' })).toBeTruthy();
+   expect(Is.string('192.168.1.1', { format: 'ipV6' })).toBeFalsy();
+   expect(Is.string('1234:5678', { format: 'ipV6' })).toBeFalsy();
 
    // ## Credit card
    expect(Is.string('4000056655665556', { format: 'creditCard' })).toBeTruthy(); // VISA
@@ -157,6 +168,36 @@ it('Core Is', () => {
    expect(Is.string('https://www.jsowl.com/remove-an-item-from-an-array-in-javascript/', { format: 'url' })).toBeTruthy();
    expect(Is.string('htt//jsowl', { format: 'url' })).toBeFalsy();
    expect(Is.string('www.jsowl.com', { format: 'url' })).toBeFalsy();
+
+   // ## Image
+   expect(Is.string('https://2.img-dpreview.com/files/p/E~C1000x0S4000x4000T1200x1200~articles/3925134721/0266554465.jpeg', { format: 'image' })).toBeTruthy();
+   expect(Is.string('https://2.img-dpreview.com/files/p/E~C1000x0S4000x4000T1200x1200~articles/3925134721/0266554465', { format: 'image' })).toBeFalsy();
+
+   // ## Base64
+   expect(Is.string('SGVsbG8gV29ybGQ=', { format: 'base64' })).toBeTruthy();
+   expect(Is.string('SGVsbG8gV29ybGQ==somewhat_valid', { format: 'base64' })).toBeFalsy();
+
+   // ## Md5
+   expect(Is.string('3e25960a79dbc69b674cd4ec67a72c62', { format: 'md5' })).toBeTruthy();
+   expect(Is.string('3e25960a79dbc69b674cd4ec67a72C62', { format: 'md5' })).toBeFalsy(); // C is upper case
+
+   // ## Sha1
+   expect(Is.string('7b502c3a1f48c8609ae212cdfb639dee39673f5e', { format: 'sha1' })).toBeTruthy();
+   expect(Is.string('7b502c3a1f48c8609ae212cdfb639dee39673f5E', { format: 'sha1' })).toBeFalsy(); // E is upper case
+
+   // ## Sha256
+   expect(Is.string('64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c', { format: 'sha256' })).toBeTruthy();
+   expect(Is.string('64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c_', { format: 'sha256' })).toBeFalsy();
+
+   // ## UUID
+   expect(Is.string('f47ac10b-58cc-4372-a567-0e02b2c3d479', { format: 'uuid' })).toBeTruthy();
+   expect(Is.string('12345678-1234-1234-1234-123456789012', { format: 'uuid' })).toBeFalsy(); // Invalid number of characters
+
+   // ## JWT
+   const jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+   expect(Is.string(jwt, { format: 'jwt' })).toBeTruthy();
+   expect(Is.string('Hello World', { format: 'jwt' })).toBeFalsy();
 
    // ## Number
    expect(Is.string('123', { format: 'number' })).toBeTruthy();
@@ -184,6 +225,19 @@ it('Core Is', () => {
    expect(Is.string('True', { format: 'boolean' })).toBeFalsy(); // Case sensitive
    expect(Is.string('1', { format: 'boolean' })).toBeFalsy();
    expect(Is.string('0', { format: 'boolean' })).toBeFalsy();
+
+   // ## Trim
+   expect(Is.string('Hello World', { format: 'trim' })).toBeTruthy();
+   expect(Is.string(' Hello World ', { format: 'trim' })).toBeFalsy();
+   expect(Is.string(' Hello World', { format: 'trim' })).toBeFalsy();
+   expect(Is.string('Hello World ', { format: 'trim' })).toBeFalsy();
+
+   // ## Json
+   expect(Is.string('["Hello World"]', { format: 'json' })).toBeTruthy();
+   expect(Is.string('{"foo": "bar"}', { format: 'json' })).toBeTruthy();
+   expect(Is.string('Hello World', { format: 'json' })).toBeFalsy();
+   expect(Is.string(['Hello World'], { format: 'json' })).toBeFalsy();
+   expect(Is.string({ foo: 'bar' }, { format: 'json' })).toBeFalsy();
 
    // ## RegExp
    expect(Is.string('507f1f77bcf86cd799439011', { format: /^[0-9a-fA-F]{24}$/ })).toBeTruthy();

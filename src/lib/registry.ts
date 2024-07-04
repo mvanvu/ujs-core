@@ -1,5 +1,5 @@
 'use strict';
-import { ObjectRecord, EventHandler, PathValue, Path, IsEqual, NestedOmit, NestedPick } from '../type';
+import { ObjectRecord, EventHandler, PathValue, Path, IsEqual, NestedOmit, NestedPick, TransformType } from '../type';
 import { Is } from './is';
 import { Transform } from './transform';
 import { EventEmitter } from './event-emitter';
@@ -130,7 +130,7 @@ export class Registry<TData extends any, TPath = PathOf<TData>> {
    get<TResult = unknown, PathOrKey extends TPath = any>(
       path: PathOrKey,
       defaultValue?: any,
-      filter?: string | string[],
+      filter?: TransformType | TransformType[],
    ): IsEqual<TResult, unknown> extends true ? (PathOrKey extends Path<TData> ? PathValue<TData, PathOrKey> : TResult) : TResult {
       const p = this.preparePath(path as string);
 
@@ -161,7 +161,17 @@ export class Registry<TData extends any, TPath = PathOf<TData>> {
          return defaultValue;
       }
 
-      return filter ? Transform.clean(this.cached[p], filter) : this.cached[p];
+      let value = this.cached[p];
+
+      if (filter) {
+         for (const fn of Is.array(filter) ? filter : [filter]) {
+            if (Is.func(Transform[fn])) {
+               value = Util.call(null, Transform[fn], value);
+            }
+         }
+      }
+
+      return value;
    }
 
    private validateConsistent(path?: TPath): void {

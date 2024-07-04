@@ -12,12 +12,6 @@ it('Util Transform', () => {
    // ## From an object
    expect(Transform.toString({ foo: 'bar' })).toEqual(JSON.stringify({ foo: 'bar' }));
 
-   // # toLowerCase(value: any): string
-   expect(Transform.toLowerCase('HELLO World')).toEqual('hello world');
-
-   // # toUpperCase(value: any): string
-   expect(Transform.toUpperCase('HELLO World')).toEqual('HELLO WORLD');
-
    // # toArrayUnique(value: any): any[]
    const unique = Transform.toArrayUnique([{ foo: 123 }, { foo: 123 }, { foo: 456 }]);
    expect(unique.length).toEqual(2);
@@ -77,20 +71,6 @@ it('Util Transform', () => {
    expect(Transform.toNumber({})).toEqual(0);
    expect(Transform.toNumber([])).toEqual(0);
 
-   // # toUNumber(value: any) : number => unsigned number
-   expect(Transform.toUNumber(-1.25)).toEqual(1.25);
-   expect(Transform.toUNumber('-1.25')).toEqual(1.25);
-
-   // # toInt(value: any) : number => integer
-   expect(Transform.toInt(Number.MAX_SAFE_INTEGER + 100)).toEqual(Number.MAX_SAFE_INTEGER);
-   expect(Transform.toInt(-Number.MAX_SAFE_INTEGER - 100)).toEqual(-Number.MAX_SAFE_INTEGER);
-   expect(Transform.toInt(1.25)).toEqual(1);
-   expect(Transform.toInt('1.25')).toEqual(1);
-
-   // # toUInt(value: any) : number => unsigned integer
-   expect(Transform.toUInt(-1)).toEqual(1);
-   expect(Transform.toUInt('-1')).toEqual(1);
-
    // # toBoolean(value: any) : boolean
    expect(Transform.toBoolean(true)).toEqual(true);
    expect(Transform.toBoolean('true')).toEqual(true);
@@ -140,7 +120,7 @@ it('Util Transform', () => {
    expect(Transform.toNoneDiacritics("J'aime boire du café")).toEqual("J'aime boire du cafe");
 
    // ## toNonAccentVietnamese(value: any): string => none diacritics vietnamese string
-   expect(Transform.toNonAccentVietnamese('Chào thế giới')).toEqual('Chao the gioi');
+   expect(Transform.toNonAccent('Chào thế giới')).toEqual('Chao the gioi');
 
    // # toASCIIString(value: string): string => ASCII string
    expect(Transform.toASCIIString('Chào thế giới')).toEqual('Chao the gioi');
@@ -149,23 +129,4 @@ it('Util Transform', () => {
    // # toAlnum(value: any): string => Alpha number string
    // ## Only character and number are accepted
    expect(Transform.toAlnum('^Hello @World! 2024')).toEqual('HelloWorld2024');
-
-   // # clean(value: any, typeTransform: string | string[], ...params: any[]): any => convert to multiple types
-   // ## Transform to String->Boolean
-   expect(Transform.clean(1, ['toString', 'toBoolean'])).toEqual(true);
-
-   // ## Transform to Boolean->String
-   expect(Transform.clean(0, ['toBoolean', 'toString'])).toEqual('false');
-
-   // ## The same with short way
-   expect(Transform.clean(1, ['string', 'boolean'])).toEqual(true);
-   expect(Transform.clean(0, ['boolean', 'string'])).toEqual('false');
-
-   // # Transform.cleanIfType(value: any, typeTransform: string | string[], typeValue: IsValidType | IsValidType[]): any
-   // ## Trim and convert to unsigned integer if the value is string or number
-   expect(Transform.cleanIfType(' 1.25 ', 'number', 'string')).toEqual(1.25);
-   expect(Transform.cleanIfType(1.25, 'number', ['string', 'number'])).toEqual(1.25);
-
-   // ## Do nothing if the value isn't match with they type(s), 1.25 is not the string type
-   expect(Transform.cleanIfType(1.25, ['string'], ['boolean'])).toEqual(1.25);
 });

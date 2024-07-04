@@ -28,11 +28,11 @@ registry.get('bar.foo3', '1'); // It returns: '1'
 #### Get and transform to the value to specific types (see [Transform](Transform.md))
 
 ```javascript
-registry.get('foo', undefined, 'string'); // It returns: '123'
-registry.get('foo', undefined, ['boolean', 'string']); // It returns: 'true'
+registry.get('foo', undefined, 'toString'); // It returns: '123'
+registry.get('foo', undefined, ['toBoolean', 'toString']); // It returns: 'true'
 
 // The transform will be ignored if has any default value
-registry.get('bar.foo3', 1, 'string'); // It returns: 1
+registry.get('bar.foo3', 1, 'toString'); // It returns: 1
 ```
 
 #### set(path: string, value: any, validate?: boolean): Registry

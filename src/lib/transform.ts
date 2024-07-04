@@ -1,5 +1,5 @@
 'use strict';
-import { IsValidType, LastElement, ObjectRecord, DefaultObject } from '../type';
+import { LastElement, ObjectRecord, DefaultObject } from '../type';
 import { Is } from './is';
 
 export class Transform {
@@ -134,29 +134,6 @@ export class Transform {
       }
    }
 
-   // Convert to unsigned number
-   static toUNumber(value: any): number {
-      return Math.abs(Transform.toNumber(value));
-   }
-
-   // Convert to integer
-   static toInt(value: any): number {
-      let num = Transform.toNumber(value);
-
-      if (num > Number.MAX_SAFE_INTEGER) {
-         num = Number.MAX_SAFE_INTEGER;
-      } else if (num < -Number.MAX_SAFE_INTEGER) {
-         num = -Number.MAX_SAFE_INTEGER;
-      }
-
-      return Number.parseInt(num.toString());
-   }
-
-   // Convert to unsigned integer
-   static toUInt(value: any): number {
-      return Math.abs(Transform.toInt(value));
-   }
-
    // Convert to unique array
    static toArrayUnique(value: any): any[] {
       if (Array.isArray(value)) {
@@ -199,7 +176,7 @@ export class Transform {
          .replace(/[\u0300-\u036f]/g, '');
    }
 
-   static toNonAccentVietnamese(value: any): string {
+   static toNonAccent(value: any): string {
       value = Transform.toString(value)
          .replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
          .replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
@@ -223,11 +200,11 @@ export class Transform {
    }
 
    static toASCIIString(value: any): string {
-      return Transform.clean(value, ['toString', 'toNoneDiacritics']).replace(/[^a-zA-Z0-9\s]/g, '');
+      return Transform.toNoneDiacritics(Transform.toString(value)).replace(/[^a-zA-Z0-9\s]/g, '');
    }
 
    static toSafeFileName(value: any): string {
-      let name = Transform.toNonAccentVietnamese(value);
+      let name = Transform.toNonAccent(value);
       let ext = '';
 
       if (name.includes('.')) {
@@ -336,49 +313,5 @@ export class Transform {
                : '';
          })
          .replace(/\s+/gi, ' ');
-   }
-
-   static toLowerCase(value: any): string {
-      return Transform.toString(value).toLowerCase();
-   }
-
-   static toUpperCase(value: any): string {
-      return Transform.toString(value).toUpperCase();
-   }
-
-   // Clean up value with a list of transform
-   static clean(value: any, typeTransform: string | string[], ...params: any[]): any {
-      const methodMaps = {};
-      Object.getOwnPropertyNames(Transform)
-         .filter((name) => typeof Transform[name] === 'function' && !['clean', 'cleanIfType'].includes(name))
-         .forEach((name) => (methodMaps[name.toLowerCase()] = Transform[name]));
-
-      if (!Array.isArray(typeTransform)) {
-         typeTransform = [typeTransform];
-      }
-
-      for (const transform of typeTransform.map((type) => type.toLowerCase())) {
-         let callback = methodMaps[transform];
-
-         if (!callback && transform.indexOf('to') !== 0) {
-            callback = methodMaps[`to${transform}`];
-         }
-
-         if (typeof callback === 'function') {
-            value = callback.apply(null, [value, ...params]);
-         }
-      }
-
-      return value;
-   }
-
-   static cleanIfType(value: any, typeTransform: string | string[], typeValue: IsValidType | IsValidType[]): any {
-      for (const rule of Is.array(typeValue) ? <IsValidType[]>typeValue : [<IsValidType>typeValue]) {
-         if (Is.func(Is[rule]) && Is[rule].call(null, value)) {
-            return Transform.clean(value, typeTransform);
-         }
-      }
-
-      return value;
    }
 }

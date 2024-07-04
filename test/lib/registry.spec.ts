@@ -14,11 +14,11 @@ it('Util Registry', () => {
    expect(registry.get('bar.foo3', '1')).toEqual('1');
 
    // # Get and transform to the value to specific types (see [Transform](Transform.md))
-   expect(registry.get('foo', undefined, 'string')).toEqual('123');
-   expect(registry.get('foo', undefined, ['boolean', 'string'])).toEqual('true');
+   expect(registry.get('foo', undefined, 'toString')).toEqual('123');
+   expect(registry.get('foo', undefined, ['toBoolean', 'toString'])).toEqual('true');
 
    // ## The transform will be ignored if has any default value
-   expect(registry.get('bar.foo3', 1, 'string')).toEqual(1);
+   expect(registry.get('bar.foo3', 1, 'toString')).toEqual(1);
 
    // # set(path: string, value: any, validate?: boolean): Registry
    registry.set('animal.list', ['dog', 'cat']);

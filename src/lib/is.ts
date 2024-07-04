@@ -283,13 +283,23 @@ export class Is {
                !/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
                   item,
                )) ||
+            (options?.format === 'ipV6' && !/^([0-9a-f]{1,4}:){6}|(:[0-9a-f]{1,4}){7}$/.test(item)) ||
             (options?.format === 'mongoId' && !/^[0-9a-fA-F]{24}$/.test(item)) ||
             (options?.format === 'url' && !Boolean(new URL(item))) ||
+            (options?.format === 'image' && (!Boolean(new URL(item)) || !/\.(jpe?g|png|gif|svg|ico|bmp|webp|tiff)$/i.test(item))) ||
+            (options?.format === 'base64' && !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(item)) ||
+            (options?.format === 'md5' && !/^[a-f0-9]{32}$/.test(item)) ||
+            (options?.format === 'sha1' && !/^[a-f0-9]{40}$/.test(item)) ||
+            (options?.format === 'sha256' && !/^[a-fA-F0-9]{64}$/.test(item)) ||
+            (options?.format === 'uuid' && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(item)) ||
+            (options?.format === 'jwt' && !/^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/.test(item)) ||
             (options?.format === 'number' && !/^-?[0-9]+(\.[0-9]+)?$/.test(item)) ||
             (options?.format === 'unsignedNumber' && !/^[0-9]+(\.[0-9]+)?$/.test(item)) ||
             (options?.format === 'integer' && !/^-?[0-9]+(\.[0]+)?$/.test(item)) ||
             (options?.format === 'unsignedInteger' && !/^[0-9]+(\.[0]+)?$/.test(item)) ||
             (options?.format === 'boolean' && !['true', 'false'].includes(item)) ||
+            (options?.format === 'trim' && /^\s+|\s+$/.test(item)) ||
+            (options?.format === 'json' && typeof JSON.parse(item) !== 'object') ||
             (options?.format instanceof RegExp && !options.format.test(item))
          ) {
             return false;

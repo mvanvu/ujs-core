@@ -172,7 +172,12 @@ Is.class(function () {}); // It returns: false
 Is.string(123); // It returns: false
 Is.string('123'); // It returns: true
 
-// Format validator: 'email' | 'mongoId' | 'date-time' | 'ipV4' | 'creditCard' | 'url' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | RegExp;
+// Not empty string
+Is.string('A', { notEmpty: true }); // It returns: true
+Is.string('', { notEmpty: true }); // It returns: false
+expect(Is.string('  ', { notEmpty: true })).toBeTruthy(); // Multi-space not an empty string
+
+// Format validator: 'email' | 'mongoId' | 'date-time' | 'ipV4' | ipV6 | 'creditCard' | 'url' | 'image' | base64 | 'md5' | 'sha1' | 'sha256' | uuid | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | trim | json | RegExp;
 
 // Email
 Is.string('user@example.com', { format: 'email' }); // It returns: true
@@ -188,7 +193,13 @@ Is.string('507f1f77bcf86cd799439011_123', { format: 'mongoId' }); // It returns:
 
 // IPv4
 Is.string('192.168.1.1', { format: 'ipV4' }); // It returns: true
+Is.string('1.1.1.1', { format: 'ipV4' }); // It returns: true
 Is.string('256.256.256.256', { format: 'ipV4' }); // It returns: false
+
+// IPv6
+Is.string('2001:0db8:85a3:0000:0000:8a2e:0370:7334', { format: 'ipV6' }); // It returns: true
+Is.string('192.168.1.1', { format: 'ipV6' }); // It returns: false
+Is.string('1234:5678', { format: 'ipV6' }); // It returns: false
 
 // Credit card
 expect(Is.string('4000056655665556', { format: 'creditCard' })).toBeTruthy(); // VISA
@@ -201,6 +212,36 @@ expect(Is.string('3566002020360505', { format: 'creditCard' })).toBeTruthy(); //
 Is.string('https://www.jsowl.com/remove-an-item-from-an-array-in-javascript/', { format: 'url' }); // It returns: true
 Is.string('htt//jsowl', { format: 'url' }); // It returns: false
 Is.string('www.jsowl.com', { format: 'url' }); // It returns: false
+
+// Image
+Is.string('https://2.img-dpreview.com/files/p/E~C1000x0S4000x4000T1200x1200~articles/3925134721/0266554465.jpeg', { format: 'image' }); // It returns: true
+Is.string('https://2.img-dpreview.com/files/p/E~C1000x0S4000x4000T1200x1200~articles/3925134721/0266554465', { format: 'image' }); // It returns: false
+
+// Base64
+Is.string('SGVsbG8gV29ybGQ=', { format: 'base64' }); // It returns: true
+Is.string('SGVsbG8gV29ybGQ==somewhat_valid', { format: 'base64' }); // It returns: false
+
+// Md5
+Is.string('3e25960a79dbc69b674cd4ec67a72c62', { format: 'md5' }); // It returns: true
+expect(Is.string('3e25960a79dbc69b674cd4ec67a72C62', { format: 'md5' })).toBeFalsy(); // C is upper case
+
+// Sha1
+Is.string('7b502c3a1f48c8609ae212cdfb639dee39673f5e', { format: 'sha1' }); // It returns: true
+expect(Is.string('7b502c3a1f48c8609ae212cdfb639dee39673f5E', { format: 'sha1' })).toBeFalsy(); // E is upper case
+
+// Sha256
+Is.string('64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c', { format: 'sha256' }); // It returns: true
+Is.string('64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c_', { format: 'sha256' }); // It returns: false
+
+// UUID
+Is.string('f47ac10b-58cc-4372-a567-0e02b2c3d479', { format: 'uuid' }); // It returns: true
+expect(Is.string('12345678-1234-1234-1234-123456789012', { format: 'uuid' })).toBeFalsy(); // Invalid number of characters
+
+// JWT
+const jwt =
+   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+Is.string(jwt, { format: 'jwt' }); // It returns: true
+Is.string('Hello World', { format: 'jwt' }); // It returns: false
 
 // Number
 Is.string('123', { format: 'number' }); // It returns: true
@@ -228,6 +269,19 @@ Is.string('false', { format: 'boolean' }); // It returns: true
 expect(Is.string('True', { format: 'boolean' })).toBeFalsy(); // Case sensitive
 Is.string('1', { format: 'boolean' }); // It returns: false
 Is.string('0', { format: 'boolean' }); // It returns: false
+
+// Trim
+Is.string('Hello World', { format: 'trim' }); // It returns: true
+Is.string(' Hello World ', { format: 'trim' }); // It returns: false
+Is.string(' Hello World', { format: 'trim' }); // It returns: false
+Is.string('Hello World ', { format: 'trim' }); // It returns: false
+
+// Json
+Is.string('["Hello World"]', { format: 'json' }); // It returns: true
+Is.string('{"foo": "bar"}', { format: 'json' }); // It returns: true
+Is.string('Hello World', { format: 'json' }); // It returns: false
+Is.string(['Hello World'], { format: 'json' }); // It returns: false
+Is.string({ foo: 'bar' }, { format: 'json' }); // It returns: false
 
 // RegExp
 Is.string('507f1f77bcf86cd799439011', { format: /^[0-9a-fA-F]{24}$/ }); // It returns: true

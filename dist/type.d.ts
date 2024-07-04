@@ -1,3 +1,4 @@
+import { type Transform } from './lib';
 export type IsValidType = 'string' | 'number' | 'boolean' | 'json' | 'object' | 'array' | 'primitive';
 export interface ObjectCommonType {
     [key: string]: IsValidType | ObjectCommonType;
@@ -96,7 +97,7 @@ export interface IsBaseOptions {
     isArray?: IsArrayOption;
 }
 export interface IsStringOptions extends IsBaseOptions {
-    format?: 'email' | 'mongoId' | 'date-time' | 'ipV4' | 'creditCard' | 'url' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | RegExp;
+    format?: 'email' | 'mongoId' | 'date-time' | 'ipV4' | 'ipV6' | 'creditCard' | 'url' | 'image' | 'base64' | 'md5' | 'sha1' | 'sha256' | 'uuid' | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | 'trim' | 'json' | RegExp;
     minLength?: number;
     maxLength?: number;
     notEmpty?: boolean;
@@ -137,4 +138,8 @@ export type ReturnsIsClass<O extends IsBaseOptions | undefined> = O extends IsSt
 export type ReturnsIsArray<O extends IsBaseOptions | undefined> = O extends IsStringOptions ? (O['isArray'] extends IsArrayValue ? any[][] : any[]) : any[];
 type ReturnsIsPrimitiveType<T> = T extends 'null' ? null : T extends 'undefined' ? undefined : T extends 'string' ? string : T extends 'boolean' ? boolean : T extends 'number' ? number : T extends 'symbol' ? symbol : T extends 'bigint' ? bigint : Primitive;
 export type ReturnsIsPrimitive<O extends IsPrimitiveOptions | undefined> = O extends IsStringOptions ? O['isArray'] extends IsArrayValue ? ReturnsIsPrimitiveType<O['type']>[] : ReturnsIsPrimitiveType<O['type']> : ReturnsIsPrimitiveType<O['type']>;
+export type StaticMethods<T> = {
+    [P in keyof T]: T[P] extends (...args: any[]) => any ? P : never;
+};
+export type TransformType = keyof Omit<StaticMethods<typeof Transform>, 'prototype'>;
 export {};

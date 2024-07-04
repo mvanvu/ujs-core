@@ -1,4 +1,4 @@
-import { ObjectRecord, EventHandler, PathValue, Path, IsEqual, NestedOmit, NestedPick } from '../type';
+import { ObjectRecord, EventHandler, PathValue, Path, IsEqual, NestedOmit, NestedPick, TransformType } from '../type';
 export type RegistryDataType = ObjectRecord | any[];
 export declare class RegistryDataError extends Error {
 }
@@ -26,7 +26,7 @@ export declare class Registry<TData extends any, TPath = PathOf<TData>> {
     isValidData(data?: any): boolean;
     private isPathNum;
     private preparePath;
-    get<TResult = unknown, PathOrKey extends TPath = any>(path: PathOrKey, defaultValue?: any, filter?: string | string[]): IsEqual<TResult, unknown> extends true ? (PathOrKey extends Path<TData> ? PathValue<TData, PathOrKey> : TResult) : TResult;
+    get<TResult = unknown, PathOrKey extends TPath = any>(path: PathOrKey, defaultValue?: any, filter?: TransformType | TransformType[]): IsEqual<TResult, unknown> extends true ? (PathOrKey extends Path<TData> ? PathValue<TData, PathOrKey> : TResult) : TResult;
     private validateConsistent;
     set(path: TPath, value: any, validate?: boolean): this;
     initPathValue<T = any>(path: TPath, value: T, validate?: boolean): T;

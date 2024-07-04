@@ -20,18 +20,6 @@ Transform.toString(true); // It returns: 'true'
 Transform.toString({ foo: 'bar' }); // It returns: JSON.stringify({ foo: 'bar' })
 ```
 
-#### toLowerCase(value: any): string
-
-```javascript
-Transform.toLowerCase('HELLO World'); // It returns: 'hello world'
-```
-
-#### toUpperCase(value: any): string
-
-```javascript
-Transform.toUpperCase('HELLO World'); // It returns: 'HELLO WORLD'
-```
-
 #### toArrayUnique(value: any): any[]
 
 ```javascript
@@ -109,29 +97,6 @@ Transform.toNumber({}); // It returns: 0
 Transform.toNumber([]); // It returns: 0
 ```
 
-#### toUNumber(value: any) : number => unsigned number
-
-```javascript
-Transform.toUNumber(-1.25); // It returns: 1.25
-Transform.toUNumber('-1.25'); // It returns: 1.25
-```
-
-#### toInt(value: any) : number => integer
-
-```javascript
-Transform.toInt(Number.MAX_SAFE_INTEGER + 100); // It returns: Number.MAX_SAFE_INTEGER
-Transform.toInt(-Number.MAX_SAFE_INTEGER - 100); // It returns: -Number.MAX_SAFE_INTEGER
-Transform.toInt(1.25); // It returns: 1
-Transform.toInt('1.25'); // It returns: 1
-```
-
-#### toUInt(value: any) : number => unsigned integer
-
-```javascript
-Transform.toUInt(-1); // It returns: 1
-Transform.toUInt('-1'); // It returns: 1
-```
-
 #### toBoolean(value: any) : boolean
 
 ```javascript
@@ -195,7 +160,7 @@ Transform.toSafeFileName('/from_path/to_path///to/file .txt'); // It returns: 'f
 Transform.toNoneDiacritics("J'aime boire du café"); // It returns: "J'aime boire du cafe"
 
 // toNonAccentVietnamese(value: any): string => none diacritics vietnamese string
-Transform.toNonAccentVietnamese('Chào thế giới'); // It returns: 'Chao the gioi'
+Transform.toNonAccent('Chào thế giới'); // It returns: 'Chao the gioi'
 ```
 
 #### toASCIIString(value: string): string => ASCII string
@@ -210,29 +175,4 @@ Transform.toASCIIString('Đây là'); // It returns: 'ay la'
 ```javascript
 // Only character and number are accepted
 Transform.toAlnum('^Hello @World! 2024'); // It returns: 'HelloWorld2024'
-```
-
-#### clean(value: any, typeTransform: string | string[], ...params: any[]): any => convert to multiple types
-
-```javascript
-// Transform to String->Boolean
-Transform.clean(1, ['toString', 'toBoolean']); // It returns: true
-
-// Transform to Boolean->String
-Transform.clean(0, ['toBoolean', 'toString']); // It returns: 'false'
-
-// The same with short way
-Transform.clean(1, ['string', 'boolean']); // It returns: true
-Transform.clean(0, ['boolean', 'string']); // It returns: 'false'
-```
-
-#### Transform.cleanIfType(value: any, typeTransform: string | string[], typeValue: IsValidType | IsValidType[]): any
-
-```javascript
-// Trim and convert to unsigned integer if the value is string or number
-Transform.cleanIfType(' 1.25 ', 'number', 'string'); // It returns: 1.25
-Transform.cleanIfType(1.25, 'number', ['string', 'number']); // It returns: 1.25
-
-// Do nothing if the value isn't match with they type(s), 1.25 is not the string type
-Transform.cleanIfType(1.25, ['string'], ['boolean']); // It returns: 1.25
 ```
