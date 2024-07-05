@@ -219,7 +219,7 @@ export class Is {
                for (const k in data) {
                   deepCheck(data[k]);
                }
-            } else if (!['string', 'boolean', 'null', 'undefined', 'number'].includes(typeof data)) {
+            } else if (data !== null && !['string', 'boolean', 'undefined', 'number'].includes(typeof data)) {
                throw new Error();
             }
          };

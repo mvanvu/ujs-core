@@ -128,7 +128,7 @@ Is.strongPassword('MyWeakPwd@'); // It returns: false
 Is.json({ foo: new Map(), bar: new Set() }); // It returns: false
 Is.json({ foo: 1, bar: [{ bar: Symbol('2') }] }); // It returns: false
 Is.json({ foo: 1, bar: [{ bar: BigInt(1) }] }); // It returns: false
-Is.json({ foo: 1, bar: [{ bar: 2 }] }); // It returns: true
+Is.json({ foo: 1, bar: [{ bar: 2, null: null }] }); // It returns: true
 ```
 
 #### Is.includes(value: any, options: IsIncludesOptions): boolean

@@ -94,7 +94,7 @@ it('Core Is', () => {
    expect(Is.json({ foo: new Map(), bar: new Set() })).toBeFalsy();
    expect(Is.json({ foo: 1, bar: [{ bar: Symbol('2') }] })).toBeFalsy();
    expect(Is.json({ foo: 1, bar: [{ bar: BigInt(1) }] })).toBeFalsy();
-   expect(Is.json({ foo: 1, bar: [{ bar: 2 }] })).toBeTruthy();
+   expect(Is.json({ foo: 1, bar: [{ bar: 2, null: null }] })).toBeTruthy();
 
    // # Is.includes(value: any, options: IsIncludesOptions): boolean
    // ## When the value is string or array
