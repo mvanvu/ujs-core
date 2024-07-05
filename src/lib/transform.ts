@@ -1,5 +1,5 @@
 'use strict';
-import { LastElement, ObjectRecord, DefaultObject } from '../type';
+import { LastElement, ObjectRecord, DefaultObject, TransformType } from '../type';
 import { Is } from './is';
 
 export class Transform {
@@ -313,5 +313,17 @@ export class Transform {
                : '';
          })
          .replace(/\s+/gi, ' ');
+   }
+
+   static clean<T>(value: T, toTypes: TransformType | TransformType[]): T {
+      if (!Array.isArray(toTypes)) {
+         toTypes = [toTypes];
+      }
+
+      for (const toType of toTypes) {
+         value = Transform[toType].call(null, value);
+      }
+
+      return value;
    }
 }

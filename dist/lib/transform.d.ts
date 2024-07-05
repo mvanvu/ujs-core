@@ -1,4 +1,4 @@
-import { LastElement, ObjectRecord, DefaultObject } from '../type';
+import { LastElement, ObjectRecord, DefaultObject, TransformType } from '../type';
 export declare class Transform {
     static trim(value: any, options?: {
         specialChars?: string;
@@ -21,4 +21,5 @@ export declare class Transform {
         allowedTags?: string[];
         allowedAttributes?: string[];
     }): string;
+    static clean<T>(value: T, toTypes: TransformType | TransformType[]): T;
 }

@@ -322,4 +322,4 @@ export type StaticMethods<T> = {
    [P in keyof T]: T[P] extends (...args: any[]) => any ? P : never;
 };
 
-export type TransformType = keyof Omit<StaticMethods<typeof Transform>, 'prototype'>;
+export type TransformType = keyof Omit<StaticMethods<typeof Transform>, 'prototype' | 'clean'>;

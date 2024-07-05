@@ -129,4 +129,7 @@ it('Util Transform', () => {
    // # toAlnum(value: any): string => Alpha number string
    // ## Only character and number are accepted
    expect(Transform.toAlnum('^Hello @World! 2024')).toEqual('HelloWorld2024');
+
+   // # Transform.clean(value: any, toTypes: TransformType | TransformType[]): any
+   expect(Transform.clean(' Đây là ', ['toNonAccent', 'trim'])).toEqual('Day la');
 });

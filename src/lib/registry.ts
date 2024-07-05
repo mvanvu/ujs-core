@@ -164,11 +164,7 @@ export class Registry<TData extends any, TPath = PathOf<TData>> {
       let value = this.cached[p];
 
       if (filter) {
-         for (const fn of Is.array(filter) ? filter : [filter]) {
-            if (Is.func(Transform[fn])) {
-               value = Util.call(null, Transform[fn], value);
-            }
-         }
+         value = Transform.clean(value, filter);
       }
 
       return value;

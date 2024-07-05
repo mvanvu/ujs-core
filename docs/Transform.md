@@ -176,3 +176,9 @@ Transform.toASCIIString('Đây là'); // It returns: 'ay la'
 // Only character and number are accepted
 Transform.toAlnum('^Hello @World! 2024'); // It returns: 'HelloWorld2024'
 ```
+
+#### Transform.clean(value: any, toTypes: TransformType | TransformType[]): any
+
+```javascript
+Transform.clean(' Đây là ', ['toNonAccent', 'trim']); // It returns: 'Day la'
+```
