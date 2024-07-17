@@ -346,7 +346,7 @@ export class Is {
    }
 
    static enum(value: any, options: IsEnumOptions): boolean {
-      return Is.each(options, value, (item: any) => options.enumArray.includes(item));
+      return Is.each(options, value, (item: any) => Array.isArray(options?.enumArray) && options.enumArray.includes(item));
    }
 
    static includes(value: any, options: IsIncludesOptions): boolean {
