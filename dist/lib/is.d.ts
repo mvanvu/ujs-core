@@ -17,6 +17,6 @@ export declare class Is {
     static enum(value: any, options: IsEnumOptions): boolean;
     static includes(value: any, options: IsIncludesOptions): boolean;
     static class<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsClass<O>;
-    private static each;
+    static each(options: IsBaseOptions | undefined, value: any, callback: (item: any) => boolean): boolean;
     static creditCard(value: string, type?: CreditCardType): boolean;
 }

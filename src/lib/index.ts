@@ -4,4 +4,5 @@ export * from './util';
 export * from './hash';
 export * from './is';
 export * from './registry';
+export * from './schema';
 export * from './transform';

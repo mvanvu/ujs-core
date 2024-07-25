@@ -187,6 +187,8 @@ export type IsArrayValue = true | 'unique';
 
 export interface IsBaseOptions {
    isArray?: IsArrayOption;
+   optional?: boolean;
+   nullable?: boolean;
 }
 
 export type IsStringOptionFormat =

@@ -95,6 +95,8 @@ export type IsArrayOption = boolean | 'unique';
 export type IsArrayValue = true | 'unique';
 export interface IsBaseOptions {
     isArray?: IsArrayOption;
+    optional?: boolean;
+    nullable?: boolean;
 }
 export type IsStringOptionFormat = 'email' | 'mongoId' | 'date-time' | 'ipV4' | 'ipV6' | 'creditCard' | 'url' | 'image' | 'base64' | 'md5' | 'sha1' | 'sha256' | 'uuid' | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | 'trim' | 'json' | RegExp;
 export interface IsStringOptions extends IsBaseOptions {

@@ -394,8 +394,15 @@ export class Is {
       return Is.each(options, value, (item: any) => Is.func(item) && item.toString()?.startsWith('class '));
    }
 
-   private static each(options: IsBaseOptions | undefined, value: any, callback: (item: any) => boolean): boolean {
+   static each(options: IsBaseOptions | undefined, value: any, callback: (item: any) => boolean): boolean {
       try {
+         const optional = options?.optional === true;
+         const nullable = options?.nullable === true || (options?.nullable === undefined && optional);
+
+         if ((optional && value === undefined) || (nullable && value === null)) {
+            return true;
+         }
+
          if (options?.isArray) {
             if (!Array.isArray(value)) {
                return false;

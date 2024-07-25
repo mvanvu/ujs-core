@@ -165,9 +165,9 @@ it('Core Is', () => {
    expect(Is.string('3566002020360505', { format: 'creditCard' })).toBeTruthy(); // JCB
 
    // ## URL
-   expect(Is.string('https://www.jsowl.com/remove-an-item-from-an-array-in-javascript/', { format: 'url' })).toBeTruthy();
-   expect(Is.string('htt//jsowl', { format: 'url' })).toBeFalsy();
-   expect(Is.string('www.jsowl.com', { format: 'url' })).toBeFalsy();
+   expect(Is.string('https://www.domain.com/remove-an-item-from-an-array-in-javascript/', { format: 'url' })).toBeTruthy();
+   expect(Is.string('htt//domain', { format: 'url' })).toBeFalsy();
+   expect(Is.string('www.domain.com', { format: 'url' })).toBeFalsy();
 
    // ## Image
    expect(Is.string('https://2.img-dpreview.com/files/p/E~C1000x0S4000x4000T1200x1200~articles/3925134721/0266554465.jpeg', { format: 'image' })).toBeTruthy();

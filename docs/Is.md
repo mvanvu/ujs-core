@@ -209,9 +209,9 @@ expect(Is.string('36227206271667', { format: 'creditCard' })).toBeTruthy(); // D
 expect(Is.string('3566002020360505', { format: 'creditCard' })).toBeTruthy(); // JCB
 
 // URL
-Is.string('https://www.jsowl.com/remove-an-item-from-an-array-in-javascript/', { format: 'url' }); // It returns: true
-Is.string('htt//jsowl', { format: 'url' }); // It returns: false
-Is.string('www.jsowl.com', { format: 'url' }); // It returns: false
+Is.string('https://www.domain.com/remove-an-item-from-an-array-in-javascript/', { format: 'url' }); // It returns: true
+Is.string('htt//domain', { format: 'url' }); // It returns: false
+Is.string('www.domain.com', { format: 'url' }); // It returns: false
 
 // Image
 Is.string('https://2.img-dpreview.com/files/p/E~C1000x0S4000x4000T1200x1200~articles/3925134721/0266554465.jpeg', { format: 'image' }); // It returns: true

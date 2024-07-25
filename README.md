@@ -47,5 +47,6 @@ See all the sample tests at: /test/lib
 -  [Hash](docs/Hash.md) provide some useful methods such as: base64, sha256, uuid, JWT...
 -  [Is](docs/Is.md) validate the value that will (or will not) match some conditions
 -  [Registry](docs/Registry.md) powerful object key-value pair manager
+-  [Schema](docs/Schema.md) validate the value by using Schema
 -  [Transform](docs/Transform.md) provide the transformer to convert any value to some expected value
 -  [Util](docs/Util.md) provide some useful common util methods
