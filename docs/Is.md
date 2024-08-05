@@ -117,6 +117,7 @@ Is.empty({ foo: 'bar' }); // It returns: false
 // Check the value is a strong password, returns false if the value is not a string
 const pwd = 'MyStrongPwd@123';
 Is.strongPassword(pwd); // It returns: true
+Is.string(pwd, { strongPassword: {} }); // It returns: true
 Is.strongPassword(pwd, { minLength: pwd.length + 1 }); // It returns: false
 Is.strongPassword('MyWeakPwd@'); // It returns: false
 ```
@@ -172,20 +173,27 @@ Is.class(function () {}); // It returns: false
 Is.string(123); // It returns: false
 Is.string('123'); // It returns: true
 
-// Not empty string
-Is.string('A', { notEmpty: true }); // It returns: true
-Is.string('', { notEmpty: true }); // It returns: false
-expect(Is.string('  ', { notEmpty: true })).toBeTruthy(); // Multi-space not an empty string
-
-// Format validator: 'email' | 'mongoId' | 'date-time' | 'ipV4' | ipV6 | 'creditCard' | 'url' | 'image' | base64 | 'md5' | 'sha1' | 'sha256' | uuid | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | trim | json | RegExp;
+// Format validator: 'email' | 'mongoId' | 'dateTime' | 'date' | 'time' | 'ipV4' | ipV6 | 'creditCard' | 'url' | 'image' | base64 | 'md5' | 'sha1' | 'sha256' | uuid | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | trim | json | RegExp;
 
 // Email
 Is.string('user@example.com', { format: 'email' }); // It returns: true
 Is.string('user.example.com', { format: 'email' }); // It returns: false
 
 // Date-Time
-Is.string('2024-07-03T00:00:00.00', { format: 'date-time' }); // It returns: true
-Is.string('2024-07-03_00:00:00.00', { format: 'date-time' }); // It returns: false
+Is.string('2024-07-03T00:00:00.00', { format: 'dateTime' }); // It returns: true
+Is.string('2024-07-03_00:00:00.00', { format: 'dateTime' }); // It returns: false
+
+// Date
+Is.string('2024-08-05', { format: 'date' }); // It returns: true
+Is.string('2024-13-05', { format: 'date' }); // It returns: false
+Is.string('2024-08-32', { format: 'date' }); // It returns: false
+Is.string('2024-08-05T00:00:00.00', { format: 'date' }); // It returns: false
+
+// Time
+Is.string('10:29:59', { format: 'time' }); // It returns: true
+Is.string('10:29:59.999', { format: 'time' }); // It returns: true
+Is.string('24:29:59.999', { format: 'time' }); // It returns: false
+Is.string('00:60:59.999', { format: 'time' }); // It returns: false
 
 // Mongo ID
 Is.string('507f1f77bcf86cd799439011', { format: 'mongoId' }); // It returns: true

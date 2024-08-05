@@ -1,4 +1,4 @@
-import { IsBaseOptions, IsNumberOptions, IsStringOptionFormat, IsStringOptions } from '../type';
+import { IsBaseOptions, IsNumberOptions, IsStringOptionFormat, IsStringOptions, IsStrongPasswordOptions } from '../type';
 export declare class BaseSchema {
     protected options: IsBaseOptions;
     protected errors?: Record<string, string>;
@@ -13,8 +13,8 @@ export declare class StringSchema extends BaseSchema {
     protected options: IsStringOptions;
     minLength(num: number): this;
     maxLength(num: number): this;
-    notEmpty(notEmpty?: boolean): this;
     format(format: IsStringOptionFormat): this;
+    strongPassword(options?: Omit<IsStrongPasswordOptions, 'isArray' | 'optional' | 'nullable'>): this;
 }
 export declare class NumberSchema extends BaseSchema {
     protected options: IsNumberOptions;
@@ -24,27 +24,29 @@ export declare class NumberSchema extends BaseSchema {
 }
 export declare class BooleanSchema extends BaseSchema {
 }
-type ItemSchema = NumberSchema | ArraySchema | StringSchema | BooleanSchema | ObjectSchema;
-export declare class ObjectSchema extends BaseSchema {
+export type ItemSchema = NumberSchema | StringSchema | BooleanSchema | ObjectSchema<any> | ArraySchema<any>;
+export type ObjectSchemaProps<T extends object> = {
+    [K in keyof T]: T[K] extends object ? ObjectSchemaProps<T[K]> : ItemSchema;
+};
+export declare class ObjectSchema<T extends object> extends BaseSchema {
+    private properties?;
     private _isWhiteList;
-    private properties;
+    constructor(properties?: ObjectSchemaProps<T>);
     get isWhiteList(): boolean;
     get keys(): string[];
     each(callback: (property: ItemSchema, k: string) => any): void;
-    props(props: Record<string, ItemSchema>): this;
     whiteList(isWhiteList?: boolean): this;
     check(value: any): boolean;
 }
-export declare class ArraySchema extends BaseSchema {
-    private itemsProps;
-    items(itemsProps: ItemSchema | ItemSchema[]): this;
+export declare class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema {
+    private itemsProps?;
+    constructor(itemsProps?: T);
     check(value: any): boolean;
 }
 export declare class Schema {
     static string(): StringSchema;
     static number(): NumberSchema;
     static boolean(): BooleanSchema;
-    static object(): ObjectSchema;
-    static array(): ArraySchema;
+    static object<T extends object>(properties?: ObjectSchemaProps<T>): ObjectSchema<T>;
+    static array<T extends ItemSchema | ItemSchema[]>(itemsProps?: T): ArraySchema<T>;
 }
-export {};

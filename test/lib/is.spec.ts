@@ -86,6 +86,7 @@ it('Core Is', () => {
    // ## Check the value is a strong password, returns false if the value is not a string
    const pwd = 'MyStrongPwd@123';
    expect(Is.strongPassword(pwd)).toBeTruthy();
+   expect(Is.string(pwd, { strongPassword: {} })).toBeTruthy();
    expect(Is.strongPassword(pwd, { minLength: pwd.length + 1 })).toBeFalsy();
    expect(Is.strongPassword('MyWeakPwd@')).toBeFalsy();
 
@@ -129,19 +130,26 @@ it('Core Is', () => {
    expect(Is.string(123)).toBeFalsy();
    expect(Is.string('123')).toBeTruthy();
 
-   // ## Not empty string
-   expect(Is.string('A', { notEmpty: true })).toBeTruthy();
-   expect(Is.string('', { notEmpty: true })).toBeFalsy();
-   expect(Is.string('  ', { notEmpty: true })).toBeTruthy(); // Multi-space not an empty string
-
-   // ## Format validator: 'email' | 'mongoId' | 'date-time' | 'ipV4' | ipV6 | 'creditCard' | 'url' | 'image' | base64 | 'md5' | 'sha1' | 'sha256' | uuid | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | trim | json | RegExp;
+   // ## Format validator: 'email' | 'mongoId' | 'dateTime' | 'date' | 'time' | 'ipV4' | ipV6 | 'creditCard' | 'url' | 'image' | base64 | 'md5' | 'sha1' | 'sha256' | uuid | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | trim | json | RegExp;
    // ## Email
    expect(Is.string('user@example.com', { format: 'email' })).toBeTruthy();
    expect(Is.string('user.example.com', { format: 'email' })).toBeFalsy();
 
    // ## Date-Time
-   expect(Is.string('2024-07-03T00:00:00.00', { format: 'date-time' })).toBeTruthy();
-   expect(Is.string('2024-07-03_00:00:00.00', { format: 'date-time' })).toBeFalsy();
+   expect(Is.string('2024-07-03T00:00:00.00', { format: 'dateTime' })).toBeTruthy();
+   expect(Is.string('2024-07-03_00:00:00.00', { format: 'dateTime' })).toBeFalsy();
+
+   // ## Date
+   expect(Is.string('2024-08-05', { format: 'date' })).toBeTruthy();
+   expect(Is.string('2024-13-05', { format: 'date' })).toBeFalsy();
+   expect(Is.string('2024-08-32', { format: 'date' })).toBeFalsy();
+   expect(Is.string('2024-08-05T00:00:00.00', { format: 'date' })).toBeFalsy();
+
+   // ## Time
+   expect(Is.string('10:29:59', { format: 'time' })).toBeTruthy();
+   expect(Is.string('10:29:59.999', { format: 'time' })).toBeTruthy();
+   expect(Is.string('24:29:59.999', { format: 'time' })).toBeFalsy();
+   expect(Is.string('00:60:59.999', { format: 'time' })).toBeFalsy();
 
    // ## Mongo ID
    expect(Is.string('507f1f77bcf86cd799439011', { format: 'mongoId' })).toBeTruthy();

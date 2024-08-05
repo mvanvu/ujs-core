@@ -194,7 +194,9 @@ export interface IsBaseOptions {
 export type IsStringOptionFormat =
    | 'email'
    | 'mongoId'
-   | 'date-time'
+   | 'dateTime'
+   | 'date'
+   | 'time'
    | 'ipV4'
    | 'ipV6'
    | 'creditCard'
@@ -213,13 +215,14 @@ export type IsStringOptionFormat =
    | 'boolean'
    | 'trim'
    | 'json'
+   | 'strongPassword'
    | RegExp;
 
 export interface IsStringOptions extends IsBaseOptions {
    format?: IsStringOptionFormat;
    minLength?: number;
    maxLength?: number;
-   notEmpty?: boolean;
+   strongPassword?: IsStrongPasswordOptions;
 }
 
 export interface IsNumberOptions extends IsBaseOptions {

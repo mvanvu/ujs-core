@@ -272,12 +272,13 @@ export class Is {
             typeof item !== 'string' ||
             (Is.number(options?.minLength) && item.length < options.minLength) ||
             (Is.number(options?.maxLength) && item.length > options.maxLength) ||
-            (options?.notEmpty && !item.length) ||
             (options?.format === 'email' &&
                !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
                   item,
                )) ||
-            (options?.format === 'date-time' && !DateTime.parse(item)) ||
+            (options?.format === 'dateTime' && !DateTime.parse(item)) ||
+            (options?.format === 'date' && (!/^\d{4}-\d{2}-\d{2}$/.test(item) || !DateTime.parse(item))) ||
+            (options?.format === 'time' && (!/^\d{2}:\d{2}:\d{2}(\.\d{1,3})?$/.test(item) || !DateTime.parse(`2024-08-05T${item}`))) ||
             (options?.format === 'creditCard' && !Is.creditCard(item)) ||
             (options?.format === 'ipV4' &&
                !/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
@@ -300,7 +301,8 @@ export class Is {
             (options?.format === 'boolean' && !['true', 'false'].includes(item)) ||
             (options?.format === 'trim' && /^\s+|\s+$/.test(item)) ||
             (options?.format === 'json' && typeof JSON.parse(item) !== 'object') ||
-            (options?.format instanceof RegExp && !options.format.test(item))
+            (options?.format instanceof RegExp && !options.format.test(item)) ||
+            (options?.strongPassword && !Is.strongPassword(item, options.strongPassword))
          ) {
             return false;
          }

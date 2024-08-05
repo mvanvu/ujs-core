@@ -7,9 +7,9 @@ it('Core Schema', async () => {
    expect(Schema.string().nullable().check(null)).toBeTruthy();
    expect(Schema.string().nullable(false).check(null)).toBeFalsy();
    expect(Schema.string().check('')).toBeTruthy();
-   expect(Schema.string().notEmpty().check('')).toBeFalsy();
-   expect(Schema.string().notEmpty(false).check('')).toBeTruthy();
-   expect(Schema.string().format('date-time').check('2024-07-03T00:00:00.00')).toBeTruthy();
+   expect(Schema.string().minLength(1).check('')).toBeFalsy();
+   expect(Schema.string().minLength(0).check('')).toBeTruthy();
+   expect(Schema.string().format('dateTime').check('2024-07-03T00:00:00.00')).toBeTruthy();
    expect(Schema.string().format('mongoId').check('507f1f77bcf86cd799439011')).toBeTruthy();
    expect(Schema.string().format('ipV4').check('192.168.1.1')).toBeTruthy();
    expect(Schema.string().format('ipV6').check('2001:0db8:85a3:0000:0000:8a2e:0370:7334')).toBeTruthy();
@@ -26,6 +26,12 @@ it('Core Schema', async () => {
    const jwt =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
    expect(Schema.string().format('jwt').check(jwt)).toBeTruthy();
+
+   const regex = /^[0-9a-fA-F]{24}$/;
+   expect(Schema.string().format(regex).check('507f1f77bcf86cd799439011')).toBeTruthy();
+   expect(Schema.string().format(regex).check('507f1f77bcf86cd79943901g')).toBeFalsy();
+   expect(Schema.string().strongPassword().check('MyStrongPwd@123')).toBeTruthy();
+   expect(Schema.string().strongPassword({ minLength: 16 }).check('MyStrongPwd@123')).toBeFalsy();
 
    // # Schema.boolean(): BooleanSchema
    expect(Schema.boolean().check(1)).toBeFalsy();
@@ -52,29 +58,23 @@ it('Core Schema', async () => {
    expect(Schema.object().check({})).toBeTruthy();
    expect(Schema.object().check([])).toBeFalsy();
    expect(Schema.array().check([])).toBeTruthy();
-   expect(Schema.array().items(Schema.number()).check([1, 1.5])).toBeTruthy();
-   expect(Schema.array().items(Schema.number()).check([1, 1.5, true])).toBeFalsy();
+   expect(Schema.array(Schema.number()).check([1, 1.5])).toBeTruthy();
+   expect(Schema.array(Schema.number()).check([1, 1.5, true])).toBeFalsy();
 
    // # Deep Object/Array schema
-   const schema = Schema.object().props({
+   const schema = Schema.object({
       foo: Schema.number(),
-      bar: Schema.object().props({
-         bar2: Schema.boolean(),
-      }),
+      bar: Schema.object({ bar2: Schema.boolean() }),
       arrayAny: Schema.array(),
-      arrayNumber: Schema.array().items(Schema.number()),
-      arrayNumberBoolean: Schema.array().items([Schema.number(), Schema.boolean()]),
-      arrayObject: Schema.array().items(
-         Schema.object()
-            .whiteList()
-            .props({
-               number: Schema.number(),
-               integer: Schema.number().integer(),
-               boolean: Schema.boolean(),
-               object: Schema.object().props({
-                  array: Schema.array().items(Schema.array().items(Schema.number())),
-               }),
-            }),
+      arrayNumber: Schema.array(Schema.number()),
+      arrayNumberBoolean: Schema.array([Schema.number(), Schema.boolean()]),
+      arrayObject: Schema.array(
+         Schema.object({
+            number: Schema.number(),
+            integer: Schema.number().integer(),
+            boolean: Schema.boolean(),
+            object: Schema.object({ array: Schema.array(Schema.array(Schema.number())) }),
+         }).whiteList(),
       ),
       email: Schema.string().format('email'),
       minLength2: Schema.string().minLength(2),

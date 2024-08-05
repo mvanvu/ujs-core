@@ -1,4 +1,4 @@
-import { IsBaseOptions, IsNumberOptions, IsStringOptionFormat, IsStringOptions } from '../type';
+import { IsBaseOptions, IsNumberOptions, IsStringOptionFormat, IsStringOptions, IsStrongPasswordOptions } from '../type';
 import { Is } from './is';
 
 export class BaseSchema {
@@ -61,14 +61,15 @@ export class StringSchema extends BaseSchema {
       return this;
    }
 
-   notEmpty(notEmpty?: boolean): this {
-      this.options.notEmpty = notEmpty === undefined || notEmpty === true;
+   format(format: IsStringOptionFormat): this {
+      this.options.format = format;
 
       return this;
    }
 
-   format(format: IsStringOptionFormat): this {
-      this.options.format = format;
+   strongPassword(options?: Omit<IsStrongPasswordOptions, 'isArray' | 'optional' | 'nullable'>): this {
+      this.options.format = 'strongPassword';
+      this.options.strongPassword = options ?? {};
 
       return this;
    }
@@ -98,9 +99,9 @@ export class NumberSchema extends BaseSchema {
 
 export class BooleanSchema extends BaseSchema {}
 
-type ItemSchema = NumberSchema | ArraySchema | StringSchema | BooleanSchema | ObjectSchema;
+export type ItemSchema = NumberSchema | StringSchema | BooleanSchema | ObjectSchema<any> | ArraySchema<any>;
 
-const handleWhiteList = (objSchema: ObjectSchema, value: any, isWhiteList: boolean) => {
+const handleWhiteList = (objSchema: ObjectSchema<any>, value: any, isWhiteList: boolean) => {
    if (!Is.object(value)) {
       throw new Error();
    }
@@ -130,10 +131,16 @@ const checkProperty = (properties: ItemSchema, value: any, isWhiteList?: boolean
    }
 };
 
-export class ObjectSchema extends BaseSchema {
+export type ObjectSchemaProps<T extends object> = {
+   [K in keyof T]: T[K] extends object ? ObjectSchemaProps<T[K]> : ItemSchema;
+};
+
+export class ObjectSchema<T extends object> extends BaseSchema {
    private _isWhiteList = false;
 
-   private properties: Record<string, ItemSchema> = {};
+   constructor(private properties?: ObjectSchemaProps<T>) {
+      super();
+   }
 
    get isWhiteList(): boolean {
       return this._isWhiteList;
@@ -151,12 +158,6 @@ export class ObjectSchema extends BaseSchema {
       for (const k in this.properties) {
          callback.call(this, this.properties[k], k);
       }
-   }
-
-   props(props: Record<string, ItemSchema>): this {
-      this.properties = props;
-
-      return this;
    }
 
    whiteList(isWhiteList?: boolean): this {
@@ -179,13 +180,9 @@ export class ObjectSchema extends BaseSchema {
    }
 }
 
-export class ArraySchema extends BaseSchema {
-   private itemsProps: ItemSchema | ItemSchema[];
-
-   items(itemsProps: ItemSchema | ItemSchema[]): this {
-      this.itemsProps = itemsProps;
-
-      return this;
+export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema {
+   constructor(private itemsProps?: T) {
+      super();
    }
 
    check(value: any): boolean {
@@ -234,11 +231,11 @@ export class Schema {
       return new BooleanSchema();
    }
 
-   static object(): ObjectSchema {
-      return new ObjectSchema();
+   static object<T extends object>(properties?: ObjectSchemaProps<T>): ObjectSchema<T> {
+      return new ObjectSchema(properties);
    }
 
-   static array(): ArraySchema {
-      return new ArraySchema();
+   static array<T extends ItemSchema | ItemSchema[]>(itemsProps?: T): ArraySchema<T> {
+      return new ArraySchema(itemsProps);
    }
 }

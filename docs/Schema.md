@@ -14,9 +14,9 @@ Schema.string().optional().check(null); // It returns: true
 Schema.string().nullable().check(null); // It returns: true
 Schema.string().nullable(false).check(null); // It returns: false
 Schema.string().check(''); // It returns: true
-Schema.string().notEmpty().check(''); // It returns: false
-Schema.string().notEmpty(false).check(''); // It returns: true
-Schema.string().format('date-time').check('2024-07-03T00:00:00.00'); // It returns: true
+Schema.string().minLength(1).check(''); // It returns: false
+Schema.string().minLength(0).check(''); // It returns: true
+Schema.string().format('dateTime').check('2024-07-03T00:00:00.00'); // It returns: true
 Schema.string().format('mongoId').check('507f1f77bcf86cd799439011'); // It returns: true
 Schema.string().format('ipV4').check('192.168.1.1'); // It returns: true
 Schema.string().format('ipV6').check('2001:0db8:85a3:0000:0000:8a2e:0370:7334'); // It returns: true
@@ -33,6 +33,12 @@ Schema.string().format('uuid').check('f47ac10b-58cc-4372-a567-0e02b2c3d479'); //
 const jwt =
    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 Schema.string().format('jwt').check(jwt); // It returns: true
+
+const regex = /^[0-9a-fA-F]{24}$/;
+Schema.string().format(regex).check('507f1f77bcf86cd799439011'); // It returns: true
+Schema.string().format(regex).check('507f1f77bcf86cd79943901g'); // It returns: false
+Schema.string().strongPassword().check('MyStrongPwd@123'); // It returns: true
+Schema.string().strongPassword({ minLength: 16 }).check('MyStrongPwd@123'); // It returns: false
 ```
 
 #### Schema.boolean(): BooleanSchema
@@ -69,32 +75,26 @@ Schema.number().integer().max(10).check(9); // It returns: true
 Schema.object().check({}); // It returns: true
 Schema.object().check([]); // It returns: false
 Schema.array().check([]); // It returns: true
-Schema.array().items(Schema.number()).check([1, 1.5]); // It returns: true
-Schema.array().items(Schema.number()).check([1, 1.5, true]); // It returns: false
+Schema.array(Schema.number()).check([1, 1.5]); // It returns: true
+Schema.array(Schema.number()).check([1, 1.5, true]); // It returns: false
 ```
 
 #### Deep Object/Array schema
 
 ```javascript
-const schema = Schema.object().props({
+const schema = Schema.object({
 foo: Schema.number(),
-bar: Schema.object().props({
-bar2: Schema.boolean(),
-}),
+bar: Schema.object({ bar2: Schema.boolean() }),
 arrayAny: Schema.array(),
-arrayNumber: Schema.array().items(Schema.number()),
-arrayNumberBoolean: Schema.array().items([Schema.number(), Schema.boolean()]),
-arrayObject: Schema.array().items(
-Schema.object()
-.whiteList()
-.props({
+arrayNumber: Schema.array(Schema.number()),
+arrayNumberBoolean: Schema.array([Schema.number(), Schema.boolean()]),
+arrayObject: Schema.array(
+Schema.object({
 number: Schema.number(),
 integer: Schema.number().integer(),
 boolean: Schema.boolean(),
-object: Schema.object().props({
-array: Schema.array().items(Schema.array().items(Schema.number())),
-}),
-}),
+object: Schema.object({ array: Schema.array(Schema.array(Schema.number())) }),
+}).whiteList(),
 ),
 email: Schema.string().format('email'),
 minLength2: Schema.string().minLength(2),
