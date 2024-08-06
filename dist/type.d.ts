@@ -98,7 +98,7 @@ export interface IsBaseOptions {
     optional?: boolean;
     nullable?: boolean;
 }
-export type IsStringOptionFormat = 'email' | 'mongoId' | 'dateTime' | 'date' | 'time' | 'ipV4' | 'ipV6' | 'creditCard' | 'url' | 'image' | 'base64' | 'md5' | 'sha1' | 'sha256' | 'uuid' | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | 'trim' | 'json' | 'strongPassword' | RegExp;
+export type IsStringOptionFormat = 'email' | 'mongoId' | 'dateTime' | 'date' | 'time' | 'ipV4' | 'ipV6' | 'creditCard' | 'url' | 'image' | 'base64' | 'md5' | 'sha1' | 'sha256' | 'uuid' | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | 'trim' | 'json' | 'strongPassword' | 'alphanum' | 'lowercase' | 'uppercase' | RegExp;
 export interface IsStringOptions extends IsBaseOptions {
     format?: IsStringOptionFormat;
     minLength?: number;
@@ -122,7 +122,7 @@ export interface IsStrongPasswordOptions extends IsBaseOptions {
     minNumber?: number;
 }
 export interface IsEnumOptions extends IsBaseOptions {
-    enumArray: any[];
+    enum: any[];
 }
 export interface IsIncludesOptions extends IsBaseOptions {
     target: any;
@@ -145,4 +145,5 @@ export type StaticMethods<T> = {
     [P in keyof T]: T[P] extends (...args: any[]) => any ? P : never;
 };
 export type TransformType = keyof Omit<StaticMethods<typeof Transform>, 'prototype' | 'clean'>;
+export type EnumElement = string | number | null | boolean;
 export {};

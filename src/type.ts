@@ -216,6 +216,9 @@ export type IsStringOptionFormat =
    | 'trim'
    | 'json'
    | 'strongPassword'
+   | 'alphanum'
+   | 'lowercase'
+   | 'uppercase'
    | RegExp;
 
 export interface IsStringOptions extends IsBaseOptions {
@@ -246,7 +249,7 @@ export interface IsStrongPasswordOptions extends IsBaseOptions {
 }
 
 export interface IsEnumOptions extends IsBaseOptions {
-   enumArray: any[];
+   enum: any[];
 }
 
 export interface IsIncludesOptions extends IsBaseOptions {
@@ -330,3 +333,5 @@ export type StaticMethods<T> = {
 };
 
 export type TransformType = keyof Omit<StaticMethods<typeof Transform>, 'prototype' | 'clean'>;
+
+export type EnumElement = string | number | null | boolean;

@@ -291,6 +291,18 @@ Is.string('Hello World', { format: 'json' }); // It returns: false
 Is.string(['Hello World'], { format: 'json' }); // It returns: false
 Is.string({ foo: 'bar' }, { format: 'json' }); // It returns: false
 
+// Alphanum
+Is.string('AbcXyZ0123', { format: 'alphanum' }); // It returns: true
+Is.string('Hello World', { format: 'alphanum' }); // It returns: false
+
+// Lowercase
+Is.string('abc', { format: 'lowercase' }); // It returns: true
+Is.string('Abc', { format: 'lowercase' }); // It returns: false
+
+// Uppercase
+Is.string('ABC XYZ', { format: 'uppercase' }); // It returns: true
+Is.string('Abc Xyz', { format: 'uppercase' }); // It returns: false
+
 // RegExp
 Is.string('507f1f77bcf86cd799439011', { format: /^[0-9a-fA-F]{24}$/ }); // It returns: true
 ```
@@ -309,10 +321,10 @@ Is.boolean(0); // It returns: false
 
 ```javascript
 // Check the value is a enum from an array
-Is.enum(true, { enumArray: [true, false] }); // It returns: true
-Is.enum('Active', { enumArray: ['Active', 'Pending'] }); // It returns: true
-Is.enum('Pending', { enumArray: ['Active', 'Pending'] }); // It returns: true
-expect(Is.enum('active', { enumArray: ['Active', 'Pending'] })).toBeFalsy(); // Case sensitive
+Is.enum(true, { enum: [true, false] }); // It returns: true
+Is.enum('Active', { enum: ['Active', 'Pending'] }); // It returns: true
+Is.enum('Pending', { enum: ['Active', 'Pending'] }); // It returns: true
+expect(Is.enum('active', { enum: ['Active', 'Pending'] })).toBeFalsy(); // Case sensitive
 ```
 
 #### Validate as array

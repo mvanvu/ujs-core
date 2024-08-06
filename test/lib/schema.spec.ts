@@ -1,7 +1,7 @@
 import { Schema } from '../../src';
 
 it('Core Schema', async () => {
-   // # Schema.string(): StringSchema
+   // # Schema.string(options?: IsStringOptions): StringSchema
    expect(Schema.string().check(null)).toBeFalsy();
    expect(Schema.string().optional().check(null)).toBeTruthy();
    expect(Schema.string().nullable().check(null)).toBeTruthy();
@@ -33,7 +33,7 @@ it('Core Schema', async () => {
    expect(Schema.string().strongPassword().check('MyStrongPwd@123')).toBeTruthy();
    expect(Schema.string().strongPassword({ minLength: 16 }).check('MyStrongPwd@123')).toBeFalsy();
 
-   // # Schema.boolean(): BooleanSchema
+   // # Schema.boolean(options?: IsBaseOptions): BooleanSchema
    expect(Schema.boolean().check(1)).toBeFalsy();
    expect(Schema.boolean().check(true)).toBeTruthy();
    expect(Schema.boolean().check(false)).toBeTruthy();
@@ -42,7 +42,7 @@ it('Core Schema', async () => {
    expect(Schema.boolean().isArray().check([false, true])).toBeTruthy();
    expect(Schema.boolean().isArray('unique').check([false, false, true])).toBeFalsy();
 
-   // # Schema.number(): NumberSchema
+   // # Schema.number(options?: IsNumberOptions): NumberSchema
    expect(Schema.number().check(1)).toBeTruthy();
    expect(Schema.number().check([1, 2, 3])).toBeFalsy();
    expect(Schema.number().isArray().check([1, 2, 3])).toBeTruthy();
@@ -53,8 +53,8 @@ it('Core Schema', async () => {
    expect(Schema.number().integer().max(10).check(9)).toBeTruthy();
 
    // # Object & Array
-   // ## Schema.object(): ObjectSchema
-   // ## Schema.array(): ArraySchema
+   // ## Schema.object<T extends object>(properties?: ObjectSchemaProps<T>): ObjectSchema<T>
+   // ## array<T extends ItemSchema | ItemSchema[]>(itemsProps?: T): ArraySchema<T>
    expect(Schema.object().check({})).toBeTruthy();
    expect(Schema.object().check([])).toBeFalsy();
    expect(Schema.array().check([])).toBeTruthy();
@@ -140,4 +140,10 @@ it('Core Schema', async () => {
    expect(invalidValue).not.toHaveProperty('noAcceptProp');
    expect(invalidValue.bar).not.toHaveProperty('noAcceptProp');
    expect(invalidValue.arrayObject[0]).not.toHaveProperty('noAcceptProp');
+
+   // # Schema.enum(emum: EnumElement[]): EnumSchema
+   expect(Schema.enum(['Active', 'Inactive', true, false, 1, 0]).check('Inactive')).toBeTruthy();
+   expect(Schema.enum(['Active', 'Inactive', true, false, 1, 0]).check(null)).toBeFalsy();
+
+   console.log(JSON.stringify(schema.buildSchema(), null, 2));
 });

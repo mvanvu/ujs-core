@@ -301,6 +301,9 @@ export class Is {
             (options?.format === 'boolean' && !['true', 'false'].includes(item)) ||
             (options?.format === 'trim' && /^\s+|\s+$/.test(item)) ||
             (options?.format === 'json' && typeof JSON.parse(item) !== 'object') ||
+            (options?.format === 'alphanum' && !/^[a-zA-Z0-9]+$/.test(item)) ||
+            (options?.format === 'lowercase' && /[A-Z]/.test(item)) ||
+            (options?.format === 'uppercase' && /[a-z]/.test(item)) ||
             (options?.format instanceof RegExp && !options.format.test(item)) ||
             (options?.strongPassword && !Is.strongPassword(item, options.strongPassword))
          ) {
@@ -348,7 +351,7 @@ export class Is {
    }
 
    static enum(value: any, options: IsEnumOptions): boolean {
-      return Is.each(options, value, (item: any) => Array.isArray(options?.enumArray) && options.enumArray.includes(item));
+      return Is.each(options, value, (item: any) => Array.isArray(options?.enum) && options.enum.includes(item));
    }
 
    static includes(value: any, options: IsIncludesOptions): boolean {

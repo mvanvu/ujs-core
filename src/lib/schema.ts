@@ -1,15 +1,16 @@
-import { IsBaseOptions, IsNumberOptions, IsStringOptionFormat, IsStringOptions, IsStrongPasswordOptions } from '../type';
+import { EnumElement, IsBaseOptions, IsNumberOptions, IsStringOptionFormat, IsStringOptions, IsStrongPasswordOptions } from '../type';
 import { Is } from './is';
-
-export class BaseSchema {
+export abstract class BaseSchema {
    protected options: IsBaseOptions = {};
-
-   protected errors?: Record<string, string> = null;
 
    private readonly isType!: string;
 
    constructor() {
       this.isType = this.constructor.name.replace('Schema', '').toLowerCase();
+   }
+
+   get isAllowNull(): boolean {
+      return this.options.nullable === true || (this.options.nullable === undefined && this.options.optional === true);
    }
 
    isArray(isArray?: boolean | 'unique'): this {
@@ -31,9 +32,6 @@ export class BaseSchema {
    }
 
    check(value: any): boolean {
-      // Reset errors
-      this.errors = null;
-
       switch (this.isType) {
          case 'number':
          case 'boolean':
@@ -44,10 +42,14 @@ export class BaseSchema {
             return false;
       }
    }
+
+   abstract buildSchema(): Record<string, any>;
 }
 
 export class StringSchema extends BaseSchema {
-   protected options: IsStringOptions = {};
+   constructor(protected options: IsStringOptions = {}) {
+      super();
+   }
 
    minLength(num: number): this {
       this.options.minLength = num;
@@ -73,10 +75,26 @@ export class StringSchema extends BaseSchema {
 
       return this;
    }
+
+   buildSchema() {
+      return {
+         type: this.isAllowNull ? ['null', 'string'] : 'string',
+         minLength: this.options.minLength,
+         maxLength: this.options.maxLength,
+         format:
+            this.options.format === 'dateTime'
+               ? 'date-time'
+               : ['date', 'time', 'email', 'ipV4', 'ipV6', 'url'].includes(this.options.format as string)
+                 ? (this.options.format as string).toLowerCase().replace('url', 'uri')
+                 : undefined,
+      };
+   }
 }
 
 export class NumberSchema extends BaseSchema {
-   protected options: IsNumberOptions = {};
+   constructor(protected options: IsNumberOptions = {}) {
+      super();
+   }
 
    integer(integer?: boolean): this {
       this.options.integer = integer === undefined || integer === true;
@@ -95,9 +113,27 @@ export class NumberSchema extends BaseSchema {
 
       return this;
    }
+
+   buildSchema() {
+      const type = this.options.integer === true ? 'integer' : 'number';
+
+      return {
+         type: this.isAllowNull ? ['null', type] : type,
+         minimum: this.options.min,
+         maximum: this.options.max,
+      };
+   }
 }
 
-export class BooleanSchema extends BaseSchema {}
+export class BooleanSchema extends BaseSchema {
+   constructor(protected options: IsBaseOptions = {}) {
+      super();
+   }
+
+   buildSchema() {
+      return { type: this.isAllowNull ? ['null', 'boolean'] : 'boolean' };
+   }
+}
 
 export type ItemSchema = NumberSchema | StringSchema | BooleanSchema | ObjectSchema<any> | ArraySchema<any>;
 
@@ -178,6 +214,16 @@ export class ObjectSchema<T extends object> extends BaseSchema {
          return true;
       });
    }
+
+   buildSchema() {
+      const objSchema = { type: this.isAllowNull ? ['null', 'object'] : 'object', required: this.keys, properties: {} };
+
+      this.each(function (property, key) {
+         objSchema.properties[key] = property.buildSchema();
+      });
+
+      return objSchema;
+   }
 }
 
 export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema {
@@ -216,19 +262,74 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
          return true;
       });
    }
+
+   buildSchema() {
+      const arraySchema = { type: this.isAllowNull ? ['null', 'array'] : 'array', prefixItems: [], items: {} };
+      const { itemsProps } = this;
+
+      if (itemsProps) {
+         if (Is.array(itemsProps)) {
+            for (let i = 0, n = itemsProps.length; i < n; i++) {
+               arraySchema.prefixItems[i] = itemsProps[i].buildSchema();
+            }
+         } else {
+            arraySchema.items = itemsProps.buildSchema();
+         }
+      }
+
+      if (Is.empty(arraySchema.prefixItems)) {
+         delete arraySchema.prefixItems;
+      }
+
+      if (Is.empty(arraySchema.items)) {
+         delete arraySchema.items;
+      }
+
+      return arraySchema;
+   }
+}
+
+export class EnumSchema extends BaseSchema {
+   constructor(private emum?: EnumElement[]) {
+      super();
+   }
+
+   valid(enumArray: EnumElement[]): this {
+      this.emum = enumArray;
+
+      return this;
+   }
+
+   check(value: any): boolean {
+      return Is.each(this.options, value, (item) => !!this.emum?.includes(item));
+   }
+
+   buildSchema() {
+      const enumSchema = { type: ['string', 'number', 'integer', 'boolean'], enum: this.emum ?? [] };
+
+      if (this.isAllowNull) {
+         enumSchema.type.push('null');
+      }
+
+      return enumSchema;
+   }
 }
 
 export class Schema {
-   static string(): StringSchema {
-      return new StringSchema();
+   static string(options?: IsStringOptions): StringSchema {
+      return new StringSchema(options);
    }
 
-   static number(): NumberSchema {
-      return new NumberSchema();
+   static number(options?: IsNumberOptions): NumberSchema {
+      return new NumberSchema(options);
    }
 
-   static boolean(): BooleanSchema {
-      return new BooleanSchema();
+   static boolean(options?: IsBaseOptions): BooleanSchema {
+      return new BooleanSchema(options);
+   }
+
+   static enum(emum: EnumElement[]): EnumSchema {
+      return new EnumSchema(emum);
    }
 
    static object<T extends object>(properties?: ObjectSchemaProps<T>): ObjectSchema<T> {

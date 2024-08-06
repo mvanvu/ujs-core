@@ -247,6 +247,18 @@ it('Core Is', () => {
    expect(Is.string(['Hello World'], { format: 'json' })).toBeFalsy();
    expect(Is.string({ foo: 'bar' }, { format: 'json' })).toBeFalsy();
 
+   // ## Alphanum
+   expect(Is.string('AbcXyZ0123', { format: 'alphanum' })).toBeTruthy();
+   expect(Is.string('Hello World', { format: 'alphanum' })).toBeFalsy();
+
+   // ## Lowercase
+   expect(Is.string('abc', { format: 'lowercase' })).toBeTruthy();
+   expect(Is.string('Abc', { format: 'lowercase' })).toBeFalsy();
+
+   // ## Uppercase
+   expect(Is.string('ABC XYZ', { format: 'uppercase' })).toBeTruthy();
+   expect(Is.string('Abc Xyz', { format: 'uppercase' })).toBeFalsy();
+
    // ## RegExp
    expect(Is.string('507f1f77bcf86cd799439011', { format: /^[0-9a-fA-F]{24}$/ })).toBeTruthy();
 
@@ -259,10 +271,10 @@ it('Core Is', () => {
 
    // # Is.enum(value: any, options: IsEnumOptions): boolean
    // ## Check the value is a enum from an array
-   expect(Is.enum(true, { enumArray: [true, false] })).toBeTruthy();
-   expect(Is.enum('Active', { enumArray: ['Active', 'Pending'] })).toBeTruthy();
-   expect(Is.enum('Pending', { enumArray: ['Active', 'Pending'] })).toBeTruthy();
-   expect(Is.enum('active', { enumArray: ['Active', 'Pending'] })).toBeFalsy(); // Case sensitive
+   expect(Is.enum(true, { enum: [true, false] })).toBeTruthy();
+   expect(Is.enum('Active', { enum: ['Active', 'Pending'] })).toBeTruthy();
+   expect(Is.enum('Pending', { enum: ['Active', 'Pending'] })).toBeTruthy();
+   expect(Is.enum('active', { enum: ['Active', 'Pending'] })).toBeFalsy(); // Case sensitive
 
    // # Validate as array
    expect(Is.string('str1', { isArray: true })).toBeFalsy();

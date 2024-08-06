@@ -6,7 +6,7 @@
 import { Schema } from '@mvanvu/ujs';
 ```
 
-#### Schema.string(): StringSchema
+#### Schema.string(options?: IsStringOptions): StringSchema
 
 ```javascript
 Schema.string().check(null); // It returns: false
@@ -41,7 +41,7 @@ Schema.string().strongPassword().check('MyStrongPwd@123'); // It returns: true
 Schema.string().strongPassword({ minLength: 16 }).check('MyStrongPwd@123'); // It returns: false
 ```
 
-#### Schema.boolean(): BooleanSchema
+#### Schema.boolean(options?: IsBaseOptions): BooleanSchema
 
 ```javascript
 Schema.boolean().check(1); // It returns: false
@@ -53,7 +53,7 @@ Schema.boolean().isArray().check([false, true]); // It returns: true
 Schema.boolean().isArray('unique').check([false, false, true]); // It returns: false
 ```
 
-#### Schema.number(): NumberSchema
+#### Schema.number(options?: IsNumberOptions): NumberSchema
 
 ```javascript
 Schema.number().check(1); // It returns: true
@@ -69,9 +69,9 @@ Schema.number().integer().max(10).check(9); // It returns: true
 #### Object & Array
 
 ```javascript
-// Schema.object(): ObjectSchema
+// Schema.object<T extends object>(properties?: ObjectSchemaProps<T>): ObjectSchema<T>
 
-// Schema.array(): ArraySchema
+// array<T extends ItemSchema | ItemSchema[]>(itemsProps?: T): ArraySchema<T>
 Schema.object().check({}); // It returns: true
 Schema.object().check([]); // It returns: false
 Schema.array().check([]); // It returns: true
@@ -159,4 +159,14 @@ schema.whiteList().check(invalidValue); // It returns: true
 invalidValue; // It returns: [ROOT].'noAcceptProp' === undefined
 invalidValue.bar; // It returns: [ROOT].'noAcceptProp' === undefined
 invalidValue.arrayObject[0]; // It returns: [ROOT].'noAcceptProp' === undefined
+
+```
+
+#### Schema.enum(emum: EnumElement[]): EnumSchema
+
+```javascript
+Schema.enum(['Active', 'Inactive', true, false, 1, 0]).check('Inactive'); // It returns: true
+Schema.enum(['Active', 'Inactive', true, false, 1, 0]).check(null); // It returns: false
+
+console.log(JSON.stringify(schema.buildSchema(), null, 2));
 ```
