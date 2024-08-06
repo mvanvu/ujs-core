@@ -14,7 +14,7 @@ export abstract class BaseSchema {
    }
 
    isArray(isArray?: boolean | 'unique'): this {
-      this.options.isArray = isArray === undefined || isArray === true;
+      this.options.isArray = isArray === 'unique' ? isArray : isArray === undefined || isArray === true;
 
       return this;
    }
