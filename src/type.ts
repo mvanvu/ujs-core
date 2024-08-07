@@ -181,12 +181,7 @@ export type ClassConstructor<T> = new (...arg: any[]) => T;
 export type CreditCardType = 'VISA' | 'AMEX' | 'MASTERCARD' | 'DISCOVER' | 'DINERS' | 'JCB' | 'CHINA_UNION_PAY';
 export class IsError extends Error {}
 
-// === BIG REFACTOR ===
-export type IsArrayOption = boolean | 'unique';
-export type IsArrayValue = true | 'unique';
-
 export interface IsBaseOptions {
-   isArray?: IsArrayOption;
    optional?: boolean;
    nullable?: boolean;
 }
@@ -197,10 +192,10 @@ export type IsStringOptionFormat =
    | 'dateTime'
    | 'date'
    | 'time'
-   | 'ipV4'
-   | 'ipV6'
+   | 'ipv4'
+   | 'ipv6'
    | 'creditCard'
-   | 'url'
+   | 'uri'
    | 'image'
    | 'base64'
    | 'md5'
@@ -215,7 +210,6 @@ export type IsStringOptionFormat =
    | 'boolean'
    | 'trim'
    | 'json'
-   | 'strongPassword'
    | 'alphanum'
    | 'lowercase'
    | 'uppercase'
@@ -236,11 +230,12 @@ export interface IsNumberOptions extends IsBaseOptions {
 
 export type IsPrimitiveType = 'null' | 'undefined' | 'string' | 'number' | 'boolean' | 'symbol' | 'bigint';
 
-export interface IsPrimitiveOptions extends IsBaseOptions {
-   type?: IsPrimitiveType;
+export interface IsArrayOptions extends IsBaseOptions {
+   minLength?: number;
+   maxLength?: number;
 }
 
-export interface IsStrongPasswordOptions extends IsBaseOptions {
+export interface IsStrongPasswordOptions {
    minLength?: number;
    minSpecialChars?: number;
    minUpper?: number;
@@ -248,85 +243,9 @@ export interface IsStrongPasswordOptions extends IsBaseOptions {
    minNumber?: number;
 }
 
-export interface IsEnumOptions extends IsBaseOptions {
-   enum: any[];
-}
-
-export interface IsIncludesOptions extends IsBaseOptions {
-   target: any;
-}
-
-export type ReturnsIsString<O extends IsStringOptions | undefined> = O extends IsStringOptions
-   ? O['isArray'] extends IsArrayValue
-      ? string[]
-      : string
-   : string;
-
-export type ReturnsIsNumber<O extends IsNumberOptions | undefined> = O extends IsStringOptions
-   ? O['isArray'] extends IsArrayValue
-      ? number[]
-      : number
-   : number;
-
-export type ReturnsIsBoolean<O extends IsBaseOptions | undefined> = O extends IsStringOptions
-   ? O['isArray'] extends IsArrayValue
-      ? boolean[]
-      : boolean
-   : boolean;
-
-export type ReturnsIsObject<O extends IsBaseOptions | undefined> = O extends IsStringOptions
-   ? O['isArray'] extends IsArrayValue
-      ? ObjectRecord[]
-      : ObjectRecord
-   : ObjectRecord;
-
 export type IsFunc = (...agrs: any[]) => any;
 export type IsAsyncFunc = (...agrs: any[]) => Promise<any>;
 export type IsCallable = (...agrs: any[]) => any | Promise<any>;
-
-export type ReturnsIsFunc<O extends IsBaseOptions | undefined> = O extends IsStringOptions ? (O['isArray'] extends IsArrayValue ? IsFunc[] : IsFunc) : IsFunc;
-
-export type ReturnsIsAsyncFunc<O extends IsBaseOptions | undefined> = O extends IsStringOptions
-   ? O['isArray'] extends IsArrayValue
-      ? IsAsyncFunc[]
-      : IsAsyncFunc
-   : IsAsyncFunc;
-
-export type ReturnsIsCallable<O extends IsBaseOptions | undefined> = O extends IsStringOptions
-   ? O['isArray'] extends IsArrayValue
-      ? IsCallable[]
-      : IsCallable
-   : IsCallable;
-
-export type ReturnsIsClass<O extends IsBaseOptions | undefined> = O extends IsStringOptions
-   ? O['isArray'] extends IsArrayValue
-      ? ClassConstructor<any>[]
-      : ClassConstructor<any>
-   : ClassConstructor<any>;
-
-export type ReturnsIsArray<O extends IsBaseOptions | undefined> = O extends IsStringOptions ? (O['isArray'] extends IsArrayValue ? any[][] : any[]) : any[];
-
-type ReturnsIsPrimitiveType<T> = T extends 'null'
-   ? null
-   : T extends 'undefined'
-     ? undefined
-     : T extends 'string'
-       ? string
-       : T extends 'boolean'
-         ? boolean
-         : T extends 'number'
-           ? number
-           : T extends 'symbol'
-             ? symbol
-             : T extends 'bigint'
-               ? bigint
-               : Primitive;
-
-export type ReturnsIsPrimitive<O extends IsPrimitiveOptions | undefined> = O extends IsStringOptions
-   ? O['isArray'] extends IsArrayValue
-      ? ReturnsIsPrimitiveType<O['type']>[]
-      : ReturnsIsPrimitiveType<O['type']>
-   : ReturnsIsPrimitiveType<O['type']>;
 
 export type StaticMethods<T> = {
    [P in keyof T]: T[P] extends (...args: any[]) => any ? P : never;

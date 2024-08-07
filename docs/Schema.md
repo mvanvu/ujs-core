@@ -3,7 +3,7 @@
 ### Usage
 
 ```javascript
-import { Schema } from '@mvanvu/ujs';
+import { Schema, Util } from '@mvanvu/ujs';
 ```
 
 #### Schema.string(options?: IsStringOptions): StringSchema
@@ -18,13 +18,13 @@ Schema.string().minLength(1).check(''); // It returns: false
 Schema.string().minLength(0).check(''); // It returns: true
 Schema.string().format('dateTime').check('2024-07-03T00:00:00.00'); // It returns: true
 Schema.string().format('mongoId').check('507f1f77bcf86cd799439011'); // It returns: true
-Schema.string().format('ipV4').check('192.168.1.1'); // It returns: true
-Schema.string().format('ipV6').check('2001:0db8:85a3:0000:0000:8a2e:0370:7334'); // It returns: true
+Schema.string().format('ipv4').check('192.168.1.1'); // It returns: true
+Schema.string().format('ipv6').check('2001:0db8:85a3:0000:0000:8a2e:0370:7334'); // It returns: true
 Schema.string().format('mongoId').check('507f1f77bcf86cd799439011'); // It returns: true
 Schema.string().format('email').check('example.email.com'); // It returns: false
 Schema.string().format('email').check('example@email.com'); // It returns: true
 Schema.string().format('creditCard').check('4000056655665556'); // It returns: true
-Schema.string().format('url').check('https://www.domain.com/remove-an-item-from-an-array-in-javascript/'); // It returns: true
+Schema.string().format('uri').check('https://www.domain.com/remove-an-item-from-an-array-in-javascript/'); // It returns: true
 Schema.string().format('base64').check('SGVsbG8gV29ybGQ='); // It returns: true
 Schema.string().format('md5').check('3e25960a79dbc69b674cd4ec67a72c62'); // It returns: true
 Schema.string().format('sha1').check('7b502c3a1f48c8609ae212cdfb639dee39673f5e'); // It returns: true
@@ -39,6 +39,32 @@ Schema.string().format(regex).check('507f1f77bcf86cd799439011'); // It returns: 
 Schema.string().format(regex).check('507f1f77bcf86cd79943901g'); // It returns: false
 Schema.string().strongPassword().check('MyStrongPwd@123'); // It returns: true
 Schema.string().strongPassword({ minLength: 16 }).check('MyStrongPwd@123'); // It returns: false
+
+// Number and Boolean format, will auto transform to thr right format
+const stringFormat = Schema.string().format('boolean');
+stringFormat.check('true'); // It returns: true
+stringFormat.getValue(); // It returns: true
+
+stringFormat.format('number');
+stringFormat.check('1.25'); // It returns: true
+stringFormat.getValue(); // It returns: 1.25
+
+stringFormat.format('unsignedNumber');
+stringFormat.check('-1.25'); // It returns: false
+stringFormat.check('1.25'); // It returns: true
+stringFormat.getValue(); // It returns: 1.25
+
+stringFormat.format('integer');
+stringFormat.check('-1.25'); // It returns: false
+stringFormat.check('1'); // It returns: true
+stringFormat.check('1.0'); // It returns: true
+stringFormat.getValue(); // It returns: 1
+
+stringFormat.format('unsignedInteger');
+stringFormat.check('-1'); // It returns: false
+stringFormat.check('1'); // It returns: true
+stringFormat.check('1.0'); // It returns: true
+stringFormat.getValue(); // It returns: 1
 ```
 
 #### Schema.boolean(options?: IsBaseOptions): BooleanSchema
@@ -49,8 +75,6 @@ Schema.boolean().check(true); // It returns: true
 Schema.boolean().check(false); // It returns: true
 Schema.boolean().check([1, true]); // It returns: false
 Schema.boolean().check([false, true]); // It returns: false
-Schema.boolean().isArray().check([false, true]); // It returns: true
-Schema.boolean().isArray('unique').check([false, false, true]); // It returns: false
 ```
 
 #### Schema.number(options?: IsNumberOptions): NumberSchema
@@ -58,12 +82,18 @@ Schema.boolean().isArray('unique').check([false, false, true]); // It returns: f
 ```javascript
 Schema.number().check(1); // It returns: true
 Schema.number().check([1, 2, 3]); // It returns: false
-Schema.number().isArray().check([1, 2, 3]); // It returns: true
 Schema.number().check(1.25); // It returns: true
 Schema.number().integer().check(1.25); // It returns: false
 Schema.number().integer().min(3).check(2); // It returns: false
 Schema.number().integer().max(10).check(12); // It returns: false
 Schema.number().integer().max(10).check(9); // It returns: true
+```
+
+#### Schema.enum(emum: EnumElement[]): EnumSchema
+
+```javascript
+Schema.enum(['Active', 'Inactive', true, false, 1, 0]).check('Inactive'); // It returns: true
+Schema.enum(['Active', 'Inactive', true, false, 1, 0]).check(null); // It returns: false
 ```
 
 #### Object & Array
@@ -127,46 +157,47 @@ nullable: null,
 };
 
 schema.check(validValue); // It returns: true
-
-const invalidValue = {
-foo: 123,
-bar: { bar2: true, noAcceptProp: 'OOps!' },
-arrayAny: ['1', 2, true, [], {}],
-arrayNumber: [1, 2.5, 3],
-arrayNumberBoolean: [123, false],
-arrayObject: [
-{
-number: 1.5,
-integer: 1,
-boolean: false,
-object: {
-array: [
-[123, 456],
-[789, 11112],
-],
-},
-noAcceptProp: 'OOps!',
-},
-],
-email: 'admin@email.com',
-minLength2: '12',
-nullable: null,
-noAcceptProp: 'OOps!',
-};
+const invalidValue = { noAcceptProp: 'OOps!', ...Util.clone(validValue) };
 
 schema.check(invalidValue); // It returns: false
 schema.whiteList().check(invalidValue); // It returns: true
 invalidValue; // It returns: [ROOT].'noAcceptProp' === undefined
-invalidValue.bar; // It returns: [ROOT].'noAcceptProp' === undefined
-invalidValue.arrayObject[0]; // It returns: [ROOT].'noAcceptProp' === undefined
+schema.getValue(); // It returns: [ROOT].'noAcceptProp' === undefined
 
-```
+const invalidDataValue = {
+num: '1',
+obj: { num: true, bool: 1, bar: { array: 1 }, enum: ['Active', 'Inactive'], string: '1234', deep: { number: -1.4 } },
+arr: [
+123,
+true,
+{
+foo: 456,
+bar: {
+blab: 1.25,
+},
+},
+],
+};
+const objSchema = Schema.object<typeof invalidDataValue>({
+num: Schema.number(),
+obj: Schema.object<(typeof invalidDataValue)['obj']>({
+num: Schema.number(),
+bool: Schema.boolean(),
+bar: Schema.array(Schema.object({ bar: Schema.array(Schema.string()) })),
+enum: Schema.enum([1, 0]),
+string: Schema.string().minLength(5).format('email'),
+deep: Schema.object({ number: Schema.number().integer().min(-1) }),
+}),
+arr: Schema.array([
+Schema.number(),
+Schema.string(),
+Schema.object({ foo: Schema.boolean(), bar: Schema.object({ blab: Schema.number().integer().min(2) }) }),
+]),
+objSchema.check(invalidDataValue); // It returns: false
 
-#### Schema.enum(emum: EnumElement[]): EnumSchema
 
-```javascript
-Schema.enum(['Active', 'Inactive', true, false, 1, 0]).check('Inactive'); // It returns: true
-Schema.enum(['Active', 'Inactive', true, false, 1, 0]).check(null); // It returns: false
+// Not unique array
+Schema.array().unique().check([1, 1, 2]); // It returns: false
 
-console.log(JSON.stringify(schema.buildSchema(), null, 2));
+console.log(JSON.stringify(objSchema.getErrors(), null, 2));
 ```

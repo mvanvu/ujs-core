@@ -1,13 +1,41 @@
-import { EnumElement, IsBaseOptions, IsNumberOptions, IsStringOptionFormat, IsStringOptions, IsStrongPasswordOptions } from '../type';
+import { EnumElement, IsArrayOptions, IsBaseOptions, IsNumberOptions, IsStringOptionFormat, IsStringOptions, IsStrongPasswordOptions } from '../type';
+export declare const schemaErrors: {
+    NOT_AN_ARRAY: string;
+    NOT_AN_OBJECT: string;
+    NOT_A_STRING: string;
+    INVALID_STRING_FORMAT: string;
+    STRING_MIN_LENGTH: string;
+    STRING_MAX_LENGTH: string;
+    ARRAY_MIN_LENGTH: string;
+    ARRAY_MAX_LENGTH: string;
+    NOT_A_NUMBER: string;
+    NOT_AN_INTEGER: string;
+    NUMBER_MINIMUM: string;
+    NUMBER_MAXIMUM: string;
+    NOT_A_BOOLEAN: string;
+    NOT_AN_ENUM: string;
+    REQUIRED: string;
+    NOT_ALLOW_NULL: string;
+    NOT_ALLOW_PROPERTIES: string;
+    NOT_SUITABLE_ARRAY: string;
+    NOT_AN_UNIQUE_ARRAY: string;
+    NOT_STRONG_PASSWORD: string;
+};
 export declare abstract class BaseSchema {
     protected options: IsBaseOptions;
-    private readonly isType;
-    constructor();
+    protected errors: any;
+    protected value: any;
     get isAllowNull(): boolean;
-    isArray(isArray?: boolean | 'unique'): this;
     optional(optional?: boolean): this;
     nullable(nullable?: boolean): this;
+    reset(): this;
+    getErrors(): any;
+    getValue(): any;
     check(value: any): boolean;
+    protected appendError(path: string, error: any): this;
+    protected abstract checkError(input: {
+        value: any;
+    }, path: string | undefined): void;
     abstract buildSchema(): Record<string, any>;
 }
 export declare class StringSchema extends BaseSchema {
@@ -16,13 +44,16 @@ export declare class StringSchema extends BaseSchema {
     minLength(num: number): this;
     maxLength(num: number): this;
     format(format: IsStringOptionFormat): this;
-    strongPassword(options?: Omit<IsStrongPasswordOptions, 'isArray' | 'optional' | 'nullable'>): this;
+    strongPassword(options?: IsStrongPasswordOptions): this;
     buildSchema(): {
         type: string | string[];
         minLength: number;
         maxLength: number;
-        format: string;
+        format: string | RegExp;
     };
+    protected checkError(input: {
+        value: any;
+    }): void;
 }
 export declare class NumberSchema extends BaseSchema {
     protected options: IsNumberOptions;
@@ -35,6 +66,9 @@ export declare class NumberSchema extends BaseSchema {
         minimum: number;
         maximum: number;
     };
+    protected checkError(input: {
+        value: any;
+    }): void;
 }
 export declare class BooleanSchema extends BaseSchema {
     protected options: IsBaseOptions;
@@ -42,10 +76,13 @@ export declare class BooleanSchema extends BaseSchema {
     buildSchema(): {
         type: string | string[];
     };
+    protected checkError(input: {
+        value: any;
+    }): void;
 }
-export type ItemSchema = NumberSchema | StringSchema | BooleanSchema | ObjectSchema<any> | ArraySchema<any>;
+export type ItemSchema = NumberSchema | StringSchema | BooleanSchema | EnumSchema | ObjectSchema<any> | ArraySchema<any>;
 export type ObjectSchemaProps<T extends object> = {
-    [K in keyof T]: T[K] extends object ? ObjectSchemaProps<T[K]> : ItemSchema;
+    [K in keyof T]: ItemSchema;
 };
 export declare class ObjectSchema<T extends object> extends BaseSchema {
     private properties?;
@@ -53,9 +90,11 @@ export declare class ObjectSchema<T extends object> extends BaseSchema {
     constructor(properties?: ObjectSchemaProps<T>);
     get isWhiteList(): boolean;
     get keys(): string[];
-    each(callback: (property: ItemSchema, k: string) => any): void;
     whiteList(isWhiteList?: boolean): this;
-    check(value: any): boolean;
+    resetErrors(): this;
+    protected checkError(input: {
+        value: any;
+    }, path: string): void;
     buildSchema(): {
         type: string | string[];
         required: string[];
@@ -64,8 +103,15 @@ export declare class ObjectSchema<T extends object> extends BaseSchema {
 }
 export declare class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema {
     private itemsProps?;
-    constructor(itemsProps?: T);
-    check(value: any): boolean;
+    protected options: IsArrayOptions;
+    private arrayUnique;
+    constructor(itemsProps?: T, options?: IsArrayOptions);
+    minLength(num: number): this;
+    maxLength(num: number): this;
+    unique(unique?: boolean): this;
+    protected checkError(input: {
+        value: any;
+    }, path: string): void;
     buildSchema(): {
         type: string | string[];
         prefixItems: any[];
@@ -76,7 +122,9 @@ export declare class EnumSchema extends BaseSchema {
     private emum?;
     constructor(emum?: EnumElement[]);
     valid(enumArray: EnumElement[]): this;
-    check(value: any): boolean;
+    protected checkError(input: {
+        value: any;
+    }): void;
     buildSchema(): {
         type: string[];
         enum: EnumElement[];

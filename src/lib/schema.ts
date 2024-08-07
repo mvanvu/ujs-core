@@ -1,22 +1,38 @@
-import { EnumElement, IsBaseOptions, IsNumberOptions, IsStringOptionFormat, IsStringOptions, IsStrongPasswordOptions } from '../type';
+import { EnumElement, IsArrayOptions, IsBaseOptions, IsNumberOptions, IsStringOptionFormat, IsStringOptions, IsStrongPasswordOptions } from '../type';
 import { Is } from './is';
+import { Transform } from './transform';
+
+export const schemaErrors = {
+   NOT_AN_ARRAY: 'NOT_AN_ARRAY',
+   NOT_AN_OBJECT: 'NOT_AN_OBJECT',
+   NOT_A_STRING: 'NOT_A_STRING',
+   INVALID_STRING_FORMAT: 'INVALID_STRING_FORMAT',
+   STRING_MIN_LENGTH: 'STRING_MIN_LENGTH',
+   STRING_MAX_LENGTH: 'STRING_MAX_LENGTH',
+   ARRAY_MIN_LENGTH: 'ARRAY_MIN_LENGTH',
+   ARRAY_MAX_LENGTH: 'ARRAY_MAX_LENGTH',
+   NOT_A_NUMBER: 'NOT_A_NUMBER',
+   NOT_AN_INTEGER: 'NOT_AN_INTEGER',
+   NUMBER_MINIMUM: 'NUMBER_MINIMUM',
+   NUMBER_MAXIMUM: 'NUMBER_MAXIMUM',
+   NOT_A_BOOLEAN: 'NOT_A_BOOLEAN',
+   NOT_AN_ENUM: 'NOT_AN_ENUM',
+   REQUIRED: 'REQUIRED',
+   NOT_ALLOW_NULL: 'NOT_ALLOW_NULL',
+   NOT_ALLOW_PROPERTIES: 'NOT_ALLOW_PROPERTIES',
+   NOT_SUITABLE_ARRAY: 'NOT_SUITABLE_ARRAY',
+   NOT_AN_UNIQUE_ARRAY: 'NOT_AN_UNIQUE_ARRAY',
+   NOT_STRONG_PASSWORD: 'NOT_STRONG_PASSWORD',
+};
 export abstract class BaseSchema {
    protected options: IsBaseOptions = {};
 
-   private readonly isType!: string;
+   protected errors: any = null;
 
-   constructor() {
-      this.isType = this.constructor.name.replace('Schema', '').toLowerCase();
-   }
+   protected value: any = undefined;
 
    get isAllowNull(): boolean {
       return this.options.nullable === true || (this.options.nullable === undefined && this.options.optional === true);
-   }
-
-   isArray(isArray?: boolean | 'unique'): this {
-      this.options.isArray = isArray === 'unique' ? isArray : isArray === undefined || isArray === true;
-
-      return this;
    }
 
    optional(optional?: boolean): this {
@@ -31,19 +47,94 @@ export abstract class BaseSchema {
       return this;
    }
 
-   check(value: any): boolean {
-      switch (this.isType) {
-         case 'number':
-         case 'boolean':
-         case 'string':
-            return Is[this.isType].call(this, value, this.options);
+   reset(): this {
+      this.value = undefined;
+      this.errors = [];
 
-         default:
-            return false;
-      }
+      return this;
    }
 
-   abstract buildSchema(): Record<string, any>;
+   getErrors(): any {
+      return this.errors;
+   }
+
+   getValue(): any {
+      return this.value;
+   }
+
+   check(value: any): boolean {
+      this.reset();
+      this.value = value;
+      const optional = this.options.optional === true;
+      const nullable = this.options.nullable === true || (this.options?.nullable === undefined && optional);
+
+      if ((optional && value === undefined) || (nullable && value === null)) {
+         return true;
+      }
+
+      const input = { value };
+      this.checkError(input, '');
+      const isValid = Is.empty(this.errors);
+
+      if (isValid) {
+         // Update the value
+         this.value = input.value;
+      }
+
+      return isValid;
+   }
+
+   protected appendError(path: string, error: any): this {
+      if (!Is.object(this.errors)) {
+         this.errors = {};
+      }
+
+      const isLeafError = (e: any) => Is.array(e) && Is.object(e[0]) && Is.string(e[0].message);
+      const setError = (p: string, e: any[]) => {
+         p = p
+            .replace(/\$|^\.|\.$/g, '')
+            .replace(/\.+/g, '.')
+            .replace(/\.\[/g, '[');
+
+         if (!Is.array(this.errors[p])) {
+            this.errors[p] = [];
+         }
+
+         this.errors[p].push(...e);
+      };
+      const flatten = (p: string, err: any) => {
+         if (isLeafError(err)) {
+            setError(p, err);
+         } else if (Is.array(err)) {
+            err.forEach((e, i) => {
+               const p2 = `${p}[${i}]`;
+               flatten(p2, e);
+            });
+         } else if (Is.object(err)) {
+            if (Is.string(err.message)) {
+               setError(p, [err]);
+            } else {
+               for (const k in err) {
+                  const e = err[k];
+                  const p2 = `${p}.${k}`;
+
+                  if (isLeafError(e)) {
+                     setError(p2, e);
+                  } else if (Is.object(e)) {
+                     flatten(p2, e);
+                  }
+               }
+            }
+         }
+      };
+
+      flatten(path, error);
+
+      return this;
+   }
+
+   protected abstract checkError(input: { value: any }, path: string | undefined): void;
+   public abstract buildSchema(): Record<string, any>;
 }
 
 export class StringSchema extends BaseSchema {
@@ -69,8 +160,7 @@ export class StringSchema extends BaseSchema {
       return this;
    }
 
-   strongPassword(options?: Omit<IsStrongPasswordOptions, 'isArray' | 'optional' | 'nullable'>): this {
-      this.options.format = 'strongPassword';
+   strongPassword(options?: IsStrongPasswordOptions): this {
       this.options.strongPassword = options ?? {};
 
       return this;
@@ -84,10 +174,50 @@ export class StringSchema extends BaseSchema {
          format:
             this.options.format === 'dateTime'
                ? 'date-time'
-               : ['date', 'time', 'email', 'ipV4', 'ipV6', 'url'].includes(this.options.format as string)
-                 ? (this.options.format as string).toLowerCase().replace('url', 'uri')
+               : ['date', 'time', 'email', 'ipv4', 'ipv6', 'uri'].includes(this.options.format as string)
+                 ? this.options.format
                  : undefined,
       };
+   }
+
+   protected checkError(input: { value: any }): void {
+      const { value } = input;
+
+      if (Is.string(value)) {
+         if (this.options.format) {
+            if (!Is.stringFormat(value, this.options.format)) {
+               const format = this.options.format instanceof RegExp ? 'RegExp' : this.options.format;
+               this.errors.push({ message: schemaErrors.INVALID_STRING_FORMAT, meta: { format } });
+            } else {
+               switch (this.options.format) {
+                  case 'boolean':
+                     input.value = Transform.toBoolean(value);
+                     break;
+
+                  case 'number':
+                  case 'unsignedNumber':
+                  case 'integer':
+                  case 'unsignedInteger':
+                     input.value = Transform.toNumber(value);
+                     break;
+               }
+            }
+         }
+
+         if (this.options.strongPassword && !Is.strongPassword(value, this.options.strongPassword)) {
+            this.errors.push({ message: schemaErrors.NOT_STRONG_PASSWORD, meta: { ...this.options.strongPassword } });
+         }
+
+         if (Is.number(this.options.minLength) && value.length < this.options.minLength) {
+            this.errors.push({ message: schemaErrors.STRING_MIN_LENGTH, meta: { minLength: this.options.minLength } });
+         }
+
+         if (Is.number(this.options.maxLength) && value.length > this.options.maxLength) {
+            this.errors.push({ message: schemaErrors.STRING_MAX_LENGTH, meta: { maxLength: this.options.maxLength } });
+         }
+      } else {
+         this.errors.push({ message: schemaErrors.NOT_A_STRING });
+      }
    }
 }
 
@@ -123,6 +253,26 @@ export class NumberSchema extends BaseSchema {
          maximum: this.options.max,
       };
    }
+
+   protected checkError(input: { value: any }): void {
+      const { value } = input;
+
+      if (Is.number(value)) {
+         if (this.options.integer && !Number.isInteger(value)) {
+            this.errors.push({ message: schemaErrors.NOT_AN_INTEGER });
+         }
+
+         if (Is.number(this.options.min) && value < this.options.min) {
+            this.errors.push({ message: schemaErrors.NUMBER_MINIMUM, meta: { min: this.options.min } });
+         }
+
+         if (Is.number(this.options.max) && value > this.options.max) {
+            this.errors.push({ message: schemaErrors.NUMBER_MAXIMUM, meta: { min: this.options.max } });
+         }
+      } else {
+         this.errors.push({ message: this.options.integer ? schemaErrors.NOT_AN_INTEGER : schemaErrors.NOT_A_NUMBER });
+      }
+   }
 }
 
 export class BooleanSchema extends BaseSchema {
@@ -133,43 +283,17 @@ export class BooleanSchema extends BaseSchema {
    buildSchema() {
       return { type: this.isAllowNull ? ['null', 'boolean'] : 'boolean' };
    }
+
+   protected checkError(input: { value: any }): void {
+      if (!Is.boolean(input.value)) {
+         this.errors.push({ message: schemaErrors.NOT_A_BOOLEAN });
+      }
+   }
 }
 
-export type ItemSchema = NumberSchema | StringSchema | BooleanSchema | ObjectSchema<any> | ArraySchema<any>;
+export type ItemSchema = NumberSchema | StringSchema | BooleanSchema | EnumSchema | ObjectSchema<any> | ArraySchema<any>;
 
-const handleWhiteList = (objSchema: ObjectSchema<any>, value: any, isWhiteList: boolean) => {
-   if (!Is.object(value)) {
-      throw new Error();
-   }
-
-   for (const k in value) {
-      if (!objSchema.keys.includes(k)) {
-         if (isWhiteList) {
-            delete value[k];
-            continue;
-         }
-
-         throw new Error();
-      }
-   }
-};
-
-const checkProperty = (properties: ItemSchema, value: any, isWhiteList?: boolean, path?: string) => {
-   if (properties instanceof ObjectSchema) {
-      if (isWhiteList === undefined) {
-         isWhiteList = properties.isWhiteList;
-      }
-
-      handleWhiteList(properties, value, isWhiteList);
-      properties.each((property, k) => checkProperty(property, value[k], isWhiteList));
-   } else if (properties instanceof BaseSchema && !properties.check(value)) {
-      throw new Error();
-   }
-};
-
-export type ObjectSchemaProps<T extends object> = {
-   [K in keyof T]: T[K] extends object ? ObjectSchemaProps<T[K]> : ItemSchema;
-};
+export type ObjectSchemaProps<T extends object> = { [K in keyof T]: ItemSchema };
 
 export class ObjectSchema<T extends object> extends BaseSchema {
    private _isWhiteList = false;
@@ -186,81 +310,122 @@ export class ObjectSchema<T extends object> extends BaseSchema {
       return Object.keys(this.properties);
    }
 
-   each(callback: (property: ItemSchema, k: string) => any): void {
-      if (!Is.callable(callback) || Is.empty(this.properties)) {
-         return;
-      }
-
-      for (const k in this.properties) {
-         callback.call(this, this.properties[k], k);
-      }
-   }
-
    whiteList(isWhiteList?: boolean): this {
       this._isWhiteList = isWhiteList === undefined || isWhiteList === true;
 
       return this;
    }
 
-   check(value: any): boolean {
-      return Is.each(this.options, value, (item) => {
-         try {
-            handleWhiteList(this, item, this.isWhiteList);
-            this.each((prop, k) => checkProperty(prop, item[k], this.isWhiteList, k));
-         } catch (err) {
-            return false;
+   resetErrors(): this {
+      this.errors = {};
+
+      return this;
+   }
+
+   protected checkError(input: { value: any }, path: string): void {
+      const { value } = input;
+
+      if (!Is.object(value)) {
+         this.appendError(path, { message: schemaErrors.NOT_AN_OBJECT });
+      } else if (this.properties) {
+         // Handle white list
+         for (const key in value) {
+            if (!this.keys.includes(key)) {
+               if (this.isWhiteList) {
+                  delete value[key];
+               } else {
+                  this.appendError(`${path}.${key}`, { message: schemaErrors.NOT_ALLOW_PROPERTIES });
+               }
+            }
          }
 
-         return true;
-      });
+         for (const key in this.properties) {
+            const schema = this.properties[key];
+
+            if (!schema.check(value[key])) {
+               this.appendError(`${path}.${key}`, schema.getErrors());
+            }
+         }
+      }
    }
 
    buildSchema() {
       const objSchema = { type: this.isAllowNull ? ['null', 'object'] : 'object', required: this.keys, properties: {} };
 
-      this.each(function (property, key) {
-         objSchema.properties[key] = property.buildSchema();
-      });
+      if (this.properties) {
+         Object.entries<ItemSchema>(this.properties).map(([k, v]) => (objSchema.properties[k] = v.buildSchema()));
+      }
 
       return objSchema;
    }
 }
 
 export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema {
-   constructor(private itemsProps?: T) {
+   private arrayUnique: boolean;
+
+   constructor(
+      private itemsProps?: T,
+      protected options: IsArrayOptions = {},
+   ) {
       super();
    }
 
-   check(value: any): boolean {
-      return Is.each(this.options, value, (item) => {
-         if (!Is.array(item)) {
-            return false;
+   minLength(num: number): this {
+      this.options.minLength = num;
+
+      return this;
+   }
+
+   maxLength(num: number): this {
+      this.options.maxLength = num;
+
+      return this;
+   }
+
+   unique(unique?: boolean): this {
+      this.arrayUnique = unique === undefined || unique === true;
+
+      return this;
+   }
+
+   protected checkError(input: { value: any }, path: string): void {
+      const { value } = input;
+
+      if (!Is.array(value)) {
+         this.appendError(path, { message: schemaErrors.NOT_AN_ARRAY });
+      } else {
+         if (this.arrayUnique && !Is.arrayUnique(value)) {
+            this.appendError(path, { message: schemaErrors.NOT_AN_UNIQUE_ARRAY });
          }
 
-         const { itemsProps } = this;
+         if (Is.number(this.options.minLength) && value.length < this.options.minLength) {
+            this.appendError(path, { message: schemaErrors.ARRAY_MIN_LENGTH, meta: { minLength: this.options.minLength } });
+         }
 
-         if (itemsProps) {
-            if (Is.array(itemsProps)) {
-               if (itemsProps.length !== item.length) {
-                  return false;
-               }
+         if (Is.number(this.options.maxLength) && value.length > this.options.maxLength) {
+            this.appendError(path, { message: schemaErrors.ARRAY_MAX_LENGTH, meta: { maxLength: this.options.maxLength } });
+         }
 
-               for (let i = 0, n = itemsProps.length; i < n; i++) {
-                  if (!itemsProps[i].check(item[i])) {
-                     return false;
+         if (this.itemsProps) {
+            if (Is.array(this.itemsProps)) {
+               if (this.itemsProps.length !== this.itemsProps.length) {
+                  this.appendError(path, schemaErrors.NOT_SUITABLE_ARRAY);
+               } else {
+                  for (let i = 0, n = this.itemsProps.length; i < n; i++) {
+                     if (!this.itemsProps[i].check(value[i])) {
+                        this.appendError(`${path}[${i}]`, this.itemsProps[i].getErrors());
+                     }
                   }
                }
             } else {
-               for (const element of item) {
-                  if (!itemsProps.check(element)) {
-                     return false;
+               for (const element of value) {
+                  if (!this.itemsProps.check(element)) {
+                     this.appendError(path, this.itemsProps.getErrors());
                   }
                }
             }
          }
-
-         return true;
-      });
+      }
    }
 
    buildSchema() {
@@ -300,8 +465,10 @@ export class EnumSchema extends BaseSchema {
       return this;
    }
 
-   check(value: any): boolean {
-      return Is.each(this.options, value, (item) => !!this.emum?.includes(item));
+   protected checkError(input: { value: any }): void {
+      if (!this.emum?.includes(input.value)) {
+         this.errors.push({ message: schemaErrors.NOT_AN_ENUM, meta: { enum: this.emum } });
+      }
    }
 
    buildSchema() {

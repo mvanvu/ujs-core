@@ -1,25 +1,6 @@
 'use strict';
 import { DateTime } from './datetime';
-import {
-   CreditCardType,
-   IsBaseOptions,
-   IsEnumOptions,
-   IsIncludesOptions,
-   IsNumberOptions,
-   IsPrimitiveOptions,
-   IsStringOptions,
-   IsStrongPasswordOptions,
-   ReturnsIsArray,
-   ReturnsIsAsyncFunc,
-   ReturnsIsBoolean,
-   ReturnsIsCallable,
-   ReturnsIsClass,
-   ReturnsIsFunc,
-   ReturnsIsNumber,
-   ReturnsIsObject,
-   ReturnsIsPrimitive,
-   ReturnsIsString,
-} from '../type';
+import { ClassConstructor, CreditCardType, IsAsyncFunc, IsCallable, IsFunc, IsStringOptions, IsStrongPasswordOptions, ObjectRecord, Primitive } from '../type';
 
 export class Is {
    static equals(a: any, b: any): boolean {
@@ -149,169 +130,231 @@ export class Is {
       return a !== a && b !== b; // eslint-disable-line no-self-compare
    }
 
-   static primitive<O extends IsPrimitiveOptions>(value: any, options?: O): value is ReturnsIsPrimitive<O> {
-      return Is.each(options, value, (item: any) => {
-         const typeOf = typeof item;
-         const isPrimitive = item === null || ['string', 'number', 'bigint', 'boolean', 'symbol', 'undefined'].includes(typeOf);
-
-         if (options?.type) {
-            return (options.type === 'null' && item === null) || options.type === typeOf;
-         }
-
-         return isPrimitive;
-      });
+   static primitive(value: any): value is Primitive {
+      return value === null || ['string', 'number', 'bigint', 'boolean', 'symbol', 'undefined'].includes(typeof value);
    }
 
-   static empty(value: any, options?: IsBaseOptions): boolean {
-      return Is.each(options, value, (item: any) => {
-         switch (typeof item) {
-            case 'boolean':
-               return item === false;
+   static empty(value: any): boolean {
+      switch (typeof value) {
+         case 'boolean':
+            return value === false;
 
-            case 'number':
-            case 'bigint':
-               return item === 0 || !item;
+         case 'number':
+         case 'bigint':
+            return value === 0 || !value;
 
-            case 'string':
-               return !item.trim().length;
-         }
+         case 'string':
+            return !value.trim().length;
+      }
 
-         if (item instanceof Date || item instanceof DateTime) {
-            return isNaN(+item);
-         }
+      if (value instanceof Date || value instanceof DateTime) {
+         return isNaN(+value);
+      }
 
-         if (item instanceof Map || item instanceof Set) {
-            return !item.size;
-         }
+      if (value instanceof Map || value instanceof Set) {
+         return !value.size;
+      }
 
-         if (item !== null && typeof item === 'object') {
-            return !Object.keys(item).length;
-         }
+      if (value !== null && typeof value === 'object') {
+         return !Object.keys(value).length;
+      }
 
-         if (Array.isArray(item) || Buffer.isBuffer(item)) {
-            return !item.length;
-         }
+      if (Array.isArray(value) || Buffer.isBuffer(value)) {
+         return !value.length;
+      }
 
-         return !Boolean(item);
-      });
+      return !Boolean(value);
    }
 
-   static object<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsObject<O> {
-      return Is.each(options, value, (item: any) => item !== null && typeof item === 'object' && !Array.isArray(item));
+   static object(value: any): value is ObjectRecord {
+      return value !== null && typeof value === 'object' && !Array.isArray(value);
    }
 
-   static json<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsObject<O> {
-      return Is.each(options, value, (item: any) => {
-         if (!Is.object(item) && !Is.array(item)) {
-            return false;
-         }
+   static json(value: any): value is ObjectRecord | any[] {
+      if (!Is.object(value) && !Is.array(value)) {
+         return false;
+      }
 
-         const deepCheck = (data: any) => {
-            if (Is.array(data)) {
-               for (const datum of data) {
-                  deepCheck(datum);
-               }
-            } else if (Is.object(data)) {
-               if (Object.prototype.toString.call(data) !== '[object Object]') {
-                  throw new Error();
-               }
-
-               for (const k in data) {
-                  deepCheck(data[k]);
-               }
-            } else if (data !== null && !['string', 'boolean', 'undefined', 'number'].includes(typeof data)) {
+      const deepCheck = (data: any) => {
+         if (Is.array(data)) {
+            for (const datum of data) {
+               deepCheck(datum);
+            }
+         } else if (Is.object(data)) {
+            if (Object.prototype.toString.call(data) !== '[object Object]') {
                throw new Error();
             }
-         };
 
-         deepCheck(item);
+            for (const k in data) {
+               deepCheck(data[k]);
+            }
+         } else if (data !== null && !['string', 'boolean', 'undefined', 'number'].includes(typeof data)) {
+            throw new Error();
+         }
+      };
+
+      try {
+         deepCheck(value);
 
          return true;
-      });
+      } catch {
+         return false;
+      }
    }
 
-   static array<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsArray<O> {
-      return Is.each(options, value, (item: any) => Array.isArray(item));
+   static array(value: any): value is any[] {
+      return Array.isArray(value);
    }
 
-   static asyncFunc<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsAsyncFunc<O> {
-      return Is.each(options, value, (item: any) => item instanceof (async () => {}).constructor);
-   }
+   static arrayUnique(value: any): value is any[] {
+      if (!Array.isArray(value)) {
+         return false;
+      }
 
-   static func<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsFunc<O> {
-      return Is.each(options, value, (item: any) => typeof item === 'function');
-   }
+      const unique = [];
 
-   static callable<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsCallable<O> {
-      return Is.each(options, value, (item: any) => Is.func(item) || Is.asyncFunc(item));
-   }
-
-   static number<O extends IsNumberOptions>(value: any, options?: O): value is ReturnsIsNumber<O> {
-      return Is.each(options, value, (item: any) => {
-         if (
-            typeof item !== 'number' ||
-            isNaN(item) ||
-            (options?.integer && !Number.isInteger(item)) ||
-            (typeof options?.min === 'number' && item < options.min) ||
-            (typeof options?.max === 'number' && item > options.max)
-         ) {
+      for (const element of value) {
+         if (Is.elementOf(element, unique)) {
             return false;
          }
 
-         return true;
-      });
+         unique.push(element);
+      }
+
+      return true;
    }
 
-   static boolean<O extends IsBaseOptions>(value: any, options?: IsBaseOptions): value is ReturnsIsBoolean<O> {
-      return Is.each(options, value, (item: any) => typeof item === 'boolean');
+   static asyncFunc(value: any): value is IsAsyncFunc {
+      return value instanceof (async () => {}).constructor;
    }
 
-   static string<O extends IsStringOptions>(value: any, options?: O): value is ReturnsIsString<O> {
-      return Is.each(options, value, (item: any) => {
-         if (
-            typeof item !== 'string' ||
-            (Is.number(options?.minLength) && item.length < options.minLength) ||
-            (Is.number(options?.maxLength) && item.length > options.maxLength) ||
-            (options?.format === 'email' &&
-               !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-                  item,
-               )) ||
-            (options?.format === 'dateTime' && !DateTime.parse(item)) ||
-            (options?.format === 'date' && (!/^\d{4}-\d{2}-\d{2}$/.test(item) || !DateTime.parse(item))) ||
-            (options?.format === 'time' && (!/^\d{2}:\d{2}:\d{2}(\.\d{1,3})?$/.test(item) || !DateTime.parse(`2024-08-05T${item}`))) ||
-            (options?.format === 'creditCard' && !Is.creditCard(item)) ||
-            (options?.format === 'ipV4' &&
-               !/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
-                  item,
-               )) ||
-            (options?.format === 'ipV6' && !/^([0-9a-f]{1,4}:){6}|(:[0-9a-f]{1,4}){7}$/.test(item)) ||
-            (options?.format === 'mongoId' && !/^[0-9a-fA-F]{24}$/.test(item)) ||
-            (options?.format === 'url' && !Boolean(new URL(item))) ||
-            (options?.format === 'image' && (!Boolean(new URL(item)) || !/\.(jpe?g|png|gif|svg|ico|bmp|webp|tiff)$/i.test(item))) ||
-            (options?.format === 'base64' && !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(item)) ||
-            (options?.format === 'md5' && !/^[a-f0-9]{32}$/.test(item)) ||
-            (options?.format === 'sha1' && !/^[a-f0-9]{40}$/.test(item)) ||
-            (options?.format === 'sha256' && !/^[a-fA-F0-9]{64}$/.test(item)) ||
-            (options?.format === 'uuid' && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(item)) ||
-            (options?.format === 'jwt' && !/^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/.test(item)) ||
-            (options?.format === 'number' && !/^-?[0-9]+(\.[0-9]+)?$/.test(item)) ||
-            (options?.format === 'unsignedNumber' && !/^[0-9]+(\.[0-9]+)?$/.test(item)) ||
-            (options?.format === 'integer' && !/^-?[0-9]+(\.[0]+)?$/.test(item)) ||
-            (options?.format === 'unsignedInteger' && !/^[0-9]+(\.[0]+)?$/.test(item)) ||
-            (options?.format === 'boolean' && !['true', 'false'].includes(item)) ||
-            (options?.format === 'trim' && /^\s+|\s+$/.test(item)) ||
-            (options?.format === 'json' && typeof JSON.parse(item) !== 'object') ||
-            (options?.format === 'alphanum' && !/^[a-zA-Z0-9]+$/.test(item)) ||
-            (options?.format === 'lowercase' && /[A-Z]/.test(item)) ||
-            (options?.format === 'uppercase' && /[a-z]/.test(item)) ||
-            (options?.format instanceof RegExp && !options.format.test(item)) ||
-            (options?.strongPassword && !Is.strongPassword(item, options.strongPassword))
-         ) {
-            return false;
+   static func(value: any): value is IsFunc {
+      return typeof value === 'function';
+   }
+
+   static callable(value: any): value is IsCallable {
+      return Is.func(value) || Is.asyncFunc(value);
+   }
+
+   static number(value: any): value is number {
+      return typeof value === 'number' && !isNaN(value);
+   }
+
+   static unsignedNumber(value: any): value is number {
+      return Is.number(value) && value >= 0;
+   }
+
+   static integer(value: any): value is number {
+      return Is.number(value) && Number.isInteger(value);
+   }
+
+   static unsignedInteger(value: any): value is number {
+      return Is.integer(value) && value >= 0;
+   }
+
+   static boolean(value: any): value is boolean {
+      return typeof value === 'boolean';
+   }
+
+   static stringFormat(value: any, format: IsStringOptions['format']): value is string {
+      if (typeof value !== 'string') {
+         return false;
+      }
+
+      try {
+         switch (format) {
+            case 'email':
+               return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+                  value,
+               );
+
+            case 'dateTime':
+               return !!DateTime.parse(value);
+
+            case 'date':
+               return /^\d{4}-\d{2}-\d{2}$/.test(value) && !!DateTime.parse(value);
+
+            case 'time':
+               return /^\d{2}:\d{2}:\d{2}(\.\d{1,3})?$/.test(value) && !!DateTime.parse(`2024-08-05T${value}`);
+
+            case 'creditCard':
+               return Is.creditCard(value);
+
+            case 'ipv4':
+               return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
+                  value,
+               );
+
+            case 'ipv6':
+               return /^([0-9a-f]{1,4}:){6}|(:[0-9a-f]{1,4}){7}$/.test(value);
+
+            case 'mongoId':
+               return /^[0-9a-fA-F]{24}$/.test(value);
+
+            case 'uri':
+               return Boolean(new URL(value));
+
+            case 'image':
+               return Boolean(new URL(value)) && /\.(jpe?g|png|gif|svg|ico|bmp|webp|tiff)$/i.test(value);
+
+            case 'base64':
+               return /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(value);
+
+            case 'md5':
+               return /^[a-f0-9]{32}$/.test(value);
+
+            case 'sha1':
+               return /^[a-f0-9]{40}$/.test(value);
+
+            case 'sha256':
+               return /^[a-fA-F0-9]{64}$/.test(value);
+
+            case 'uuid':
+               return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value);
+
+            case 'jwt':
+               return /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/.test(value);
+
+            case 'number':
+               return /^-?[0-9]+(\.[0-9]+)?$/.test(value);
+
+            case 'unsignedNumber':
+               return /^[0-9]+(\.[0-9]+)?$/.test(value);
+
+            case 'integer':
+               return /^-?[0-9]+(\.[0]+)?$/.test(value);
+
+            case 'unsignedInteger':
+               return /^[0-9]+(\.[0]+)?$/.test(value);
+
+            case 'boolean':
+               return /true|false/i.test(value);
+
+            case 'trim':
+               return !/^\s+|\s+$/.test(value);
+
+            case 'json':
+               return ['{', '['].includes(value[0]) && typeof JSON.parse(value) === 'object';
+
+            case 'alphanum':
+               return /^[a-zA-Z0-9]+$/.test(value);
+
+            case 'lowercase':
+               return !/[A-Z]/.test(value);
+
+            case 'uppercase':
+               return !/[a-z]/.test(value);
+
+            default:
+               return format instanceof RegExp ? format.test(value) : false;
          }
+      } catch {
+         return false;
+      }
+   }
 
-         return true;
-      });
+   static string(value: any): value is string {
+      return typeof value === 'string';
    }
 
    static nodeJs(): boolean {
@@ -324,112 +367,70 @@ export class Is {
       );
    }
 
-   static strongPassword<O extends IsStrongPasswordOptions>(value: any, options?: O): value is ReturnsIsString<O> {
-      return Is.each(options, value, (item: any) => {
-         if (typeof item !== 'string') {
-            return false;
-         }
+   static strongPassword(value: any, options?: IsStrongPasswordOptions): value is string {
+      const minLength = options?.minLength ?? 8;
+      const minSpecialChars = options?.minSpecialChars ?? 1;
+      const minUpper = options?.minUpper ?? 1;
+      const minLower = options?.minLower ?? 1;
+      const minNumber = options?.minNumber ?? 1;
 
-         const minLength = options?.minLength ?? 8;
-         const minSpecialChars = options?.minSpecialChars ?? 1;
-         const minUpper = options?.minUpper ?? 1;
-         const minLower = options?.minLower ?? 1;
-         const minNumber = options?.minNumber ?? 1;
+      if (
+         typeof value !== 'string' ||
+         value.length < minLength ||
+         (value.match(/[._-~`@#$%^&*()+=,]/g) || []).length < minSpecialChars ||
+         (value.match(/[A-Z]/g) || []).length < minUpper ||
+         (value.match(/[a-z]/g) || []).length < minLower ||
+         (value.match(/[0-9]/g) || []).length < minNumber
+      ) {
+         return false;
+      }
 
-         if (
-            item.length < minLength ||
-            (item.match(/[._-~`@#$%^&*()+=,]/g) || []).length < minSpecialChars ||
-            (item.match(/[A-Z]/g) || []).length < minUpper ||
-            (item.match(/[a-z]/g) || []).length < minLower ||
-            (item.match(/[0-9]/g) || []).length < minNumber
-         ) {
-            return false;
-         }
-
-         return true;
-      });
+      return true;
    }
 
-   static enum(value: any, options: IsEnumOptions): boolean {
-      return Is.each(options, value, (item: any) => Array.isArray(options?.enum) && options.enum.includes(item));
+   static elementOf(value: any, array: any[]): boolean {
+      return array.findIndex((element) => Is.equals(value, element)) !== -1;
    }
 
-   static includes(value: any, options: IsIncludesOptions): boolean {
-      return Is.each(options, value, (item: any) => {
-         const { target } = options;
+   static includes(value: any, target: any): boolean {
+      if (Is.string(value)) {
+         return Is.string(target) ? value.includes(target) : false;
+      }
 
-         if (Is.string(item)) {
-            return Is.string(target) ? item.includes(target) : false;
-         }
+      if (Is.array(value)) {
+         return Is.elementOf(target, value);
+      }
 
-         if (Is.array(item)) {
-            return !!item.find((it) => Is.equals(it, target));
-         }
+      if (Is.object(value) && (Is.object(target) || Is.string(target))) {
+         if (Is.string(target)) {
+            const paths = target.split('.');
+            let o = value;
 
-         if (Is.object(item) && (Is.object(target) || Is.string(target))) {
-            if (Is.string(target)) {
-               const paths = target.split('.');
-               let o = value;
+            for (let i = 0, n = paths.length; i < n; i++) {
+               const prop = paths[i];
 
-               for (let i = 0, n = paths.length; i < n; i++) {
-                  const prop = paths[i];
-
-                  if (!Is.object(o) || !o.hasOwnProperty(prop)) {
-                     return false;
-                  }
-
-                  o = o[prop];
-               }
-            } else {
-               for (const key in target) {
-                  if (!value.hasOwnProperty(key) || !Is.equals(item[key], target[key])) {
-                     return false;
-                  }
-               }
-            }
-
-            return true;
-         }
-
-         return Is.equals(item, target);
-      });
-   }
-
-   static class<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsClass<O> {
-      return Is.each(options, value, (item: any) => Is.func(item) && item.toString()?.startsWith('class '));
-   }
-
-   static each(options: IsBaseOptions | undefined, value: any, callback: (item: any) => boolean): boolean {
-      try {
-         const optional = options?.optional === true;
-         const nullable = options?.nullable === true || (options?.nullable === undefined && optional);
-
-         if ((optional && value === undefined) || (nullable && value === null)) {
-            return true;
-         }
-
-         if (options?.isArray) {
-            if (!Array.isArray(value)) {
-               return false;
-            }
-
-            const unique = [];
-
-            for (const val of value) {
-               if (!callback(val) || (options.isArray === 'unique' && unique.findIndex((uni) => Is.equals(uni, val)) !== -1)) {
+               if (!Is.object(o) || !o.hasOwnProperty(prop)) {
                   return false;
                }
 
-               unique.push(val);
+               o = o[prop];
             }
-
-            return true;
+         } else {
+            for (const key in target) {
+               if (!value.hasOwnProperty(key) || !Is.equals(value[key], target[key])) {
+                  return false;
+               }
+            }
          }
 
-         return callback(value);
-      } catch {
-         return false;
+         return true;
       }
+
+      return Is.equals(value, target);
+   }
+
+   static class(value: any): value is ClassConstructor<any> {
+      return Is.func(value) && value.toString()?.startsWith('class ');
    }
 
    static creditCard(value: string, type?: CreditCardType): boolean {

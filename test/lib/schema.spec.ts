@@ -1,4 +1,4 @@
-import { Schema } from '../../src';
+import { Schema, Util } from '../../src';
 
 it('Core Schema', async () => {
    // # Schema.string(options?: IsStringOptions): StringSchema
@@ -11,13 +11,13 @@ it('Core Schema', async () => {
    expect(Schema.string().minLength(0).check('')).toBeTruthy();
    expect(Schema.string().format('dateTime').check('2024-07-03T00:00:00.00')).toBeTruthy();
    expect(Schema.string().format('mongoId').check('507f1f77bcf86cd799439011')).toBeTruthy();
-   expect(Schema.string().format('ipV4').check('192.168.1.1')).toBeTruthy();
-   expect(Schema.string().format('ipV6').check('2001:0db8:85a3:0000:0000:8a2e:0370:7334')).toBeTruthy();
+   expect(Schema.string().format('ipv4').check('192.168.1.1')).toBeTruthy();
+   expect(Schema.string().format('ipv6').check('2001:0db8:85a3:0000:0000:8a2e:0370:7334')).toBeTruthy();
    expect(Schema.string().format('mongoId').check('507f1f77bcf86cd799439011')).toBeTruthy();
    expect(Schema.string().format('email').check('example.email.com')).toBeFalsy();
    expect(Schema.string().format('email').check('example@email.com')).toBeTruthy();
    expect(Schema.string().format('creditCard').check('4000056655665556')).toBeTruthy();
-   expect(Schema.string().format('url').check('https://www.domain.com/remove-an-item-from-an-array-in-javascript/')).toBeTruthy();
+   expect(Schema.string().format('uri').check('https://www.domain.com/remove-an-item-from-an-array-in-javascript/')).toBeTruthy();
    expect(Schema.string().format('base64').check('SGVsbG8gV29ybGQ=')).toBeTruthy();
    expect(Schema.string().format('md5').check('3e25960a79dbc69b674cd4ec67a72c62')).toBeTruthy();
    expect(Schema.string().format('sha1').check('7b502c3a1f48c8609ae212cdfb639dee39673f5e')).toBeTruthy();
@@ -33,24 +33,51 @@ it('Core Schema', async () => {
    expect(Schema.string().strongPassword().check('MyStrongPwd@123')).toBeTruthy();
    expect(Schema.string().strongPassword({ minLength: 16 }).check('MyStrongPwd@123')).toBeFalsy();
 
+   // ## Number and Boolean format, will auto transform to thr right format
+   const stringFormat = Schema.string().format('boolean');
+   expect(stringFormat.check('true')).toBeTruthy();
+   expect(stringFormat.getValue()).toBeTruthy();
+
+   stringFormat.format('number');
+   expect(stringFormat.check('1.25')).toBeTruthy();
+   expect(stringFormat.getValue()).toEqual(1.25);
+
+   stringFormat.format('unsignedNumber');
+   expect(stringFormat.check('-1.25')).toBeFalsy();
+   expect(stringFormat.check('1.25')).toBeTruthy();
+   expect(stringFormat.getValue()).toEqual(1.25);
+
+   stringFormat.format('integer');
+   expect(stringFormat.check('-1.25')).toBeFalsy();
+   expect(stringFormat.check('1')).toBeTruthy();
+   expect(stringFormat.check('1.0')).toBeTruthy();
+   expect(stringFormat.getValue()).toEqual(1);
+
+   stringFormat.format('unsignedInteger');
+   expect(stringFormat.check('-1')).toBeFalsy();
+   expect(stringFormat.check('1')).toBeTruthy();
+   expect(stringFormat.check('1.0')).toBeTruthy();
+   expect(stringFormat.getValue()).toEqual(1);
+
    // # Schema.boolean(options?: IsBaseOptions): BooleanSchema
    expect(Schema.boolean().check(1)).toBeFalsy();
    expect(Schema.boolean().check(true)).toBeTruthy();
    expect(Schema.boolean().check(false)).toBeTruthy();
    expect(Schema.boolean().check([1, true])).toBeFalsy();
    expect(Schema.boolean().check([false, true])).toBeFalsy();
-   expect(Schema.boolean().isArray().check([false, true])).toBeTruthy();
-   expect(Schema.boolean().isArray('unique').check([false, false, true])).toBeFalsy();
 
    // # Schema.number(options?: IsNumberOptions): NumberSchema
    expect(Schema.number().check(1)).toBeTruthy();
    expect(Schema.number().check([1, 2, 3])).toBeFalsy();
-   expect(Schema.number().isArray().check([1, 2, 3])).toBeTruthy();
    expect(Schema.number().check(1.25)).toBeTruthy();
    expect(Schema.number().integer().check(1.25)).toBeFalsy();
    expect(Schema.number().integer().min(3).check(2)).toBeFalsy();
    expect(Schema.number().integer().max(10).check(12)).toBeFalsy();
    expect(Schema.number().integer().max(10).check(9)).toBeTruthy();
+
+   // # Schema.enum(emum: EnumElement[]): EnumSchema
+   expect(Schema.enum(['Active', 'Inactive', true, false, 1, 0]).check('Inactive')).toBeTruthy();
+   expect(Schema.enum(['Active', 'Inactive', true, false, 1, 0]).check(null)).toBeFalsy();
 
    // # Object & Array
    // ## Schema.object<T extends object>(properties?: ObjectSchemaProps<T>): ObjectSchema<T>
@@ -108,42 +135,47 @@ it('Core Schema', async () => {
    };
 
    expect(schema.check(validValue)).toBeTruthy();
-
-   const invalidValue = {
-      foo: 123,
-      bar: { bar2: true, noAcceptProp: 'OOps!' },
-      arrayAny: ['1', 2, true, [], {}],
-      arrayNumber: [1, 2.5, 3],
-      arrayNumberBoolean: [123, false],
-      arrayObject: [
-         {
-            number: 1.5,
-            integer: 1,
-            boolean: false,
-            object: {
-               array: [
-                  [123, 456],
-                  [789, 11112],
-               ],
-            },
-            noAcceptProp: 'OOps!',
-         },
-      ],
-      email: 'admin@email.com',
-      minLength2: '12',
-      nullable: null,
-      noAcceptProp: 'OOps!',
-   };
+   const invalidValue = { noAcceptProp: 'OOps!', ...Util.clone(validValue) };
 
    expect(schema.check(invalidValue)).toBeFalsy();
    expect(schema.whiteList().check(invalidValue)).toBeTruthy();
    expect(invalidValue).not.toHaveProperty('noAcceptProp');
-   expect(invalidValue.bar).not.toHaveProperty('noAcceptProp');
-   expect(invalidValue.arrayObject[0]).not.toHaveProperty('noAcceptProp');
+   expect(schema.getValue()).not.toHaveProperty('noAcceptProp');
 
-   // # Schema.enum(emum: EnumElement[]): EnumSchema
-   expect(Schema.enum(['Active', 'Inactive', true, false, 1, 0]).check('Inactive')).toBeTruthy();
-   expect(Schema.enum(['Active', 'Inactive', true, false, 1, 0]).check(null)).toBeFalsy();
+   const invalidDataValue = {
+      num: '1',
+      obj: { num: true, bool: 1, bar: { array: 1 }, enum: ['Active', 'Inactive'], string: '1234', deep: { number: -1.4 } },
+      arr: [
+         123,
+         true,
+         {
+            foo: 456,
+            bar: {
+               blab: 1.25,
+            },
+         },
+      ],
+   };
+   const objSchema = Schema.object<typeof invalidDataValue>({
+      num: Schema.number(),
+      obj: Schema.object<(typeof invalidDataValue)['obj']>({
+         num: Schema.number(),
+         bool: Schema.boolean(),
+         bar: Schema.array(Schema.object({ bar: Schema.array(Schema.string()) })),
+         enum: Schema.enum([1, 0]),
+         string: Schema.string().minLength(5).format('email'),
+         deep: Schema.object({ number: Schema.number().integer().min(-1) }),
+      }),
+      arr: Schema.array([
+         Schema.number(),
+         Schema.string(),
+         Schema.object({ foo: Schema.boolean(), bar: Schema.object({ blab: Schema.number().integer().min(2) }) }),
+      ]),
+   });
+   expect(objSchema.check(invalidDataValue)).toBeFalsy();
 
-   console.log(JSON.stringify(schema.buildSchema(), null, 2));
+   // ## Not unique array
+   expect(Schema.array().unique().check([1, 1, 2])).toBeFalsy();
+
+   console.log(JSON.stringify(objSchema.getErrors(), null, 2));
 });

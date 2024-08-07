@@ -136,14 +136,14 @@ export class Registry<TData extends any, TPath = PathOf<TData>> {
 
       if (this.cached[p] === undefined) {
          if (p.indexOf('.') === -1) {
-            this.cached[p] = this.data[p];
+            this.cached[p] = this.data?.[p];
          } else {
             const paths = p.split('.');
             let data = this.data;
 
             for (let i = 0, n = paths.length; i < n; i++) {
                const path = paths[i];
-               data = data[path];
+               data = data?.[path];
 
                if (!Is.json(data)) {
                   data = i + 1 === n ? data : defaultValue;
@@ -199,7 +199,7 @@ export class Registry<TData extends any, TPath = PathOf<TData>> {
             if (this.isPathNum(p) && Is.array(this.data)) {
                this.data.splice(Number(p), 1);
             } else {
-               delete this.data[p];
+               delete this.data?.[p];
             }
          } else {
             this.data[p] = value;
@@ -218,38 +218,31 @@ export class Registry<TData extends any, TPath = PathOf<TData>> {
                   if (this.isPathNum(key) && Is.array(data[key])) {
                      data.splice(Number(key), 1);
                   } else {
-                     delete data[key];
+                     delete data?.[key];
                   }
 
                   return this;
                }
 
                // Re-structure path
-               if (this.isPathNum(key)) {
-                  data[key] = [];
-               } else {
-                  data[key] = {};
-               }
+               data[key] = this.isPathNum(key) ? [] : {};
             }
 
             data = data[key];
          }
 
-         const isArray = this.isPathNum(keys[n]);
+         const lastKey = keys[n];
+         const isArray = this.isPathNum(lastKey);
 
          // Remove old value to clear object non reference
          if (isArray && Is.array(data)) {
-            data.splice(Number(keys[n]), 1);
+            data.splice(Number(lastKey), 1);
          } else {
-            delete data[keys[n]];
+            delete data?.[lastKey];
          }
 
-         if (value !== undefined) {
-            if (isArray && !Is.array(data)) {
-               data = [];
-            }
-
-            data[keys[n]] = value;
+         if (value !== undefined && Is.json(data)) {
+            data[lastKey] = value;
          }
       }
 
@@ -275,13 +268,13 @@ export class Registry<TData extends any, TPath = PathOf<TData>> {
    }
 
    has<Path extends TPath>(path: Path): boolean {
-      return !Is.primitive(this.get(path, undefined), { type: 'undefined' });
+      return this.get(path, undefined) !== undefined;
    }
 
    is(path: TPath, compareValue?: any): boolean {
       const value = this.get(path);
 
-      if (Is.primitive(compareValue, { type: 'undefined' })) {
+      if (compareValue === undefined) {
          return Transform.toBoolean(value);
       }
 

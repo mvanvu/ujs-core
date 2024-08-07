@@ -85,7 +85,7 @@ export class Transform {
          } catch {}
       }
 
-      return <T>(Is.object(defaultJson) ? defaultJson : Is.primitive(value, { type: 'null' }) || Is.primitive(value, { type: 'undefined' }) ? {} : [value]);
+      return <T>(Is.object(defaultJson) ? defaultJson : value === null || value === undefined ? {} : [value]);
    }
 
    // Convert to boolean

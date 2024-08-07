@@ -1,7 +1,7 @@
 import { Is, DateTime } from '../../src';
 
 it('Core Is', () => {
-   // # func<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsFunc<O>
+   // # Is.func(value: any): value is IsFunc
    expect(Is.func(() => {})).toBeTruthy();
    expect(Is.func(async () => {})).toBeTruthy();
 
@@ -10,24 +10,41 @@ it('Core Is', () => {
    expect(Is.asyncFunc(null)).toBeFalsy();
    expect(Is.asyncFunc(() => {})).toBeFalsy();
 
-   // # Is.number<O extends IsNumberOptions>(value: any, options?: O): value is ReturnsIsNumber<O>
-   // ## Check the value is a number
-   expect(Is.number(-123)).toBeTruthy();
-   expect(Is.number(-123, { min: 0 })).toBeFalsy();
-   expect(Is.number(-123, { max: -124 })).toBeFalsy();
-   expect(Is.number(123, { integer: true })).toBeTruthy();
-   expect(Is.number(123.0, { integer: true })).toBeTruthy();
-   expect(Is.number(123.01, { integer: true })).toBeFalsy();
+   // # Is.number(value: any): value is number
+   expect(Is.number(123)).toBeTruthy();
+   expect(Is.number('123')).toBeFalsy();
 
-   // # Is.object<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsObject<O>
-   expect(Is.object(null)).toBeFalsy();
+   // # Is.unsignedNumber(value: any): value is number
+   expect(Is.unsignedNumber(123)).toBeTruthy();
+   expect(Is.unsignedNumber(-123)).toBeFalsy();
+
+   // # Is.integer(value: any): value is number
+   expect(Is.integer(123)).toBeTruthy();
+   expect(Is.integer(123.0)).toBeTruthy();
+   expect(Is.integer(123.01)).toBeFalsy();
+
+   // # Is.unsignedInteger(value: any): value is number
+   expect(Is.unsignedInteger(123)).toBeTruthy();
+   expect(Is.unsignedInteger(-1)).toBeFalsy();
+
+   // # Is.object(value: any): value is ObjectRecord
    expect(Is.object({})).toBeTruthy();
+   expect(Is.object(null)).toBeFalsy();
    expect(Is.object([])).toBeFalsy();
 
-   // # array<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsArray<O>
-   // ## Check the value is a valid array
+   // # Is.array(value: any): value is any[]
+   expect(Is.array([1, true, null])).toBeTruthy();
    expect(Is.array({})).toBeFalsy();
-   expect(Is.array([1, 2, 3])).toBeTruthy();
+
+   // # Is.arrayUnique(value: any): value is any[]
+   expect(Is.arrayUnique([1, true, null])).toBeTruthy();
+   expect(Is.arrayUnique([1, 1, null])).toBeFalsy();
+   const noUniqueArray = [
+      { foo: 'bar', bar: 123 },
+      { bar: 123, foo: 'bar' },
+   ];
+
+   expect(Is.arrayUnique(noUniqueArray)).toBeFalsy();
 
    // # Is.equals(a: any, b: any): boolean
    // ## Compare two values are equals or not
@@ -46,7 +63,8 @@ it('Core Is', () => {
    expect(Is.equals({ foo: 'bar', bar: 123 }, { bar: 123, foo: 'bar2' })).toBeFalsy();
    expect(Is.equals({ foo: 'bar', bar: 123 }, { bar: 123 })).toBeFalsy();
 
-   // # Is.primitive<O extends IsPrimitiveOptions>(value: any, options?: O): value is ReturnsIsPrimitive<O>
+   // # Is.primitive(value: any): value is IsPrimitive
+   // ## Primitive value is: 'null' | 'undefined' | 'string' | 'number' | 'boolean' | 'symbol' | 'bigint'
    expect(Is.primitive(123)).toBeTruthy();
    expect(Is.primitive(-123)).toBeTruthy();
    expect(Is.primitive(null)).toBeTruthy();
@@ -61,12 +79,7 @@ it('Core Is', () => {
    expect(Is.primitive(new Set())).toBeFalsy();
    expect(Is.primitive(new Map())).toBeFalsy();
 
-   // # Special primitive type: 'null' | 'undefined' | 'string' | 'number' | 'boolean' | 'symbol' | 'bigint'
-   expect(Is.primitive(123, { type: 'number' })).toBeTruthy();
-   expect(Is.primitive(123, { type: 'bigint' })).toBeFalsy();
-   expect(Is.primitive(null, { type: 'undefined' })).toBeFalsy();
-
-   // # Is.empty(value: any, options?: IsBaseOptions): boolean
+   // # Is.empty(value: any): boolean
    expect(Is.empty(0)).toBeTruthy();
    expect(Is.empty(0.0)).toBeTruthy();
    expect(Is.empty(false)).toBeTruthy();
@@ -82,185 +95,183 @@ it('Core Is', () => {
    expect(Is.empty([1])).toBeFalsy();
    expect(Is.empty({ foo: 'bar' })).toBeFalsy();
 
-   // # Is.strongPassword<O extends IsStrongPasswordOptions>(value: any, options?: O): value is ReturnsIsString<O>
+   // # Is.strongPassword(value: any, options?: IsStrongPasswordOptions): value is string
    // ## Check the value is a strong password, returns false if the value is not a string
    const pwd = 'MyStrongPwd@123';
    expect(Is.strongPassword(pwd)).toBeTruthy();
-   expect(Is.string(pwd, { strongPassword: {} })).toBeTruthy();
    expect(Is.strongPassword(pwd, { minLength: pwd.length + 1 })).toBeFalsy();
    expect(Is.strongPassword('MyWeakPwd@')).toBeFalsy();
 
-   // # Is.json<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsObject<O>
+   // # Is.json(value: any): value is ObjectRecord | any[]
    // ## Object or array that parsed from a valid JSON string
    expect(Is.json({ foo: new Map(), bar: new Set() })).toBeFalsy();
    expect(Is.json({ foo: 1, bar: [{ bar: Symbol('2') }] })).toBeFalsy();
    expect(Is.json({ foo: 1, bar: [{ bar: BigInt(1) }] })).toBeFalsy();
    expect(Is.json({ foo: 1, bar: [{ bar: 2, null: null }] })).toBeTruthy();
 
-   // # Is.includes(value: any, options: IsIncludesOptions): boolean
+   // # Is.includes(value: any, target: any): boolean
    // ## When the value is string or array
-   expect(Is.includes('Hello World', { target: 'ello Wor' })).toBeTruthy();
-   expect(Is.includes(['Hello World'], { target: 'ello Wor' })).toBeFalsy();
-   expect(Is.includes(['Hello', 'World'], { target: 'World' })).toBeTruthy();
+   expect(Is.includes('Hello World', 'ello Wor')).toBeTruthy();
+   expect(Is.includes(['Hello World'], 'ello Wor')).toBeFalsy();
+   expect(Is.includes(['Hello', 'World'], 'World')).toBeTruthy();
 
    // ## When the value is object and the target is object or string
-   expect(Is.includes({ foo: 1, bar: 2 }, { target: { foo: 1, bar: 2 } })).toBeTruthy();
-   expect(Is.includes({ foo: 1, bar: 2 }, { target: { foo: 1 } })).toBeTruthy();
-   expect(Is.includes({ foo: 1, bar: 2 }, { target: { bar: 2 } })).toBeTruthy();
-   expect(Is.includes({ foo: 1, bar: 2 }, { target: { bar: '2' } })).toBeFalsy();
-   expect(Is.includes({ foo: 1, bar: 2 }, { target: { deep: { foo: 123, bar: 456 } } })).toBeFalsy();
-   expect(Is.includes({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, { target: { deep: { foo: 123, bar: 456 } } })).toBeTruthy();
+   expect(Is.includes({ foo: 1, bar: 2 }, { foo: 1, bar: 2 })).toBeTruthy();
+   expect(Is.includes({ foo: 1, bar: 2 }, { foo: 1 })).toBeTruthy();
+   expect(Is.includes({ foo: 1, bar: 2 }, { bar: 2 })).toBeTruthy();
+   expect(Is.includes({ foo: 1, bar: 2 }, { deep: { foo: 123, bar: 456 } })).toBeFalsy();
+   expect(Is.includes({ foo: 1, bar: 2, deep: { foo: 123, bar: 456 } }, { deep: { foo: 123, bar: 456 } })).toBeTruthy();
 
    // ## Otherwise will returns false
-   expect(Is.includes(123, { target: 'string' })).toBeFalsy();
-   expect(Is.includes('string', { target: false })).toBeFalsy();
-   expect(Is.includes(null, { target: 'string' })).toBeFalsy();
-   expect(Is.includes({}, { target: false })).toBeFalsy();
+   expect(Is.includes(123, 'string')).toBeFalsy();
+   expect(Is.includes('string', false)).toBeFalsy();
+   expect(Is.includes(null, 'string')).toBeFalsy();
+   expect(Is.includes({}, false)).toBeFalsy();
 
    // ## true if equals
-   expect(Is.includes(false, { target: false })).toBeTruthy();
-   expect(Is.includes({ foo: 1, bar: 2 }, { target: { foo: 1, bar: 2 } })).toBeTruthy();
+   expect(Is.includes(false, false)).toBeTruthy();
+   expect(Is.includes({ foo: 1, bar: 2 }, { foo: 1, bar: 2 })).toBeTruthy();
 
-   // # Is.class<O extends IsBaseOptions>(value: any, options?: O): value is ReturnsIsClass<O>
+   // # Is.class(value: any): value is ClassConstructor<any>
    expect(Is.class(class Foo {})).toBeTruthy();
-   expect(Is.class([class Foo {}, class Bar {}], { isArray: true })).toBeTruthy();
    expect(Is.class(function () {})).toBeFalsy();
 
-   // # Is.string<O extends IsStringOptions>(value: any, options?: O): value is ReturnsIsString<O>
-   expect(Is.string(123)).toBeFalsy();
+   // # Is.string(value: any): value is string
    expect(Is.string('123')).toBeTruthy();
+   expect(Is.string(123)).toBeFalsy();
 
+   // # Is.stringFormat(value: any, format: IsStringOptions['format']): value is string
    // ## Format validator: 'email' | 'mongoId' | 'dateTime' | 'date' | 'time' | 'ipV4' | ipV6 | 'creditCard' | 'url' | 'image' | base64 | 'md5' | 'sha1' | 'sha256' | uuid | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | trim | json | RegExp;
    // ## Email
-   expect(Is.string('user@example.com', { format: 'email' })).toBeTruthy();
-   expect(Is.string('user.example.com', { format: 'email' })).toBeFalsy();
+   expect(Is.stringFormat('user@example.com', 'email')).toBeTruthy();
+   expect(Is.stringFormat('user.example.com', 'email')).toBeFalsy();
 
    // ## Date-Time
-   expect(Is.string('2024-07-03T00:00:00.00', { format: 'dateTime' })).toBeTruthy();
-   expect(Is.string('2024-07-03_00:00:00.00', { format: 'dateTime' })).toBeFalsy();
+   expect(Is.stringFormat('2024-07-03T00:00:00.00', 'dateTime')).toBeTruthy();
+   expect(Is.stringFormat('2024-07-03_00:00:00.00', 'dateTime')).toBeFalsy();
 
    // ## Date
-   expect(Is.string('2024-08-05', { format: 'date' })).toBeTruthy();
-   expect(Is.string('2024-13-05', { format: 'date' })).toBeFalsy();
-   expect(Is.string('2024-08-32', { format: 'date' })).toBeFalsy();
-   expect(Is.string('2024-08-05T00:00:00.00', { format: 'date' })).toBeFalsy();
+   expect(Is.stringFormat('2024-08-05', 'date')).toBeTruthy();
+   expect(Is.stringFormat('2024-13-05', 'date')).toBeFalsy();
+   expect(Is.stringFormat('2024-08-32', 'date')).toBeFalsy();
+   expect(Is.stringFormat('2024-08-05T00:00:00.00', 'date')).toBeFalsy();
 
    // ## Time
-   expect(Is.string('10:29:59', { format: 'time' })).toBeTruthy();
-   expect(Is.string('10:29:59.999', { format: 'time' })).toBeTruthy();
-   expect(Is.string('24:29:59.999', { format: 'time' })).toBeFalsy();
-   expect(Is.string('00:60:59.999', { format: 'time' })).toBeFalsy();
+   expect(Is.stringFormat('10:29:59', 'time')).toBeTruthy();
+   expect(Is.stringFormat('10:29:59.999', 'time')).toBeTruthy();
+   expect(Is.stringFormat('24:29:59.999', 'time')).toBeFalsy();
+   expect(Is.stringFormat('00:60:59.999', 'time')).toBeFalsy();
 
    // ## Mongo ID
-   expect(Is.string('507f1f77bcf86cd799439011', { format: 'mongoId' })).toBeTruthy();
-   expect(Is.string('507f1f77bcf86cd799439011_123', { format: 'mongoId' })).toBeFalsy();
+   expect(Is.stringFormat('507f1f77bcf86cd799439011', 'mongoId')).toBeTruthy();
+   expect(Is.stringFormat('507f1f77bcf86cd799439011_123', 'mongoId')).toBeFalsy();
 
    // ## IPv4
-   expect(Is.string('192.168.1.1', { format: 'ipV4' })).toBeTruthy();
-   expect(Is.string('1.1.1.1', { format: 'ipV4' })).toBeTruthy();
-   expect(Is.string('256.256.256.256', { format: 'ipV4' })).toBeFalsy();
+   expect(Is.stringFormat('192.168.1.1', 'ipv4')).toBeTruthy();
+   expect(Is.stringFormat('1.1.1.1', 'ipv4')).toBeTruthy();
+   expect(Is.stringFormat('256.256.256.256', 'ipv4')).toBeFalsy();
 
    // ## IPv6
-   expect(Is.string('2001:0db8:85a3:0000:0000:8a2e:0370:7334', { format: 'ipV6' })).toBeTruthy();
-   expect(Is.string('192.168.1.1', { format: 'ipV6' })).toBeFalsy();
-   expect(Is.string('1234:5678', { format: 'ipV6' })).toBeFalsy();
+   expect(Is.stringFormat('2001:0db8:85a3:0000:0000:8a2e:0370:7334', 'ipv6')).toBeTruthy();
+   expect(Is.stringFormat('192.168.1.1', 'ipv6')).toBeFalsy();
+   expect(Is.stringFormat('1234:5678', 'ipv6')).toBeFalsy();
 
    // ## Credit card
-   expect(Is.string('4000056655665556', { format: 'creditCard' })).toBeTruthy(); // VISA
-   expect(Is.string('2223003122003222', { format: 'creditCard' })).toBeTruthy(); // MASTERCARD
-   expect(Is.string('6011111111111117', { format: 'creditCard' })).toBeTruthy(); // DISCOVER
-   expect(Is.string('36227206271667', { format: 'creditCard' })).toBeTruthy(); // DINERS
-   expect(Is.string('3566002020360505', { format: 'creditCard' })).toBeTruthy(); // JCB
+   expect(Is.stringFormat('4000056655665556', 'creditCard')).toBeTruthy(); // VISA
+   expect(Is.stringFormat('2223003122003222', 'creditCard')).toBeTruthy(); // MASTERCARD
+   expect(Is.stringFormat('6011111111111117', 'creditCard')).toBeTruthy(); // DISCOVER
+   expect(Is.stringFormat('36227206271667', 'creditCard')).toBeTruthy(); // DINERS
+   expect(Is.stringFormat('3566002020360505', 'creditCard')).toBeTruthy(); // JCB
 
-   // ## URL
-   expect(Is.string('https://www.domain.com/remove-an-item-from-an-array-in-javascript/', { format: 'url' })).toBeTruthy();
-   expect(Is.string('htt//domain', { format: 'url' })).toBeFalsy();
-   expect(Is.string('www.domain.com', { format: 'url' })).toBeFalsy();
+   // ## URI
+   expect(Is.stringFormat('https://www.domain.com/remove-an-item-from-an-array-in-javascript/', 'uri')).toBeTruthy();
+   expect(Is.stringFormat('htt//domain', 'uri')).toBeFalsy();
+   expect(Is.stringFormat('www.domain.com', 'uri')).toBeFalsy();
 
    // ## Image
-   expect(Is.string('https://2.img-dpreview.com/files/p/E~C1000x0S4000x4000T1200x1200~articles/3925134721/0266554465.jpeg', { format: 'image' })).toBeTruthy();
-   expect(Is.string('https://2.img-dpreview.com/files/p/E~C1000x0S4000x4000T1200x1200~articles/3925134721/0266554465', { format: 'image' })).toBeFalsy();
+   expect(Is.stringFormat('https://2.img-dpreview.com/files/p/E~C1000x0S4000x4000T1200x1200~articles/3925134721/0266554465.jpeg', 'image')).toBeTruthy();
+   expect(Is.stringFormat('https://2.img-dpreview.com/files/p/E~C1000x0S4000x4000T1200x1200~articles/3925134721/0266554465', 'image')).toBeFalsy();
 
    // ## Base64
-   expect(Is.string('SGVsbG8gV29ybGQ=', { format: 'base64' })).toBeTruthy();
-   expect(Is.string('SGVsbG8gV29ybGQ==somewhat_valid', { format: 'base64' })).toBeFalsy();
+   expect(Is.stringFormat('SGVsbG8gV29ybGQ=', 'base64')).toBeTruthy();
+   expect(Is.stringFormat('SGVsbG8gV29ybGQ==somewhat_valid', 'base64')).toBeFalsy();
 
    // ## Md5
-   expect(Is.string('3e25960a79dbc69b674cd4ec67a72c62', { format: 'md5' })).toBeTruthy();
-   expect(Is.string('3e25960a79dbc69b674cd4ec67a72C62', { format: 'md5' })).toBeFalsy(); // C is upper case
+   expect(Is.stringFormat('3e25960a79dbc69b674cd4ec67a72c62', 'md5')).toBeTruthy();
+   expect(Is.stringFormat('3e25960a79dbc69b674cd4ec67a72C62', 'md5')).toBeFalsy(); // C is upper case
 
    // ## Sha1
-   expect(Is.string('7b502c3a1f48c8609ae212cdfb639dee39673f5e', { format: 'sha1' })).toBeTruthy();
-   expect(Is.string('7b502c3a1f48c8609ae212cdfb639dee39673f5E', { format: 'sha1' })).toBeFalsy(); // E is upper case
+   expect(Is.stringFormat('7b502c3a1f48c8609ae212cdfb639dee39673f5e', 'sha1')).toBeTruthy();
+   expect(Is.stringFormat('7b502c3a1f48c8609ae212cdfb639dee39673f5E', 'sha1')).toBeFalsy(); // E is upper case
 
    // ## Sha256
-   expect(Is.string('64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c', { format: 'sha256' })).toBeTruthy();
-   expect(Is.string('64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c_', { format: 'sha256' })).toBeFalsy();
+   expect(Is.stringFormat('64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c', 'sha256')).toBeTruthy();
+   expect(Is.stringFormat('64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c_', 'sha256')).toBeFalsy();
 
    // ## UUID
-   expect(Is.string('f47ac10b-58cc-4372-a567-0e02b2c3d479', { format: 'uuid' })).toBeTruthy();
-   expect(Is.string('12345678-1234-1234-1234-123456789012', { format: 'uuid' })).toBeFalsy(); // Invalid number of characters
+   expect(Is.stringFormat('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'uuid')).toBeTruthy();
+   expect(Is.stringFormat('12345678-1234-1234-1234-123456789012', 'uuid')).toBeFalsy(); // Invalid number of characters
 
    // ## JWT
    const jwt =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
-   expect(Is.string(jwt, { format: 'jwt' })).toBeTruthy();
-   expect(Is.string('Hello World', { format: 'jwt' })).toBeFalsy();
+   expect(Is.stringFormat(jwt, 'jwt')).toBeTruthy();
+   expect(Is.stringFormat('Hello World', 'jwt')).toBeFalsy();
 
    // ## Number
-   expect(Is.string('123', { format: 'number' })).toBeTruthy();
-   expect(Is.string('123.01', { format: 'number' })).toBeTruthy();
-   expect(Is.string('+123', { format: 'number' })).toBeFalsy();
-   expect(Is.string('123.01,2', { format: 'number' })).toBeFalsy();
+   expect(Is.stringFormat('123', 'number')).toBeTruthy();
+   expect(Is.stringFormat('123.01', 'number')).toBeTruthy();
+   expect(Is.stringFormat('+123', 'number')).toBeFalsy();
+   expect(Is.stringFormat('123.01,2', 'number')).toBeFalsy();
 
    // ## Unsigned number
-   expect(Is.string('123', { format: 'unsignedNumber' })).toBeTruthy();
-   expect(Is.string('-123.01', { format: 'unsignedNumber' })).toBeFalsy();
+   expect(Is.stringFormat('123', 'unsignedNumber')).toBeTruthy();
+   expect(Is.stringFormat('-123.01', 'unsignedNumber')).toBeFalsy();
 
    // ## Integer
-   expect(Is.string('123', { format: 'integer' })).toBeTruthy();
-   expect(Is.string('123.00', { format: 'integer' })).toBeTruthy();
-   expect(Is.string('123.01', { format: 'integer' })).toBeFalsy();
-   expect(Is.string('+123.01', { format: 'integer' })).toBeFalsy();
+   expect(Is.stringFormat('123', 'integer')).toBeTruthy();
+   expect(Is.stringFormat('123.00', 'integer')).toBeTruthy();
+   expect(Is.stringFormat('123.01', 'integer')).toBeFalsy();
+   expect(Is.stringFormat('+123.01', 'integer')).toBeFalsy();
 
    // ## Unsigned integer
-   expect(Is.string('123', { format: 'unsignedInteger' })).toBeTruthy();
-   expect(Is.string('-123.00', { format: 'unsignedInteger' })).toBeFalsy();
+   expect(Is.stringFormat('123', 'unsignedInteger')).toBeTruthy();
+   expect(Is.stringFormat('-123.00', 'unsignedInteger')).toBeFalsy();
 
    // ## Boolean
-   expect(Is.string('true', { format: 'boolean' })).toBeTruthy();
-   expect(Is.string('false', { format: 'boolean' })).toBeTruthy();
-   expect(Is.string('True', { format: 'boolean' })).toBeFalsy(); // Case sensitive
-   expect(Is.string('1', { format: 'boolean' })).toBeFalsy();
-   expect(Is.string('0', { format: 'boolean' })).toBeFalsy();
+   expect(Is.stringFormat('true', 'boolean')).toBeTruthy();
+   expect(Is.stringFormat('false', 'boolean')).toBeTruthy();
+   expect(Is.stringFormat('True', 'boolean')).toBeTruthy(); // Case insensitive
+   expect(Is.stringFormat('1', 'boolean')).toBeFalsy();
+   expect(Is.stringFormat('0', 'boolean')).toBeFalsy();
 
    // ## Trim
-   expect(Is.string('Hello World', { format: 'trim' })).toBeTruthy();
-   expect(Is.string(' Hello World ', { format: 'trim' })).toBeFalsy();
-   expect(Is.string(' Hello World', { format: 'trim' })).toBeFalsy();
-   expect(Is.string('Hello World ', { format: 'trim' })).toBeFalsy();
+   expect(Is.stringFormat('Hello World', 'trim')).toBeTruthy();
+   expect(Is.stringFormat(' Hello World ', 'trim')).toBeFalsy();
+   expect(Is.stringFormat(' Hello World', 'trim')).toBeFalsy();
+   expect(Is.stringFormat('Hello World ', 'trim')).toBeFalsy();
 
    // ## Json
-   expect(Is.string('["Hello World"]', { format: 'json' })).toBeTruthy();
-   expect(Is.string('{"foo": "bar"}', { format: 'json' })).toBeTruthy();
-   expect(Is.string('Hello World', { format: 'json' })).toBeFalsy();
-   expect(Is.string(['Hello World'], { format: 'json' })).toBeFalsy();
-   expect(Is.string({ foo: 'bar' }, { format: 'json' })).toBeFalsy();
+   expect(Is.stringFormat('["Hello World"]', 'json')).toBeTruthy();
+   expect(Is.stringFormat('{"foo": "bar"}', 'json')).toBeTruthy();
+   expect(Is.stringFormat('Hello World', 'json')).toBeFalsy();
+   expect(Is.stringFormat(['Hello World'], 'json')).toBeFalsy();
+   expect(Is.stringFormat({ foo: 'bar' }, 'json')).toBeFalsy();
 
    // ## Alphanum
-   expect(Is.string('AbcXyZ0123', { format: 'alphanum' })).toBeTruthy();
-   expect(Is.string('Hello World', { format: 'alphanum' })).toBeFalsy();
+   expect(Is.stringFormat('AbcXyZ0123', 'alphanum')).toBeTruthy();
+   expect(Is.stringFormat('Hello World', 'alphanum')).toBeFalsy();
 
    // ## Lowercase
-   expect(Is.string('abc', { format: 'lowercase' })).toBeTruthy();
-   expect(Is.string('Abc', { format: 'lowercase' })).toBeFalsy();
+   expect(Is.stringFormat('abc', 'lowercase')).toBeTruthy();
+   expect(Is.stringFormat('Abc', 'lowercase')).toBeFalsy();
 
    // ## Uppercase
-   expect(Is.string('ABC XYZ', { format: 'uppercase' })).toBeTruthy();
-   expect(Is.string('Abc Xyz', { format: 'uppercase' })).toBeFalsy();
+   expect(Is.stringFormat('ABC XYZ', 'uppercase')).toBeTruthy();
+   expect(Is.stringFormat('Abc Xyz', 'uppercase')).toBeFalsy();
 
    // ## RegExp
-   expect(Is.string('507f1f77bcf86cd799439011', { format: /^[0-9a-fA-F]{24}$/ })).toBeTruthy();
+   expect(Is.stringFormat('507f1f77bcf86cd799439011', /^[0-9a-fA-F]{24}$/)).toBeTruthy();
 
    // # Is.boolean<O extends IsBaseOptions>(value: any, options?: IsBaseOptions): value is ReturnsIsBoolean<O>
    expect(Is.boolean(true)).toBeTruthy();
@@ -269,16 +280,10 @@ it('Core Is', () => {
    expect(Is.boolean(1)).toBeFalsy();
    expect(Is.boolean(0)).toBeFalsy();
 
-   // # Is.enum(value: any, options: IsEnumOptions): boolean
+   // # elementOf(value: any, array: any[]): boolean
    // ## Check the value is a enum from an array
-   expect(Is.enum(true, { enum: [true, false] })).toBeTruthy();
-   expect(Is.enum('Active', { enum: ['Active', 'Pending'] })).toBeTruthy();
-   expect(Is.enum('Pending', { enum: ['Active', 'Pending'] })).toBeTruthy();
-   expect(Is.enum('active', { enum: ['Active', 'Pending'] })).toBeFalsy(); // Case sensitive
-
-   // # Validate as array
-   expect(Is.string('str1', { isArray: true })).toBeFalsy();
-   expect(Is.string(['str1'], { isArray: true })).toBeTruthy();
-   expect(Is.string(['str1', 1, true, null], { isArray: true })).toBeFalsy();
-   expect(Is.string(['str1', 'str2', 'str1'], { isArray: 'unique' })).toBeFalsy(); // Unique array
+   expect(Is.elementOf(true, [true, false])).toBeTruthy();
+   expect(Is.elementOf('Active', ['Active', 'Pending'])).toBeTruthy();
+   expect(Is.elementOf('Pending', ['Active', 'Pending'])).toBeTruthy();
+   expect(Is.elementOf('active', ['Active', 'Pending'])).toBeFalsy(); // Case sensitive
 });
