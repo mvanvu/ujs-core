@@ -203,5 +203,13 @@ objSchema.check(invalidDataValue); // It returns: false
 // Not unique array
 Schema.array().unique().check([1, 1, 2]); // It returns: false
 
+
+// Transform from array
+const arr = ['12.5', { h: '<p>Hello World</p>' }];
+const arrSchema = Schema.array([Schema.string().format('number'), Schema.object({ h: Schema.string() })]);
+arrSchema.check(arr); // It returns: true
+arrSchema.getValue(); // It returns: [ROOT].'[0]' ===  12.5
+arrSchema.getValue(); // It returns: [ROOT].'[1].h' ===  'Hello World'
+
 console.log(JSON.stringify(objSchema.getErrors(), null, 2));
 ```

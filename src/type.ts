@@ -220,6 +220,7 @@ export interface IsStringOptions extends IsBaseOptions {
    minLength?: number;
    maxLength?: number;
    strongPassword?: IsStrongPasswordOptions;
+   allowHtml?: 'safe' | 'raw' | false;
 }
 
 export interface IsNumberOptions extends IsBaseOptions {

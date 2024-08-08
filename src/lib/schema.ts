@@ -167,6 +167,12 @@ export class StringSchema extends BaseSchema {
       return this;
    }
 
+   allowHtml(allowHtml?: IsStringOptions['allowHtml']): this {
+      this.options.allowHtml = allowHtml === undefined ? 'safe' : allowHtml;
+
+      return this;
+   }
+
    buildSchema() {
       return {
          type: this.isAllowNull ? ['null', 'string'] : 'string',
@@ -182,26 +188,27 @@ export class StringSchema extends BaseSchema {
    }
 
    protected checkError(input: { value: any }): void {
-      const { value } = input;
+      let { value } = input;
 
       if (Is.string(value)) {
-         if (this.options.format) {
-            if (!Is.stringFormat(value, this.options.format)) {
-               const format = this.options.format instanceof RegExp ? 'RegExp' : this.options.format;
-               this.errors.push({ message: schemaErrors.INVALID_STRING_FORMAT, meta: { format } });
-            } else {
-               switch (this.options.format) {
-                  case 'boolean':
-                     input.value = Transform.toBoolean(value);
-                     break;
+         if (this.options.format && !Is.stringFormat(value, this.options.format)) {
+            const format = this.options.format instanceof RegExp ? 'RegExp' : this.options.format;
+            this.errors.push({ message: schemaErrors.INVALID_STRING_FORMAT, meta: { format } });
+         }
 
-                  case 'number':
-                  case 'unsignedNumber':
-                  case 'integer':
-                  case 'unsignedInteger':
-                     input.value = Transform.toNumber(value);
-                     break;
-               }
+         // Handle transform string value (only no-format && strongPassword options)
+         if (this.options.allowHtml !== 'raw' && !this.options.format && !this.options.strongPassword) {
+            switch (this.options.allowHtml) {
+               case 'safe':
+                  value = Transform.toSafeHtml(value).trim();
+                  break;
+
+               // Defaults to strip
+               case undefined:
+               case false:
+               default:
+                  value = Transform.toStripTags(value).trim();
+                  break;
             }
          }
 
@@ -215,6 +222,24 @@ export class StringSchema extends BaseSchema {
 
          if (Is.number(this.options.maxLength) && value.length > this.options.maxLength) {
             this.errors.push({ message: schemaErrors.STRING_MAX_LENGTH, meta: { maxLength: this.options.maxLength } });
+         }
+
+         if (!this.errors.length) {
+            // Handle transform string value
+            switch (this.options.format) {
+               case 'boolean':
+                  value = Transform.toBoolean(value);
+                  break;
+
+               case 'number':
+               case 'unsignedNumber':
+               case 'integer':
+               case 'unsignedInteger':
+                  value = Transform.toNumber(value);
+                  break;
+            }
+
+            input.value = value;
          }
       } else {
          this.errors.push({ message: schemaErrors.NOT_A_STRING });

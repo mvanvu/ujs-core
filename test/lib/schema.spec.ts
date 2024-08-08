@@ -181,5 +181,12 @@ it('Core Schema', async () => {
    // ## Not unique array
    expect(Schema.array().unique().check([1, 1, 2])).toBeFalsy();
 
+   // ## Transform from array
+   const arr = ['12.5', { h: '<p>Hello World</p>' }];
+   const arrSchema = Schema.array([Schema.string().format('number'), Schema.object({ h: Schema.string() })]);
+   expect(arrSchema.check(arr)).toBeTruthy();
+   expect(arrSchema.getValue()).toHaveProperty('[0]', 12.5);
+   expect(arrSchema.getValue()).toHaveProperty('[1].h', 'Hello World');
+
    console.log(JSON.stringify(objSchema.getErrors(), null, 2));
 });

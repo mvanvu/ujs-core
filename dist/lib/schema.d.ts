@@ -45,6 +45,7 @@ export declare class StringSchema extends BaseSchema {
     maxLength(num: number): this;
     format(format: IsStringOptionFormat): this;
     strongPassword(options?: IsStrongPasswordOptions): this;
+    allowHtml(allowHtml?: IsStringOptions['allowHtml']): this;
     buildSchema(): {
         type: string | string[];
         minLength: number;
