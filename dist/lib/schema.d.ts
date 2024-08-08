@@ -86,9 +86,8 @@ export type ObjectSchemaProps<T extends object> = {
 };
 export declare class ObjectSchema<T extends object> extends BaseSchema {
     private properties?;
-    private _isWhiteList;
+    private isWhiteList;
     constructor(properties?: ObjectSchemaProps<T>);
-    get isWhiteList(): boolean;
     get keys(): string[];
     whiteList(isWhiteList?: boolean): this;
     resetErrors(): this;

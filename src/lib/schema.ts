@@ -1,5 +1,6 @@
 import { EnumElement, IsArrayOptions, IsBaseOptions, IsNumberOptions, IsStringOptionFormat, IsStringOptions, IsStrongPasswordOptions } from '../type';
 import { Is } from './is';
+import { Registry } from './registry';
 import { Transform } from './transform';
 
 export const schemaErrors = {
@@ -76,8 +77,8 @@ export abstract class BaseSchema {
       this.checkError(input, '');
       const isValid = Is.empty(this.errors);
 
-      if (isValid) {
-         // Update the value
+      if (isValid && Is.primitive(value) && !Is.equals(value, input.value)) {
+         // Update the primitive value
          this.value = input.value;
       }
 
@@ -296,14 +297,10 @@ export type ItemSchema = NumberSchema | StringSchema | BooleanSchema | EnumSchem
 export type ObjectSchemaProps<T extends object> = { [K in keyof T]: ItemSchema };
 
 export class ObjectSchema<T extends object> extends BaseSchema {
-   private _isWhiteList = false;
+   private isWhiteList = false;
 
    constructor(private properties?: ObjectSchemaProps<T>) {
       super();
-   }
-
-   get isWhiteList(): boolean {
-      return this._isWhiteList;
    }
 
    get keys(): string[] {
@@ -311,7 +308,7 @@ export class ObjectSchema<T extends object> extends BaseSchema {
    }
 
    whiteList(isWhiteList?: boolean): this {
-      this._isWhiteList = isWhiteList === undefined || isWhiteList === true;
+      this.isWhiteList = isWhiteList === undefined || isWhiteList === true;
 
       return this;
    }
@@ -344,6 +341,8 @@ export class ObjectSchema<T extends object> extends BaseSchema {
 
             if (!schema.check(value[key])) {
                this.appendError(`${path}.${key}`, schema.getErrors());
+            } else if (Is.primitive(value[key])) {
+               value[key] = schema.getValue();
             }
          }
       }
@@ -414,13 +413,19 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
                   for (let i = 0, n = this.itemsProps.length; i < n; i++) {
                      if (!this.itemsProps[i].check(value[i])) {
                         this.appendError(`${path}[${i}]`, this.itemsProps[i].getErrors());
+                     } else if (Is.primitive(value[i])) {
+                        value[i] = this.itemsProps[i].getValue();
                      }
                   }
                }
             } else {
-               for (const element of value) {
+               for (let i = 0, n = value.length; i < n; i++) {
+                  const element = value[i];
+
                   if (!this.itemsProps.check(element)) {
                      this.appendError(path, this.itemsProps.getErrors());
+                  } else if (Is.primitive(value[i])) {
+                     value[i] = this.itemsProps.getValue();
                   }
                }
             }

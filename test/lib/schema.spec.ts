@@ -104,7 +104,7 @@ it('Core Schema', async () => {
          }).whiteList(),
       ),
       email: Schema.string().format('email'),
-      minLength2: Schema.string().minLength(2),
+      minLength2: Schema.string().minLength(2).format('unsignedInteger'),
       optional: Schema.string().optional(),
       nullable: Schema.string().nullable(),
    });
@@ -138,9 +138,13 @@ it('Core Schema', async () => {
    const invalidValue = { noAcceptProp: 'OOps!', ...Util.clone(validValue) };
 
    expect(schema.check(invalidValue)).toBeFalsy();
+
+   // Revert string value
+   invalidValue.minLength2 = '12';
    expect(schema.whiteList().check(invalidValue)).toBeTruthy();
    expect(invalidValue).not.toHaveProperty('noAcceptProp');
    expect(schema.getValue()).not.toHaveProperty('noAcceptProp');
+   expect(schema.getValue()).toHaveProperty('minLength2', 12);
 
    const invalidDataValue = {
       num: '1',

@@ -127,7 +127,7 @@ object: Schema.object({ array: Schema.array(Schema.array(Schema.number())) }),
 }).whiteList(),
 ),
 email: Schema.string().format('email'),
-minLength2: Schema.string().minLength(2),
+minLength2: Schema.string().minLength(2).format('unsignedInteger'),
 optional: Schema.string().optional(),
 nullable: Schema.string().nullable(),
 
@@ -160,9 +160,13 @@ schema.check(validValue); // It returns: true
 const invalidValue = { noAcceptProp: 'OOps!', ...Util.clone(validValue) };
 
 schema.check(invalidValue); // It returns: false
+
+// Revert string value
+invalidValue.minLength2 = '12';
 schema.whiteList().check(invalidValue); // It returns: true
 invalidValue; // It returns: [ROOT].'noAcceptProp' === undefined
 schema.getValue(); // It returns: [ROOT].'noAcceptProp' === undefined
+schema.getValue(); // It returns: [ROOT].'minLength2' ===  12
 
 const invalidDataValue = {
 num: '1',
