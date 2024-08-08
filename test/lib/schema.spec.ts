@@ -187,6 +187,15 @@ it('Core Schema', async () => {
    expect(arrSchema.check(arr)).toBeTruthy();
    expect(arrSchema.getValue()).toHaveProperty('[0]', 12.5);
    expect(arrSchema.getValue()).toHaveProperty('[1].h', 'Hello World');
-
    console.log(JSON.stringify(objSchema.getErrors(), null, 2));
+
+   // # Force allow values (for all of schemas)
+   const stringSchema = Schema.string()
+      .nullable(false)
+      .allow(1, true, null, { foo: { deep: 'bar' } });
+   expect(stringSchema.check(1)).toBeTruthy();
+   expect(stringSchema.check(true)).toBeTruthy();
+   expect(stringSchema.check(null)).toBeTruthy(); // null is allowed so it skips the nullable option
+   expect(stringSchema.check(false)).toBeFalsy();
+   expect(stringSchema.check({ foo: { deep: 'bar' } })).toBeTruthy();
 });

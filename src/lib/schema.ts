@@ -32,6 +32,8 @@ export abstract class BaseSchema {
 
    protected value: any = undefined;
 
+   protected allowValues: any[];
+
    get isAllowNull(): boolean {
       return this.options.nullable === true || (this.options.nullable === undefined && this.options.optional === true);
    }
@@ -44,6 +46,12 @@ export abstract class BaseSchema {
 
    nullable(nullable?: boolean): this {
       this.options.nullable = nullable === undefined || nullable === true;
+
+      return this;
+   }
+
+   allow(...values: any[]): this {
+      this.allowValues = values;
 
       return this;
    }
@@ -69,7 +77,11 @@ export abstract class BaseSchema {
       const optional = this.options.optional === true;
       const nullable = this.options.nullable === true || (this.options?.nullable === undefined && optional);
 
-      if ((optional && value === undefined) || (nullable && value === null)) {
+      if (
+         (optional && value === undefined) ||
+         (nullable && value === null) ||
+         (Is.array(this.allowValues) && this.allowValues.findIndex((allowValue) => Is.equals(allowValue, value)) !== -1)
+      ) {
          return true;
       }
 
