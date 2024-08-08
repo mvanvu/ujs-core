@@ -210,6 +210,19 @@ const arrSchema = Schema.array([Schema.string().format('number'), Schema.object(
 arrSchema.check(arr); // It returns: true
 arrSchema.getValue(); // It returns: [ROOT].'[0]' ===  12.5
 arrSchema.getValue(); // It returns: [ROOT].'[1].h' ===  'Hello World'
-
 console.log(JSON.stringify(objSchema.getErrors(), null, 2));
+
+```
+
+#### Force allow values (for all of schemas)
+
+```javascript
+const stringSchema = Schema.string()
+   .nullable(false)
+   .allow(1, true, null, { foo: { deep: 'bar' } });
+stringSchema.check(1); // It returns: true
+stringSchema.check(true); // It returns: true
+expect(stringSchema.check(null)).toBeTruthy(); // null is allowed so it skips the nullable option
+stringSchema.check(false); // It returns: false
+stringSchema.check({ foo: { deep: 'bar' } }); // It returns: true
 ```
