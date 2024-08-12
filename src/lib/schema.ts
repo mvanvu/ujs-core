@@ -257,6 +257,10 @@ export class StringSchema extends BaseSchema {
          this.errors.push({ message: schemaErrors.NOT_A_STRING });
       }
    }
+
+   array(): ArraySchema<this> {
+      return new ArraySchema(this);
+   }
 }
 
 export class NumberSchema extends BaseSchema {
@@ -311,6 +315,10 @@ export class NumberSchema extends BaseSchema {
          this.errors.push({ message: this.options.integer ? schemaErrors.NOT_AN_INTEGER : schemaErrors.NOT_A_NUMBER });
       }
    }
+
+   array(): ArraySchema<this> {
+      return new ArraySchema(this);
+   }
 }
 
 export class BooleanSchema extends BaseSchema {
@@ -326,6 +334,10 @@ export class BooleanSchema extends BaseSchema {
       if (!Is.boolean(input.value)) {
          this.errors.push({ message: schemaErrors.NOT_A_BOOLEAN });
       }
+   }
+
+   array(): ArraySchema<this> {
+      return new ArraySchema(this);
    }
 }
 
@@ -393,6 +405,10 @@ export class ObjectSchema<T extends object> extends BaseSchema {
       }
 
       return objSchema;
+   }
+
+   array(): ArraySchema<this> {
+      return new ArraySchema(this);
    }
 }
 

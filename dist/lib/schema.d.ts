@@ -57,6 +57,7 @@ export declare class StringSchema extends BaseSchema {
     protected checkError(input: {
         value: any;
     }): void;
+    array(): ArraySchema<this>;
 }
 export declare class NumberSchema extends BaseSchema {
     protected options: IsNumberOptions;
@@ -72,6 +73,7 @@ export declare class NumberSchema extends BaseSchema {
     protected checkError(input: {
         value: any;
     }): void;
+    array(): ArraySchema<this>;
 }
 export declare class BooleanSchema extends BaseSchema {
     protected options: IsBaseOptions;
@@ -82,6 +84,7 @@ export declare class BooleanSchema extends BaseSchema {
     protected checkError(input: {
         value: any;
     }): void;
+    array(): ArraySchema<this>;
 }
 export type ItemSchema = NumberSchema | StringSchema | BooleanSchema | EnumSchema | ObjectSchema<any> | ArraySchema<any>;
 export type ObjectSchemaProps<T extends object> = {
@@ -102,6 +105,7 @@ export declare class ObjectSchema<T extends object> extends BaseSchema {
         required: string[];
         properties: {};
     };
+    array(): ArraySchema<this>;
 }
 export declare class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema {
     private itemsProps?;
