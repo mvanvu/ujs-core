@@ -7,8 +7,8 @@ it('Core Schema', async () => {
    expect(Schema.string().nullable().check(null)).toBeTruthy();
    expect(Schema.string().nullable(false).check(null)).toBeFalsy();
    expect(Schema.string().check('')).toBeTruthy();
-   expect(Schema.string().minLength(1).check('')).toBeFalsy();
-   expect(Schema.string().minLength(0).check('')).toBeTruthy();
+   expect(Schema.string().min(1).check('')).toBeFalsy();
+   expect(Schema.string().max(0).check('')).toBeTruthy();
    expect(Schema.string().format('dateTime').check('2024-07-03T00:00:00.00')).toBeTruthy();
    expect(Schema.string().format('mongoId').check('507f1f77bcf86cd799439011')).toBeTruthy();
    expect(Schema.string().format('ipv4').check('192.168.1.1')).toBeTruthy();
@@ -104,7 +104,7 @@ it('Core Schema', async () => {
          }).whiteList(),
       ),
       email: Schema.string().format('email'),
-      minLength2: Schema.string().minLength(2).format('unsignedInteger'),
+      minLength2: Schema.string().min(2).format('unsignedInteger'),
       optional: Schema.string().optional(),
       nullable: Schema.string().nullable(),
    });
@@ -167,7 +167,7 @@ it('Core Schema', async () => {
          bool: Schema.boolean(),
          bar: Schema.array(Schema.object({ bar: Schema.array(Schema.string()) })),
          enum: Schema.enum([1, 0]),
-         string: Schema.string().minLength(5).format('email'),
+         string: Schema.string().min(5).format('email'),
          deep: Schema.object({ number: Schema.number().integer().min(-1) }),
       }),
       arr: Schema.array([
