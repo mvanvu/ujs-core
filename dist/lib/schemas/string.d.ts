@@ -4,8 +4,8 @@ import { BaseSchema } from './base';
 export declare class StringSchema extends BaseSchema {
     protected options: IsStringOptions;
     constructor(options?: IsStringOptions);
-    min(num: number): this;
-    max(num: number): this;
+    minLength(num: number): this;
+    maxLength(num: number): this;
     format(format: IsStringOptionFormat): this;
     strongPassword(options?: IsStrongPasswordOptions): this;
     allowHtml(allowHtml?: IsStringOptions['allowHtml']): this;

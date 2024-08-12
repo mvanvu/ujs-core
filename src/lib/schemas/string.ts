@@ -10,13 +10,13 @@ export class StringSchema extends BaseSchema {
       super();
    }
 
-   min(num: number): this {
+   minLength(num: number): this {
       this.options.minLength = num;
 
       return this;
    }
 
-   max(num: number): this {
+   maxLength(num: number): this {
       this.options.maxLength = num;
 
       return this;
