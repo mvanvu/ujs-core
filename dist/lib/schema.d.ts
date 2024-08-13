@@ -1,10 +1,10 @@
-import { ClassConstructor, EnumElement, IsBaseOptions, IsNumberOptions, IsStringOptions, IsStrongPasswordOptions } from '../type';
+import { ClassConstructor, EnumArgs, IsBaseOptions, IsNumberOptions, IsStringOptions, IsStrongPasswordOptions } from '../type';
 import { ArraySchema, BooleanSchema, ClassRefSchema, EnumSchema, ItemSchema, NumberSchema, ObjectSchema, ObjectSchemaProps, StringSchema } from './schemas';
 export declare class Schema {
     static string(options?: IsStringOptions): StringSchema;
     static number(options?: IsNumberOptions): NumberSchema;
     static boolean(options?: IsBaseOptions): BooleanSchema;
-    static enum(emum: EnumElement[]): EnumSchema;
+    static enum(emum: EnumArgs): EnumSchema;
     static object<T extends object>(properties?: ObjectSchemaProps<T>): ObjectSchema<T>;
     static array<T extends ItemSchema | ItemSchema[]>(itemsProps?: T): ArraySchema<T>;
     static trim(): StringSchema;

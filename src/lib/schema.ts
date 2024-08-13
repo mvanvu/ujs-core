@@ -1,4 +1,4 @@
-import { ClassConstructor, EnumElement, IsBaseOptions, IsNumberOptions, IsStringOptions, IsStrongPasswordOptions } from '../type';
+import { ClassConstructor, EnumArgs, IsBaseOptions, IsNumberOptions, IsStringOptions, IsStrongPasswordOptions } from '../type';
 import { ArraySchema, BooleanSchema, ClassRefSchema, EnumSchema, ItemSchema, NumberSchema, ObjectSchema, ObjectSchemaProps, StringSchema } from './schemas';
 
 export class Schema {
@@ -14,7 +14,7 @@ export class Schema {
       return new BooleanSchema(options);
    }
 
-   static enum(emum: EnumElement[]): EnumSchema {
+   static enum(emum: EnumArgs): EnumSchema {
       return new EnumSchema(emum);
    }
 
