@@ -128,4 +128,5 @@ export type StaticMethods<T> = {
 };
 export type TransformType = keyof Omit<StaticMethods<typeof Transform>, 'prototype' | 'clean'>;
 export type EnumElement = string | number | null | boolean;
+export type EnumArgs = EnumElement[] | Record<string, EnumElement>;
 export {};

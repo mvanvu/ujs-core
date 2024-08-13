@@ -2,13 +2,9 @@ import { IsArrayOptions } from '../../type';
 import { Is } from '../is';
 import { BaseSchema } from './base';
 import { schemaErrors } from './constant';
-import { type NumberSchema } from './number';
-import { type StringSchema } from './string';
-import { type BooleanSchema } from './boolean';
-import { type EnumSchema } from './enum';
 import { type ObjectSchema } from './object';
 
-export type ItemSchema = NumberSchema | StringSchema | BooleanSchema | EnumSchema | ObjectSchema<any> | ArraySchema<any>;
+export type ItemSchema = BaseSchema | ObjectSchema<any> | ArraySchema<any>;
 
 export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema {
    private arrayUnique: boolean;

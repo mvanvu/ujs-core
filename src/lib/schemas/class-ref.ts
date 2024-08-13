@@ -1,5 +1,6 @@
 import { ClassConstructor } from '../../type';
 import { Is } from '../is';
+import { ArraySchema } from './array';
 import { BaseSchema } from './base';
 import { UJS_CLASS_PROPERTIES } from './constant';
 import { ObjectSchema, ObjectSchemaProps } from './object';
@@ -30,7 +31,7 @@ export class ClassRefSchema<T extends object> extends ObjectSchema<T> {
       return props;
    }
 
-   public clone(): ClassRefSchema<T> {
-      return new ClassRefSchema(this.classRef);
+   array(): ArraySchema<this> {
+      return new ArraySchema(this);
    }
 }

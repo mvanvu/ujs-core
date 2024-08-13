@@ -1,11 +1,7 @@
 import { IsArrayOptions } from '../../type';
 import { BaseSchema } from './base';
-import { type NumberSchema } from './number';
-import { type StringSchema } from './string';
-import { type BooleanSchema } from './boolean';
-import { type EnumSchema } from './enum';
 import { type ObjectSchema } from './object';
-export type ItemSchema = NumberSchema | StringSchema | BooleanSchema | EnumSchema | ObjectSchema<any> | ArraySchema<any>;
+export type ItemSchema = BaseSchema | ObjectSchema<any> | ArraySchema<any>;
 export declare class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema {
     private itemsProps?;
     protected options: IsArrayOptions;

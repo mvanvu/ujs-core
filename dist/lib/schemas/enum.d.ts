@@ -1,9 +1,10 @@
-import { EnumElement } from '../../type';
+import { EnumArgs, EnumElement } from '../../type';
+import { ArraySchema } from './array';
 import { BaseSchema } from './base';
 export declare class EnumSchema extends BaseSchema {
-    private emum?;
-    constructor(emum?: EnumElement[]);
-    valid(enumArray: EnumElement[]): this;
+    private data?;
+    constructor(data?: EnumArgs);
+    get elements(): EnumElement[];
     protected checkError(input: {
         value: any;
     }): void;
@@ -11,4 +12,5 @@ export declare class EnumSchema extends BaseSchema {
         type: string[];
         enum: EnumElement[];
     };
+    array(): ArraySchema<this>;
 }
