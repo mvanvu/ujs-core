@@ -1,5 +1,5 @@
-import { EnumElement, IsBaseOptions, IsNumberOptions, IsStringOptions } from '../type';
-import { ArraySchema, BooleanSchema, EnumSchema, ItemSchema, NumberSchema, ObjectSchema, ObjectSchemaProps, StringSchema } from './schemas';
+import { ClassConstructor, EnumElement, IsBaseOptions, IsNumberOptions, IsStringOptions, IsStrongPasswordOptions } from '../type';
+import { ArraySchema, BooleanSchema, ClassRefSchema, EnumSchema, ItemSchema, NumberSchema, ObjectSchema, ObjectSchemaProps, StringSchema } from './schemas';
 export declare class Schema {
     static string(options?: IsStringOptions): StringSchema;
     static number(options?: IsNumberOptions): NumberSchema;
@@ -7,4 +7,29 @@ export declare class Schema {
     static enum(emum: EnumElement[]): EnumSchema;
     static object<T extends object>(properties?: ObjectSchemaProps<T>): ObjectSchema<T>;
     static array<T extends ItemSchema | ItemSchema[]>(itemsProps?: T): ArraySchema<T>;
+    static trim(): StringSchema;
+    static strNum(): StringSchema;
+    static content(): StringSchema;
+    static strUNum(): StringSchema;
+    static strInt(): StringSchema;
+    static strUInt(): StringSchema;
+    static strBool(): StringSchema;
+    static email(): StringSchema;
+    static safeHTML(): StringSchema;
+    static raw(): StringSchema;
+    static password(options?: IsStrongPasswordOptions): StringSchema;
+    static regex(regex: RegExp): StringSchema;
+    static ipv4(): StringSchema;
+    static mongoId(): StringSchema;
+    static dateTime(): StringSchema;
+    static date(): StringSchema;
+    static time(): StringSchema;
+    static jwt(): StringSchema;
+    static uri(): StringSchema;
+    static imageUri(): StringSchema;
+    static alphanum(): StringSchema;
+    static int(): NumberSchema;
+    static uint(nonZero?: boolean): NumberSchema;
+    static unum(nonZero?: boolean): NumberSchema;
+    static classRef<T extends object>(classRef: ClassConstructor<T>): ClassRefSchema<T>;
 }

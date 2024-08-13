@@ -1,5 +1,6 @@
 import { IsBaseOptions } from '../../type';
 import { Is } from '../is';
+import { UJS_CLASS_PROPERTIES } from './constant';
 
 export abstract class BaseSchema {
    protected options: IsBaseOptions = {};
@@ -120,6 +121,24 @@ export abstract class BaseSchema {
       flatten(path, error);
 
       return this;
+   }
+
+   // Typesscript decorator for custom class
+   decorate(): PropertyDecorator {
+      const schema = this;
+
+      return function (target: Object, propertyKey: PropertyKey): void {
+         if (!target.hasOwnProperty(UJS_CLASS_PROPERTIES)) {
+            target[UJS_CLASS_PROPERTIES] = {};
+         }
+
+         if (!target[UJS_CLASS_PROPERTIES][propertyKey]) {
+            target[UJS_CLASS_PROPERTIES][propertyKey] = {};
+         }
+
+         // Each property has only a schema
+         target[UJS_CLASS_PROPERTIES][propertyKey] = schema;
+      };
    }
 
    protected abstract checkError(input: { value: any }, path: string | undefined): void;

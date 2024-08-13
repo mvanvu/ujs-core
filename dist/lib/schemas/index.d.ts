@@ -1,6 +1,7 @@
 export * from './array';
 export * from './base';
 export * from './boolean';
+export * from './class-ref';
 export * from './constant';
 export * from './enum';
 export * from './number';

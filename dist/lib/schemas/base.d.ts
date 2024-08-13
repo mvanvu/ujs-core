@@ -13,6 +13,7 @@ export declare abstract class BaseSchema {
     getValue(): any;
     check(value: any): boolean;
     protected appendError(path: string, error: any): this;
+    decorate(): PropertyDecorator;
     protected abstract checkError(input: {
         value: any;
     }, path: string | undefined): void;

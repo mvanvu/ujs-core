@@ -20,3 +20,4 @@ export declare const schemaErrors: {
     NOT_AN_UNIQUE_ARRAY: string;
     NOT_STRONG_PASSWORD: string;
 };
+export declare const UJS_CLASS_PROPERTIES = "__UJS_CLASS_PROPERTIES__";

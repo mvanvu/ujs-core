@@ -210,7 +210,7 @@ const arrSchema = Schema.array([Schema.string().format('number'), Schema.object(
 arrSchema.check(arr); // It returns: true
 arrSchema.getValue(); // It returns: [ROOT].'[0]' ===  12.5
 arrSchema.getValue(); // It returns: [ROOT].'[1].h' ===  'Hello World'
-console.log(JSON.stringify(objSchema.getErrors(), null, 2));
+// console.log(JSON.stringify(objSchema.getErrors(), null, 2));
 
 ```
 
@@ -225,4 +225,17 @@ stringSchema.check(true); // It returns: true
 expect(stringSchema.check(null)).toBeTruthy(); // null is allowed so it skips the nullable option
 stringSchema.check(false); // It returns: false
 stringSchema.check({ foo: { deep: 'bar' } }); // It returns: true
+```
+
+#### Class ref schema
+
+```javascript
+const fooClassRef = Schema.classRef(FooSchema);
+fooClassRef.check({ uint: 1, email: 'my@email.com' }); // It returns: true
+
+const barClassRef = Schema.classRef(BarSchema);
+barClassRef.check({ content: 'Something', foo: { uint: 1, email: 'my@email.com' } }); // It returns: true
+barClassRef.check({ foo: { uint: 1, email: 'my.email.com' } }); // It returns: false
+barClassRef.check({ content: ' Something ', foo: { uint: 1, email: 'my.email.com' } }); // It returns: false
+console.log(JSON.stringify(barClassRef.getErrors(), null, 2));
 ```
