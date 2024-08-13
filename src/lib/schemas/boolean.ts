@@ -10,7 +10,11 @@ export class BooleanSchema extends BaseSchema {
    }
 
    buildSchema() {
-      return { type: this.isAllowNull ? ['null', 'boolean'] : 'boolean' };
+      return {
+         type: this.isAllowNull ? ['null', 'boolean'] : 'boolean',
+         description: this.description,
+         example: this.example,
+      };
    }
 
    protected checkError(input: { value: any }): void {

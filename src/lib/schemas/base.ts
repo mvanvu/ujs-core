@@ -1,6 +1,7 @@
 import { IsBaseOptions } from '../../type';
 import { Is } from '../is';
 import { UJS_CLASS_PROPERTIES } from './constant';
+import 'reflect-metadata';
 
 export abstract class BaseSchema {
    protected options: IsBaseOptions = {};
@@ -10,6 +11,10 @@ export abstract class BaseSchema {
    protected value: any = undefined;
 
    protected allowValues: any[];
+
+   protected description: string;
+
+   protected example: any;
 
    get isAllowNull(): boolean {
       return this.options.nullable === true || (this.options.nullable === undefined && this.options.optional === true);
@@ -123,6 +128,18 @@ export abstract class BaseSchema {
       return this;
    }
 
+   desc(description: string): this {
+      this.description = description;
+
+      return this;
+   }
+
+   eg(example: any): this {
+      this.example = example;
+
+      return this;
+   }
+
    // Typesscript decorator for custom class
    decorate(): PropertyDecorator {
       const schema = this;
@@ -138,6 +155,10 @@ export abstract class BaseSchema {
 
          // Each property has only a schema
          target[UJS_CLASS_PROPERTIES][propertyKey] = schema;
+
+         // Apply Swagger
+         const apiKey = 'swagger/apiModelProperties';
+         Reflect.defineMetadata(apiKey, schema.buildSchema(), target, propertyKey as string);
       };
    }
 

@@ -34,6 +34,8 @@ export class NumberSchema extends BaseSchema {
          type: this.isAllowNull ? ['null', type] : type,
          minimum: this.options.min,
          maximum: this.options.max,
+         description: this.description,
+         example: this.example,
       };
    }
 

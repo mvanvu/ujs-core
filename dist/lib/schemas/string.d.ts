@@ -13,6 +13,8 @@ export declare class StringSchema extends BaseSchema {
         type: string | string[];
         minLength: number;
         maxLength: number;
+        description: string;
+        example: any;
         format: string | RegExp;
     };
     protected checkError(input: {

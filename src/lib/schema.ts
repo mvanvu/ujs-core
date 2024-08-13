@@ -36,7 +36,7 @@ export class Schema {
    }
 
    static content(): StringSchema {
-      return Schema.string().format('trim').minLength(1);
+      return Schema.string().format('trim').minLength(2);
    }
 
    static strUNum(): StringSchema {

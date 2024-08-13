@@ -17,5 +17,7 @@ export declare class ArraySchema<T extends ItemSchema | ItemSchema[]> extends Ba
         type: string | string[];
         prefixItems: any[];
         items: {};
+        description: string;
+        example: any;
     };
 }

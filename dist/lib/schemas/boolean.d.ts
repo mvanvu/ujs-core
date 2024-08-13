@@ -6,6 +6,8 @@ export declare class BooleanSchema extends BaseSchema {
     constructor(options?: IsBaseOptions);
     buildSchema(): {
         type: string | string[];
+        description: string;
+        example: any;
     };
     protected checkError(input: {
         value: any;

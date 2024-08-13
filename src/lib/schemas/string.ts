@@ -45,6 +45,8 @@ export class StringSchema extends BaseSchema {
          type: this.isAllowNull ? ['null', 'string'] : 'string',
          minLength: this.options.minLength,
          maxLength: this.options.maxLength,
+         description: this.description,
+         example: this.example,
          format:
             this.options.format === 'dateTime'
                ? 'date-time'

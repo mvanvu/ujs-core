@@ -81,8 +81,14 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
    }
 
    buildSchema() {
-      const arraySchema = { type: this.isAllowNull ? ['null', 'array'] : 'array', prefixItems: [], items: {} };
       const { itemsProps } = this;
+      const arraySchema = {
+         type: this.isAllowNull ? ['null', 'array'] : 'array',
+         prefixItems: [],
+         items: {},
+         description: this.description,
+         example: this.example,
+      };
 
       if (itemsProps) {
          if (Is.array(itemsProps)) {

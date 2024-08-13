@@ -11,6 +11,8 @@ export declare class EnumSchema extends BaseSchema {
     buildSchema(): {
         type: string[];
         enum: EnumElement[];
+        description: string;
+        example: any;
     };
     array(): ArraySchema<this>;
 }

@@ -11,6 +11,8 @@ export declare class NumberSchema extends BaseSchema {
         type: string | string[];
         minimum: number;
         maximum: number;
+        description: string;
+        example: any;
     };
     protected checkError(input: {
         value: any;

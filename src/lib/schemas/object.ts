@@ -57,7 +57,13 @@ export class ObjectSchema<T extends object> extends BaseSchema {
    }
 
    buildSchema() {
-      const objSchema = { type: this.isAllowNull ? ['null', 'object'] : 'object', required: this.keys, properties: {} };
+      const objSchema = {
+         type: this.isAllowNull ? ['null', 'object'] : 'object',
+         required: this.keys,
+         properties: {},
+         description: this.description,
+         example: this.example,
+      };
 
       if (this.properties) {
          Object.entries<ItemSchema>(this.properties).map(([k, v]) => (objSchema.properties[k] = v.buildSchema()));

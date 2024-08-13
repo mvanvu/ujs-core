@@ -17,6 +17,8 @@ export declare class ObjectSchema<T extends object> extends BaseSchema {
         type: string | string[];
         required: string[];
         properties: {};
+        description: string;
+        example: any;
     };
     array(): ArraySchema<this>;
 }
