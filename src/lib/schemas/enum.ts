@@ -30,7 +30,7 @@ export class EnumSchema extends BaseSchema {
    buildSchema() {
       const enumSchema = {
          type: ['string', 'number', 'integer', 'boolean'],
-         enum: this.elements ?? [],
+         enum: this.elements,
          description: this.description,
          example: this.example,
       };

@@ -20,6 +20,10 @@ export abstract class BaseSchema {
       return this.options.nullable === true || (this.options.nullable === undefined && this.options.optional === true);
    }
 
+   get isOptional(): boolean {
+      return this.options.optional === true;
+   }
+
    optional(optional?: boolean): this {
       this.options.optional = optional === undefined || optional === true;
 

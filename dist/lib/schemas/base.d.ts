@@ -8,6 +8,7 @@ export declare abstract class BaseSchema {
     protected description: string;
     protected example: any;
     get isAllowNull(): boolean;
+    get isOptional(): boolean;
     optional(optional?: boolean): this;
     nullable(nullable?: boolean): this;
     allow(...values: any[]): this;
