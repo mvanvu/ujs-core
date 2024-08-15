@@ -1,6 +1,7 @@
 import { IsStringOptionFormat, IsStringOptions, IsStrongPasswordOptions } from '../../type';
 import { Is } from '../is';
 import { Transform } from '../transform';
+import { Util } from '../util';
 import { ArraySchema } from './array';
 import { BaseSchema } from './base';
 import { schemaErrors } from './constant';
@@ -117,5 +118,9 @@ export class StringSchema extends BaseSchema {
 
    array(): ArraySchema<this> {
       return new ArraySchema(this);
+   }
+
+   clone(): StringSchema {
+      return new StringSchema(Util.clone(this.options));
    }
 }

@@ -9,6 +9,8 @@ export declare abstract class BaseSchema {
     protected example: any;
     get isAllowNull(): boolean;
     get isOptional(): boolean;
+    setOptions(options: IsBaseOptions): this;
+    getOptions(): IsBaseOptions;
     optional(optional?: boolean): this;
     nullable(nullable?: boolean): this;
     allow(...values: any[]): this;
@@ -24,4 +26,5 @@ export declare abstract class BaseSchema {
         value: any;
     }, path: string | undefined): void;
     abstract buildSchema(): Record<string, any>;
+    abstract clone(): BaseSchema;
 }

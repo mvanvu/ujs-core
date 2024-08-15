@@ -6,4 +6,5 @@ export declare class ClassRefSchema<T extends object> extends ObjectSchema<T> {
     constructor(classRef: ClassConstructor<T>);
     static collectAllProperties<T extends object>(ClassRef: ClassConstructor<T>): ObjectSchemaProps<T>;
     array(): ArraySchema<this>;
+    clone(): ClassRefSchema<T>;
 }

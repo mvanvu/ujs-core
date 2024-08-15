@@ -21,4 +21,5 @@ export declare class ObjectSchema<T extends object> extends BaseSchema {
         example: any;
     };
     array(): ArraySchema<this>;
+    clone(): ObjectSchema<T>;
 }

@@ -21,4 +21,5 @@ export declare class StringSchema extends BaseSchema {
         value: any;
     }): void;
     array(): ArraySchema<this>;
+    clone(): StringSchema;
 }

@@ -1,4 +1,5 @@
 import { Is } from '../is';
+import { Util } from '../util';
 import { ArraySchema, ItemSchema } from './array';
 import { BaseSchema } from './base';
 import { schemaErrors } from './constant';
@@ -39,7 +40,7 @@ export class ObjectSchema<T extends object> extends BaseSchema {
                if (this.isWhiteList) {
                   delete value[key];
                } else {
-                  this.appendError(`${path}.${key}`, { message: schemaErrors.NOT_ALLOW_PROPERTIES });
+                  this.appendError(`${path}.${key}`, { message: schemaErrors.NOT_ALLOW_PROPERTY });
                }
             }
          }
@@ -88,5 +89,15 @@ export class ObjectSchema<T extends object> extends BaseSchema {
 
    array(): ArraySchema<this> {
       return new ArraySchema(this);
+   }
+
+   clone(): ObjectSchema<T> {
+      const obj = new ObjectSchema(this.properties ? Util.clone(this.properties) : undefined).setOptions(this.options);
+
+      if (this.isWhiteList) {
+         obj.whiteList(true);
+      }
+
+      return obj;
    }
 }

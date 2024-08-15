@@ -15,7 +15,7 @@ export declare const schemaErrors: {
     NOT_AN_ENUM: string;
     REQUIRED: string;
     NOT_ALLOW_NULL: string;
-    NOT_ALLOW_PROPERTIES: string;
+    NOT_ALLOW_PROPERTY: string;
     NOT_SUITABLE_ARRAY: string;
     NOT_AN_UNIQUE_ARRAY: string;
     NOT_STRONG_PASSWORD: string;

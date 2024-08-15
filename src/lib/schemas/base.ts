@@ -24,6 +24,16 @@ export abstract class BaseSchema {
       return this.options.optional === true;
    }
 
+   setOptions(options: IsBaseOptions): this {
+      this.options = options;
+
+      return this;
+   }
+
+   getOptions(): IsBaseOptions {
+      return this.options;
+   }
+
    optional(optional?: boolean): this {
       this.options.optional = optional === undefined || optional === true;
 
@@ -168,4 +178,5 @@ export abstract class BaseSchema {
 
    protected abstract checkError(input: { value: any }, path: string | undefined): void;
    public abstract buildSchema(): Record<string, any>;
+   public abstract clone(): BaseSchema;
 }

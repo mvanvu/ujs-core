@@ -1,5 +1,6 @@
 import { IsArrayOptions } from '../../type';
 import { Is } from '../is';
+import { Util } from '../util';
 import { BaseSchema } from './base';
 import { schemaErrors } from './constant';
 import { type ObjectSchema } from './object';
@@ -109,5 +110,15 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
       }
 
       return arraySchema;
+   }
+
+   clone(): ArraySchema<T> {
+      const arr = new ArraySchema<T>(this.itemsProps ? Util.clone(this.itemsProps) : undefined, Util.clone(this.options));
+
+      if (this.arrayUnique) {
+         arr.unique(true);
+      }
+
+      return arr;
    }
 }

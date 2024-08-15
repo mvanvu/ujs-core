@@ -18,4 +18,5 @@ export declare class NumberSchema extends BaseSchema {
         value: any;
     }): void;
     array(): ArraySchema<this>;
+    clone(): NumberSchema;
 }

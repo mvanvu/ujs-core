@@ -20,4 +20,5 @@ export declare class ArraySchema<T extends ItemSchema | ItemSchema[]> extends Ba
         description: string;
         example: any;
     };
+    clone(): ArraySchema<T>;
 }

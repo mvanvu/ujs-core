@@ -1,5 +1,6 @@
 import { IsNumberOptions } from '../../type';
 import { Is } from '../is';
+import { Util } from '../util';
 import { ArraySchema } from './array';
 import { BaseSchema } from './base';
 import { schemaErrors } from './constant';
@@ -61,5 +62,9 @@ export class NumberSchema extends BaseSchema {
 
    array(): ArraySchema<this> {
       return new ArraySchema(this);
+   }
+
+   clone(): NumberSchema {
+      return new NumberSchema(Util.clone(this.options));
    }
 }

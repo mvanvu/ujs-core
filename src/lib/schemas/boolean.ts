@@ -1,5 +1,6 @@
 import { IsBaseOptions } from '../../type';
 import { Is } from '../is';
+import { Util } from '../util';
 import { ArraySchema } from './array';
 import { BaseSchema } from './base';
 import { schemaErrors } from './constant';
@@ -25,5 +26,9 @@ export class BooleanSchema extends BaseSchema {
 
    array(): ArraySchema<this> {
       return new ArraySchema(this);
+   }
+
+   clone(): BooleanSchema {
+      return new BooleanSchema(Util.clone(this.options));
    }
 }

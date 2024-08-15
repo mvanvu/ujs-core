@@ -15,4 +15,5 @@ export declare class EnumSchema extends BaseSchema {
         example: any;
     };
     array(): ArraySchema<this>;
+    clone(): EnumSchema;
 }

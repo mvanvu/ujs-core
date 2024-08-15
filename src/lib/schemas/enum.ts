@@ -1,5 +1,6 @@
 import { EnumArgs, EnumElement } from '../../type';
 import { Is } from '../is';
+import { Util } from '../util';
 import { ArraySchema } from './array';
 import { BaseSchema } from './base';
 import { schemaErrors } from './constant';
@@ -44,5 +45,9 @@ export class EnumSchema extends BaseSchema {
 
    array(): ArraySchema<this> {
       return new ArraySchema(this);
+   }
+
+   clone(): EnumSchema {
+      return new EnumSchema(this.data ? Util.clone(this.data) : undefined).setOptions(Util.clone(this.options));
    }
 }

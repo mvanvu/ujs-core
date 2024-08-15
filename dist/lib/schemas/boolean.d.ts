@@ -13,4 +13,5 @@ export declare class BooleanSchema extends BaseSchema {
         value: any;
     }): void;
     array(): ArraySchema<this>;
+    clone(): BooleanSchema;
 }
