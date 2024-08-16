@@ -208,5 +208,10 @@ it('Core Schema', async () => {
    expect(barClassRef.check({ content: 'Something', foo: { uint: 1, email: 'my@email.com' } })).toBeTruthy();
    expect(barClassRef.check({ foo: { uint: 1, email: 'my.email.com' } })).toBeFalsy();
    expect(barClassRef.check({ content: ' Something ', foo: { uint: 1, email: 'my.email.com' } })).toBeFalsy();
-   console.log(JSON.stringify(barClassRef.getErrors(), null, 2));
+
+   // # Disable validate
+   // ## The schema UJS support to export to swagger property (for eg: usage in NestJS), sometime we don't need validate and just for Swagger only
+   expect(Schema.number().integer().check(1.25)).toBeFalsy();
+   expect(Schema.number().integer().validate(false).check(1.25)).toBeTruthy();
+   expect(Schema.number().validate(false).check('Not a number')).toBeTruthy();
 });

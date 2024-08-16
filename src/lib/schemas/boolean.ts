@@ -16,8 +16,9 @@ export class BooleanSchema extends BaseSchema {
 
    buildSwagger(): Record<string, any> {
       return {
-         type: Boolean,
+         type: 'boolean',
          required: !this.isOptional(),
+         nullable: this.isNullable(),
          description: this.options.description,
          example: this.options.example,
       };

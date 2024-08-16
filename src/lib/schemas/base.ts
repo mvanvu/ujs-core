@@ -73,16 +73,10 @@ export abstract class BaseSchema {
       this.reset();
       this.value = value;
 
-      if (!this.isValidate()) {
-         return true;
-      }
-
-      const optional = this.isOptional();
-      const nullable = this.isNullable();
-
       if (
-         (optional && value === undefined) ||
-         (nullable && value === null) ||
+         !this.isValidate() ||
+         (this.isOptional() && value === undefined) ||
+         (this.isNullable() && value === null) ||
          (Is.array(this.options.allowValues) && this.options.allowValues.findIndex((allowValue) => Is.equals(allowValue, value)) !== -1)
       ) {
          return true;

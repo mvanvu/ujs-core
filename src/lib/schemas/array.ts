@@ -111,8 +111,9 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
 
    buildSwagger(): Record<string, any> {
       const arraySwagger: Record<string, any> = {
-         type: Array,
+         type: 'array',
          required: !this.isOptional(),
+         nullable: this.isNullable(),
          description: this.options.description,
          example: this.options.example,
       };

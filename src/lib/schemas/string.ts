@@ -57,13 +57,16 @@ export class StringSchema extends BaseSchema {
 
    buildSwagger(): Record<string, any> {
       const stringSwagger: Record<string, any> = {
-         type: String,
+         type: 'string',
          required: !this.isOptional(),
+         nullable: this.isNullable(),
          description: this.options.description,
          example: this.options.example,
       };
 
-      if (this.options.format) {
+      if (this.options.strongPassword) {
+         stringSwagger.format = 'password';
+      } else if (this.options.format) {
          switch (this.options.format) {
             case 'date':
                stringSwagger.format = 'date';
@@ -82,13 +85,14 @@ export class StringSchema extends BaseSchema {
                break;
 
             default:
-               stringSwagger.format = this.options.format;
+               if (this.options.format instanceof RegExp) {
+                  stringSwagger.pattern = this.options.format.source;
+               } else {
+                  stringSwagger.format = this.options.format;
+               }
+
                break;
          }
-      }
-
-      if (this.options.strongPassword) {
-         stringSwagger.format = 'password';
       }
 
       return stringSwagger;

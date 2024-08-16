@@ -39,10 +39,13 @@ export class NumberSchema extends BaseSchema {
 
    buildSwagger(): Record<string, any> {
       return {
-         type: Number,
+         type: this.options.integer === true ? 'integer' : 'number',
          required: !this.isOptional(),
+         nullable: this.isNullable(),
          description: this.options.description,
          example: this.options.example,
+         minimum: this.options.min,
+         maximum: this.options.max,
       };
    }
 

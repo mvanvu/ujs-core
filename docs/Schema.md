@@ -237,5 +237,13 @@ const barClassRef = Schema.classRef(BarSchema);
 barClassRef.check({ content: 'Something', foo: { uint: 1, email: 'my@email.com' } }); // It returns: true
 barClassRef.check({ foo: { uint: 1, email: 'my.email.com' } }); // It returns: false
 barClassRef.check({ content: ' Something ', foo: { uint: 1, email: 'my.email.com' } }); // It returns: false
-console.log(JSON.stringify(barClassRef.getErrors(), null, 2));
+```
+
+#### Disable validate
+
+```javascript
+// The schema UJS support to export to swagger property (for eg: usage in NestJS), sometime we don't need validate and just for Swagger only
+Schema.number().integer().check(1.25); // It returns: false
+Schema.number().integer().validate(false).check(1.25); // It returns: true
+Schema.number().validate(false).check('Not a number'); // It returns: true
 ```

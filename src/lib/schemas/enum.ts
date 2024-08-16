@@ -44,9 +44,10 @@ export class EnumSchema extends BaseSchema {
 
    buildSwagger(): Record<string, any> {
       return {
-         type: String,
+         type: 'string',
          enum: this.elements,
          required: !this.isOptional(),
+         nullable: this.isNullable(),
          description: this.options.description,
          example: this.options.example,
       };

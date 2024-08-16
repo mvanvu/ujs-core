@@ -90,8 +90,9 @@ export class ObjectSchema<T extends object> extends BaseSchema {
 
    buildSwagger(): Record<string, any> {
       const objSwagger: Record<string, any> = {
-         type: Object,
+         type: 'object',
          required: !this.isOptional(),
+         nullable: this.isNullable(),
          description: this.options.description,
          example: this.options.example,
       };

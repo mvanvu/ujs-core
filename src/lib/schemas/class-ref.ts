@@ -118,6 +118,7 @@ export class ClassRefSchema<T extends object> extends ObjectSchema<T> {
       return {
          type: this.classRef,
          required: !this.isOptional(),
+         nullable: this.isNullable(),
          description: this.options.description,
          example: this.options.example,
       };
