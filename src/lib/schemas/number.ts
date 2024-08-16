@@ -6,9 +6,7 @@ import { BaseSchema } from './base';
 import { schemaErrors } from './constant';
 
 export class NumberSchema extends BaseSchema {
-   constructor(protected options: IsNumberOptions = {}) {
-      super();
-   }
+   protected options: IsNumberOptions = {};
 
    integer(integer?: boolean): this {
       this.options.integer = integer === undefined || integer === true;
@@ -35,7 +33,7 @@ export class NumberSchema extends BaseSchema {
          type: this.isNullable() ? ['null', type] : type,
          minimum: this.options.min,
          maximum: this.options.max,
-         description: this.description,
+         description: this.options.description,
       };
    }
 
@@ -43,8 +41,8 @@ export class NumberSchema extends BaseSchema {
       return {
          type: Number,
          required: !this.isOptional(),
-         description: this.description,
-         example: this.example,
+         description: this.options.description,
+         example: this.options.example,
       };
    }
 
@@ -73,6 +71,6 @@ export class NumberSchema extends BaseSchema {
    }
 
    clone(): NumberSchema {
-      return new NumberSchema(Util.clone(this.options));
+      return new NumberSchema().setOptions(Util.clone(this.options));
    }
 }

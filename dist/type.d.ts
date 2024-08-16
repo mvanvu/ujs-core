@@ -94,8 +94,12 @@ export declare class IsError extends Error {
 export interface IsBaseOptions {
     optional?: boolean;
     nullable?: boolean;
+    allowValues?: any[];
+    description?: string;
+    example?: any;
+    validate?: boolean;
 }
-export type IsStringOptionFormat = 'email' | 'mongoId' | 'dateTime' | 'date' | 'time' | 'ipv4' | 'ipv6' | 'creditCard' | 'uri' | 'image' | 'base64' | 'md5' | 'sha1' | 'sha256' | 'uuid' | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | 'trim' | 'json' | 'alphanum' | 'lowercase' | 'uppercase' | RegExp;
+export type IsStringOptionFormat = 'email' | 'mongoId' | 'dateTime' | 'date' | 'time' | 'ipv4' | 'ipv6' | 'creditCard' | 'uri' | 'image' | 'base64' | 'md5' | 'sha1' | 'sha256' | 'uuid' | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | 'trim' | 'json' | 'alphanum' | 'lowercase' | 'uppercase' | 'binary' | RegExp;
 export interface IsStringOptions extends IsBaseOptions {
     format?: IsStringOptionFormat;
     minLength?: number;
@@ -110,6 +114,7 @@ export interface IsNumberOptions extends IsBaseOptions {
 }
 export type IsPrimitiveType = 'null' | 'undefined' | 'string' | 'number' | 'boolean' | 'symbol' | 'bigint';
 export interface IsArrayOptions extends IsBaseOptions {
+    unique?: boolean;
     minLength?: number;
     maxLength?: number;
 }

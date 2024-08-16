@@ -64,7 +64,7 @@ export class ObjectSchema<T extends object> extends BaseSchema {
          type: this.isNullable() ? ['null', 'object'] : 'object',
          required,
          properties: {},
-         description: this.description,
+         description: this.options.description,
       };
 
       if (this.properties) {
@@ -92,20 +92,9 @@ export class ObjectSchema<T extends object> extends BaseSchema {
       const objSwagger: Record<string, any> = {
          type: Object,
          required: !this.isOptional(),
-         description: this.description,
-         example: this.example,
+         description: this.options.description,
+         example: this.options.example,
       };
-
-      if (this.properties) {
-         class SwaggerObject<T extends object> extends ObjectSchema<T> {}
-         Reflect.defineProperty(SwaggerObject, 'name', { value: `SwaggerObject${Date.now()}` });
-
-         for (const property in this.properties) {
-            this.properties[property].defineSwaggerMetadata(SwaggerObject.prototype, property);
-         }
-
-         objSwagger.type = SwaggerObject;
-      }
 
       return objSwagger;
    }

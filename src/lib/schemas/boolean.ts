@@ -6,15 +6,11 @@ import { BaseSchema } from './base';
 import { schemaErrors } from './constant';
 
 export class BooleanSchema extends BaseSchema {
-   constructor(protected options: IsBaseOptions = {}) {
-      super();
-   }
-
    buildSchema() {
       return {
          type: this.isNullable() ? ['null', 'boolean'] : 'boolean',
-         description: this.description,
-         example: this.example,
+         description: this.options.description,
+         example: this.options.example,
       };
    }
 
@@ -22,8 +18,8 @@ export class BooleanSchema extends BaseSchema {
       return {
          type: Boolean,
          required: !this.isOptional(),
-         description: this.description,
-         example: this.example,
+         description: this.options.description,
+         example: this.options.example,
       };
    }
 
@@ -38,6 +34,6 @@ export class BooleanSchema extends BaseSchema {
    }
 
    clone(): BooleanSchema {
-      return new BooleanSchema(Util.clone(this.options));
+      return new BooleanSchema().setOptions(Util.clone(this.options));
    }
 }

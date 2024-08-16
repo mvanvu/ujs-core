@@ -8,12 +8,9 @@ import { type ObjectSchema } from './object';
 export type ItemSchema = BaseSchema | ObjectSchema<any> | ArraySchema<any>;
 
 export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema {
-   private arrayUnique: boolean;
+   protected options: IsArrayOptions = {};
 
-   constructor(
-      private itemsProps?: T,
-      protected options: IsArrayOptions = {},
-   ) {
+   constructor(protected itemsProps?: T) {
       super();
    }
 
@@ -30,7 +27,7 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
    }
 
    unique(unique?: boolean): this {
-      this.arrayUnique = unique === undefined || unique === true;
+      this.options.unique = unique === undefined || unique === true;
 
       return this;
    }
@@ -41,7 +38,7 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
       if (!Is.array(value)) {
          this.appendError(path, { message: schemaErrors.NOT_AN_ARRAY });
       } else {
-         if (this.arrayUnique && !Is.arrayUnique(value)) {
+         if (this.options.unique && !Is.arrayUnique(value)) {
             this.appendError(path, { message: schemaErrors.NOT_AN_UNIQUE_ARRAY });
          }
 
@@ -87,8 +84,8 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
          type: this.isNullable() ? ['null', 'array'] : 'array',
          prefixItems: [],
          items: {},
-         description: this.description,
-         example: this.example,
+         description: this.options,
+         example: this.options.example,
       };
 
       if (itemsProps) {
@@ -116,36 +113,22 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
       const arraySwagger: Record<string, any> = {
          type: Array,
          required: !this.isOptional(),
-         description: this.description,
-         example: this.example,
+         description: this.options.description,
+         example: this.options.example,
       };
 
-      if (Is.array(this.itemsProps) && this.itemsProps.length) {
-         return {
-            ...this.itemsProps[0].buildSwagger(),
-            ...arraySwagger,
-            isArray: true,
-         };
+      if (Is.array(this.itemsProps) && this.itemsProps[0] instanceof BaseSchema) {
+         Object.assign(arraySwagger, { type: this.itemsProps[0].buildSwagger().type, isArray: true });
       }
 
       if (this.itemsProps instanceof BaseSchema) {
-         return {
-            ...this.itemsProps[0].buildSwagger(),
-            ...arraySwagger,
-            isArray: true,
-         };
+         Object.assign(arraySwagger, { type: this.itemsProps.buildSwagger().type, isArray: true });
       }
 
       return arraySwagger;
    }
 
    clone(): ArraySchema<T> {
-      const arr = new ArraySchema<T>(this.itemsProps ? Util.clone(this.itemsProps) : undefined, Util.clone(this.options));
-
-      if (this.arrayUnique) {
-         arr.unique(true);
-      }
-
-      return arr;
+      return new ArraySchema<T>(Util.clone(this.itemsProps)).setOptions(Util.clone(this.options));
    }
 }

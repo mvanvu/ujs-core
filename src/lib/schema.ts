@@ -2,16 +2,16 @@ import { ClassConstructor, EnumArgs, IsBaseOptions, IsNumberOptions, IsStringOpt
 import { ArraySchema, BooleanSchema, ClassRefSchema, EnumSchema, ItemSchema, NumberSchema, ObjectSchema, ObjectSchemaProps, StringSchema } from './schemas';
 
 export class Schema {
-   static string(options?: IsStringOptions): StringSchema {
-      return new StringSchema(options);
+   static string(): StringSchema {
+      return new StringSchema();
    }
 
-   static number(options?: IsNumberOptions): NumberSchema {
-      return new NumberSchema(options);
+   static number(): NumberSchema {
+      return new NumberSchema();
    }
 
-   static boolean(options?: IsBaseOptions): BooleanSchema {
-      return new BooleanSchema(options);
+   static boolean(): BooleanSchema {
+      return new BooleanSchema();
    }
 
    static enum(emum: EnumArgs): EnumSchema {

@@ -16,14 +16,13 @@ export class ClassRefSchema<T extends object> extends ObjectSchema<T> {
       const schemaProps = Util.clone(Reflect.getMetadata(UJS_CLASS_PROPERTIES, classRef.prototype) || {});
       const collectSwaggerProperties = (target: Object) => {
          Util.clone(Reflect.getMetadata(UJS_SWAGGER_PROPERTIES_ARRAY, target) || []).forEach((prop: string) => {
-            // Remove first char :
-            prop = prop.substring(1);
+            const property = prop.replace(/^:/, '');
 
-            if (!swaggerProps[prop]) {
-               const swaggerProperty = Reflect.getMetadata(UJS_SWAGGER_PROPERTIES_MODEL, target, prop);
+            if (!swaggerProps[property]) {
+               const swaggerProperty = Reflect.getMetadata(UJS_SWAGGER_PROPERTIES_MODEL, target, property);
 
                if (swaggerProperty) {
-                  swaggerProps[prop] = Util.clone(swaggerProperty);
+                  swaggerProps[property] = Util.clone(swaggerProperty);
                }
             }
          });
@@ -53,81 +52,75 @@ export class ClassRefSchema<T extends object> extends ObjectSchema<T> {
 
    static Pick<T extends object, K extends keyof T>(classRef: ClassConstructor<T>, properties: K[]): ClassConstructor<Pick<T, (typeof properties)[number]>> {
       const pickedSchemaProps = {};
-      const pickedSwaggerProps = {};
+      const pickedSwaggerProps: string[] = [];
       const { schemaProps, swaggerProps } = ClassRefSchema.collectAllProperties(classRef);
 
       class UjsClassRefPickType {}
-      Reflect.defineProperty(UjsClassRefPickType, 'name', { value: 'UjsPickType' });
       Object.entries(schemaProps).forEach(([k, v]) => {
          if (properties.includes(k as any)) {
             pickedSchemaProps[k] = v;
 
             if (swaggerProps[k]) {
-               pickedSwaggerProps[k] = swaggerProps[k];
+               pickedSwaggerProps.push(`:${k}`);
                Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_MODEL, swaggerProps[k], UjsClassRefPickType.prototype, k);
             }
          }
       });
       Reflect.defineMetadata(UJS_CLASS_PROPERTIES, pickedSchemaProps, UjsClassRefPickType.prototype);
-      Reflect.defineMetadata(
-         UJS_SWAGGER_PROPERTIES_ARRAY,
-         Object.keys(pickedSwaggerProps).map((p) => `:${p}`),
-         UjsClassRefPickType.prototype,
-      );
+      Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_ARRAY, pickedSwaggerProps, UjsClassRefPickType.prototype);
 
       return UjsClassRefPickType as ClassConstructor<Pick<T, (typeof properties)[number]>>;
    }
 
    static Omit<T extends object, K extends keyof T>(classRef: ClassConstructor<T>, properties: K[]): ClassConstructor<Omit<T, (typeof properties)[number]>> {
       const omitSchemaProps = {};
-      const omitSwaggerProps = {};
+      const omitSwaggerProps: string[] = [];
       const { schemaProps, swaggerProps } = ClassRefSchema.collectAllProperties(classRef);
       class UjsClassRefOmitType {}
-      Reflect.defineProperty(UjsClassRefOmitType, 'name', { value: 'UjsClassRefOmitType' });
       Object.entries(schemaProps).forEach(([k, v]) => {
          if (!properties.includes(k as any)) {
             omitSchemaProps[k] = v;
 
             if (swaggerProps[k]) {
-               omitSwaggerProps[k] = swaggerProps[k];
+               omitSwaggerProps.push(`:${k}`);
                Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_MODEL, swaggerProps[k], UjsClassRefOmitType.prototype, k);
             }
          }
       });
       Reflect.defineMetadata(UJS_CLASS_PROPERTIES, omitSchemaProps, UjsClassRefOmitType.prototype);
-      Reflect.defineMetadata(
-         UJS_SWAGGER_PROPERTIES_ARRAY,
-         Object.keys(omitSwaggerProps).map((p) => `:${p}`),
-         UjsClassRefOmitType.prototype,
-      );
+      Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_ARRAY, omitSwaggerProps, UjsClassRefOmitType.prototype);
 
       return UjsClassRefOmitType as ClassConstructor<Omit<T, (typeof properties)[number]>>;
    }
 
    static Partial<T extends object>(classRef: ClassConstructor<T>): ClassConstructor<Partial<T>> {
       const partialSchemaProps = {};
-      const partialSwaggerProps = {};
+      const partialSwaggerProps: string[] = [];
       const { schemaProps, swaggerProps } = ClassRefSchema.collectAllProperties(classRef);
 
       class UjsClassRefPartialType {}
-      Reflect.defineProperty(UjsClassRefPartialType, 'name', { value: 'UjsClassRefPartialType' });
       Object.entries(schemaProps).forEach(([k, v]) => {
          partialSchemaProps[k] = (v as BaseSchema).optional();
 
          if (swaggerProps[k]) {
-            partialSwaggerProps[k] = swaggerProps[k];
+            partialSwaggerProps.push(`:${k}`);
             Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_MODEL, { ...swaggerProps[k], required: false }, UjsClassRefPartialType.prototype, k);
          }
       });
 
       Reflect.defineMetadata(UJS_CLASS_PROPERTIES, partialSchemaProps, UjsClassRefPartialType.prototype);
-      Reflect.defineMetadata(
-         UJS_SWAGGER_PROPERTIES_ARRAY,
-         Object.keys(partialSwaggerProps).map((p) => `:${p}`),
-         UjsClassRefPartialType.prototype,
-      );
+      Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_ARRAY, partialSwaggerProps, UjsClassRefPartialType.prototype);
 
-      return UjsClassRefPartialType;
+      return UjsClassRefPartialType as ClassConstructor<Partial<T>>;
+   }
+
+   buildSwagger(): Record<string, any> {
+      return {
+         type: this.classRef,
+         required: !this.isOptional(),
+         description: this.options.description,
+         example: this.options.example,
+      };
    }
 
    array(): ArraySchema<this> {

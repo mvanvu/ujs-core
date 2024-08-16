@@ -2,13 +2,11 @@ import { IsBaseOptions } from '../../type';
 import 'reflect-metadata';
 export declare abstract class BaseSchema {
     protected options: IsBaseOptions;
-    protected errors: any;
-    protected value: any;
-    protected allowValues: any[];
-    protected description: string;
-    protected example: any;
+    protected errors?: any;
+    protected value?: any;
     isNullable(): boolean;
     isOptional(): boolean;
+    isValidate(): boolean;
     setOptions(options: IsBaseOptions): this;
     getOptions(): IsBaseOptions;
     optional(optional?: boolean): this;
@@ -17,12 +15,12 @@ export declare abstract class BaseSchema {
     reset(): this;
     getErrors(): any;
     getValue(): any;
+    validate(validate?: boolean): this;
     check(value: any): boolean;
     protected appendError(path: string, error: any): this;
     desc(description: string): this;
     eg(example: any): this;
     decorate(): PropertyDecorator;
-    defineSwaggerMetadata(target: Object, propertyKey: PropertyKey): this;
     protected abstract checkError(input: {
         value: any;
     }, path: string | undefined): void;

@@ -1,3 +1,4 @@
+import { ClassRefSchema } from './lib';
 import { Schema } from './lib/schema';
 
 export class FooSchema {

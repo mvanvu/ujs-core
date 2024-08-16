@@ -32,7 +32,7 @@ export class EnumSchema extends BaseSchema {
       const enumSchema = {
          type: ['string', 'number', 'integer', 'boolean'],
          enum: this.elements,
-         description: this.description,
+         description: this.options.description,
       };
 
       if (this.isNullable()) {
@@ -47,8 +47,8 @@ export class EnumSchema extends BaseSchema {
          type: String,
          enum: this.elements,
          required: !this.isOptional(),
-         description: this.description,
-         example: this.example,
+         description: this.options.description,
+         example: this.options.example,
       };
    }
 

@@ -3,10 +3,9 @@ import { BaseSchema } from './base';
 import { type ObjectSchema } from './object';
 export type ItemSchema = BaseSchema | ObjectSchema<any> | ArraySchema<any>;
 export declare class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema {
-    private itemsProps?;
+    protected itemsProps?: T;
     protected options: IsArrayOptions;
-    private arrayUnique;
-    constructor(itemsProps?: T, options?: IsArrayOptions);
+    constructor(itemsProps?: T);
     minLength(num: number): this;
     maxLength(num: number): this;
     unique(unique?: boolean): this;
@@ -17,7 +16,7 @@ export declare class ArraySchema<T extends ItemSchema | ItemSchema[]> extends Ba
         type: string | string[];
         prefixItems: any[];
         items: {};
-        description: string;
+        description: IsArrayOptions;
         example: any;
     };
     buildSwagger(): Record<string, any>;

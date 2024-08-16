@@ -7,9 +7,7 @@ import { BaseSchema } from './base';
 import { schemaErrors } from './constant';
 
 export class StringSchema extends BaseSchema {
-   constructor(protected options: IsStringOptions = {}) {
-      super();
-   }
+   protected options: IsStringOptions = {};
 
    minLength(num: number): this {
       this.options.minLength = num;
@@ -46,8 +44,8 @@ export class StringSchema extends BaseSchema {
          type: this.isNullable() ? ['null', 'string'] : 'string',
          minLength: this.options.minLength,
          maxLength: this.options.maxLength,
-         description: this.description,
-         example: this.example,
+         description: this.options.description,
+         example: this.options.example,
          format:
             this.options.format === 'dateTime'
                ? 'date-time'
@@ -58,12 +56,42 @@ export class StringSchema extends BaseSchema {
    }
 
    buildSwagger(): Record<string, any> {
-      return {
+      const stringSwagger: Record<string, any> = {
          type: String,
          required: !this.isOptional(),
-         description: this.description,
-         example: this.example,
+         description: this.options.description,
+         example: this.options.example,
       };
+
+      if (this.options.format) {
+         switch (this.options.format) {
+            case 'date':
+               stringSwagger.format = 'date';
+               break;
+
+            case 'dateTime':
+               stringSwagger.format = 'date-time';
+               break;
+
+            case 'base64':
+               stringSwagger.format = 'byte';
+               break;
+
+            case 'binary':
+               stringSwagger.type = 'file';
+               break;
+
+            default:
+               stringSwagger.format = this.options.format;
+               break;
+         }
+      }
+
+      if (this.options.strongPassword) {
+         stringSwagger.format = 'password';
+      }
+
+      return stringSwagger;
    }
 
    protected checkError(input: { value: any }): void {
@@ -130,6 +158,6 @@ export class StringSchema extends BaseSchema {
    }
 
    clone(): StringSchema {
-      return new StringSchema(Util.clone(this.options));
+      return new StringSchema().setOptions(Util.clone(this.options));
    }
 }

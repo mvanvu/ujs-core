@@ -345,6 +345,9 @@ export class Is {
             case 'uppercase':
                return !/[a-z]/.test(value);
 
+            case 'binary':
+               return /^[01]+$/.test(value);
+
             default:
                return format instanceof RegExp ? format.test(value) : false;
          }

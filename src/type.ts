@@ -184,6 +184,10 @@ export class IsError extends Error {}
 export interface IsBaseOptions {
    optional?: boolean;
    nullable?: boolean;
+   allowValues?: any[];
+   description?: string;
+   example?: any;
+   validate?: boolean;
 }
 
 export type IsStringOptionFormat =
@@ -213,6 +217,7 @@ export type IsStringOptionFormat =
    | 'alphanum'
    | 'lowercase'
    | 'uppercase'
+   | 'binary'
    | RegExp;
 
 export interface IsStringOptions extends IsBaseOptions {
@@ -232,6 +237,7 @@ export interface IsNumberOptions extends IsBaseOptions {
 export type IsPrimitiveType = 'null' | 'undefined' | 'string' | 'number' | 'boolean' | 'symbol' | 'bigint';
 
 export interface IsArrayOptions extends IsBaseOptions {
+   unique?: boolean;
    minLength?: number;
    maxLength?: number;
 }

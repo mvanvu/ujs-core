@@ -1,20 +1,12 @@
-import { ClassConstructor, IsBaseOptions } from '../../type';
+import { IsBaseOptions } from '../../type';
 import { Is } from '../is';
 import { UJS_CLASS_PROPERTIES, UJS_SWAGGER_PROPERTIES_ARRAY, UJS_SWAGGER_PROPERTIES_MODEL } from './constant';
 import 'reflect-metadata';
 
 export abstract class BaseSchema {
    protected options: IsBaseOptions = {};
-
-   protected errors: any = null;
-
-   protected value: any = undefined;
-
-   protected allowValues: any[];
-
-   protected description: string;
-
-   protected example: any;
+   protected errors?: any = null;
+   protected value?: any = undefined;
 
    isNullable(): boolean {
       return this.options.nullable === true || (this.options.nullable === undefined && this.options.optional === true);
@@ -22,6 +14,10 @@ export abstract class BaseSchema {
 
    isOptional(): boolean {
       return this.options.optional === true;
+   }
+
+   isValidate(): boolean {
+      return this.options.validate === undefined || this.options.validate === true;
    }
 
    setOptions(options: IsBaseOptions): this {
@@ -47,7 +43,7 @@ export abstract class BaseSchema {
    }
 
    allow(...values: any[]): this {
-      this.allowValues = values;
+      this.options.allowValues = values;
 
       return this;
    }
@@ -67,16 +63,27 @@ export abstract class BaseSchema {
       return this.value;
    }
 
+   validate(validate?: boolean): this {
+      this.options.validate = validate === undefined || validate;
+
+      return this;
+   }
+
    check(value: any): boolean {
       this.reset();
       this.value = value;
-      const optional = this.options.optional === true;
-      const nullable = this.options.nullable === true || (this.options?.nullable === undefined && optional);
+
+      if (!this.isValidate()) {
+         return true;
+      }
+
+      const optional = this.isOptional();
+      const nullable = this.isNullable();
 
       if (
          (optional && value === undefined) ||
          (nullable && value === null) ||
-         (Is.array(this.allowValues) && this.allowValues.findIndex((allowValue) => Is.equals(allowValue, value)) !== -1)
+         (Is.array(this.options.allowValues) && this.options.allowValues.findIndex((allowValue) => Is.equals(allowValue, value)) !== -1)
       ) {
          return true;
       }
@@ -143,13 +150,13 @@ export abstract class BaseSchema {
    }
 
    desc(description: string): this {
-      this.description = description;
+      this.options.description = description;
 
       return this;
    }
 
    eg(example: any): this {
-      this.example = example;
+      this.options.example = example;
 
       return this;
    }
@@ -159,26 +166,20 @@ export abstract class BaseSchema {
       const schema = this;
 
       return function (target: Object, propertyKey: PropertyKey): void {
-         const properties = Reflect.getMetadata(UJS_CLASS_PROPERTIES, target) || {};
-         properties[propertyKey] = schema;
-         Reflect.defineMetadata(UJS_CLASS_PROPERTIES, properties, target);
+         // Apply schema
+         const schemaProperties = Reflect.getMetadata(UJS_CLASS_PROPERTIES, target) || {};
+         Reflect.defineMetadata(UJS_CLASS_PROPERTIES, { ...schemaProperties, [propertyKey]: schema }, target);
 
          // Apply Swagger
-         schema.defineSwaggerMetadata(target, propertyKey);
+         const swaggerProperties = (Reflect.getMetadata(UJS_SWAGGER_PROPERTIES_ARRAY, target) || []) as string[];
+         const property = `:${propertyKey as string}`;
+
+         if (!swaggerProperties.includes(property)) {
+            Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_ARRAY, [...swaggerProperties, property], target);
+         }
+
+         Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_MODEL, schema.buildSwagger(), target, propertyKey as string);
       };
-   }
-
-   defineSwaggerMetadata(target: Object, propertyKey: PropertyKey): this {
-      const properties = (Reflect.getMetadata(UJS_SWAGGER_PROPERTIES_ARRAY, target) || []) as string[];
-      const property = `:${propertyKey as string}`;
-
-      if (!properties.includes(property)) {
-         Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_ARRAY, [...properties, property], target);
-      }
-
-      Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_MODEL, this.buildSwagger(), target, propertyKey as string);
-
-      return this;
    }
 
    protected abstract checkError(input: { value: any }, path: string | undefined): void;
