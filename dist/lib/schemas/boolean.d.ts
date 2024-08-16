@@ -9,6 +9,7 @@ export declare class BooleanSchema extends BaseSchema {
         description: string;
         example: any;
     };
+    buildSwagger(): Record<string, any>;
     protected checkError(input: {
         value: any;
     }): void;

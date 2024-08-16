@@ -1,5 +1,6 @@
 import { ArraySchema, ItemSchema } from './array';
 import { BaseSchema } from './base';
+import 'reflect-metadata';
 export type ObjectSchemaProps<T extends object> = {
     [K in keyof T]: ItemSchema;
 };
@@ -18,8 +19,8 @@ export declare class ObjectSchema<T extends object> extends BaseSchema {
         required: string[];
         properties: {};
         description: string;
-        example: any;
     };
+    buildSwagger(): Record<string, any>;
     array(): ArraySchema<this>;
     clone(): ObjectSchema<T>;
 }

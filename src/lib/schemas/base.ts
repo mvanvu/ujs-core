@@ -1,6 +1,6 @@
-import { IsBaseOptions } from '../../type';
+import { ClassConstructor, IsBaseOptions } from '../../type';
 import { Is } from '../is';
-import { UJS_CLASS_PROPERTIES } from './constant';
+import { UJS_CLASS_PROPERTIES, UJS_SWAGGER_PROPERTIES_ARRAY, UJS_SWAGGER_PROPERTIES_MODEL } from './constant';
 import 'reflect-metadata';
 
 export abstract class BaseSchema {
@@ -16,11 +16,11 @@ export abstract class BaseSchema {
 
    protected example: any;
 
-   get isAllowNull(): boolean {
+   isNullable(): boolean {
       return this.options.nullable === true || (this.options.nullable === undefined && this.options.optional === true);
    }
 
-   get isOptional(): boolean {
+   isOptional(): boolean {
       return this.options.optional === true;
    }
 
@@ -159,24 +159,30 @@ export abstract class BaseSchema {
       const schema = this;
 
       return function (target: Object, propertyKey: PropertyKey): void {
-         if (!target.hasOwnProperty(UJS_CLASS_PROPERTIES)) {
-            target[UJS_CLASS_PROPERTIES] = {};
-         }
-
-         if (!target[UJS_CLASS_PROPERTIES][propertyKey]) {
-            target[UJS_CLASS_PROPERTIES][propertyKey] = {};
-         }
-
-         // Each property has only a schema
-         target[UJS_CLASS_PROPERTIES][propertyKey] = schema;
+         const properties = Reflect.getMetadata(UJS_CLASS_PROPERTIES, target) || {};
+         properties[propertyKey] = schema;
+         Reflect.defineMetadata(UJS_CLASS_PROPERTIES, properties, target);
 
          // Apply Swagger
-         const apiKey = 'swagger/apiModelProperties';
-         Reflect.defineMetadata(apiKey, schema.buildSchema(), target, propertyKey as string);
+         schema.defineSwaggerMetadata(target, propertyKey);
       };
    }
 
+   defineSwaggerMetadata(target: Object, propertyKey: PropertyKey): this {
+      const properties = (Reflect.getMetadata(UJS_SWAGGER_PROPERTIES_ARRAY, target) || []) as string[];
+      const property = `:${propertyKey as string}`;
+
+      if (!properties.includes(property)) {
+         Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_ARRAY, [...properties, property], target);
+      }
+
+      Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_MODEL, this.buildSwagger(), target, propertyKey as string);
+
+      return this;
+   }
+
    protected abstract checkError(input: { value: any }, path: string | undefined): void;
-   public abstract buildSchema(): Record<string, any>;
-   public abstract clone(): BaseSchema;
+   abstract buildSchema(): Record<string, any>;
+   abstract buildSwagger(): Record<string, any>;
+   abstract clone(): BaseSchema;
 }

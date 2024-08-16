@@ -43,7 +43,7 @@ export class StringSchema extends BaseSchema {
 
    buildSchema() {
       return {
-         type: this.isAllowNull ? ['null', 'string'] : 'string',
+         type: this.isNullable() ? ['null', 'string'] : 'string',
          minLength: this.options.minLength,
          maxLength: this.options.maxLength,
          description: this.description,
@@ -54,6 +54,15 @@ export class StringSchema extends BaseSchema {
                : ['date', 'time', 'email', 'ipv4', 'ipv6', 'uri'].includes(this.options.format as string)
                  ? this.options.format
                  : undefined,
+      };
+   }
+
+   buildSwagger(): Record<string, any> {
+      return {
+         type: String,
+         required: !this.isOptional(),
+         description: this.description,
+         example: this.example,
       };
    }
 

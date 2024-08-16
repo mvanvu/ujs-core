@@ -12,8 +12,8 @@ export declare class EnumSchema extends BaseSchema {
         type: string[];
         enum: EnumElement[];
         description: string;
-        example: any;
     };
+    buildSwagger(): Record<string, any>;
     array(): ArraySchema<this>;
     clone(): EnumSchema;
 }

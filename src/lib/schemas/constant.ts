@@ -22,3 +22,5 @@ export const schemaErrors = {
 };
 
 export const UJS_CLASS_PROPERTIES = '__UJS_CLASS_PROPERTIES__';
+export const UJS_SWAGGER_PROPERTIES_ARRAY = 'swagger/apiModelPropertiesArray';
+export const UJS_SWAGGER_PROPERTIES_MODEL = 'swagger/apiModelProperties';

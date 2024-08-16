@@ -33,14 +33,23 @@ export class EnumSchema extends BaseSchema {
          type: ['string', 'number', 'integer', 'boolean'],
          enum: this.elements,
          description: this.description,
-         example: this.example,
       };
 
-      if (this.isAllowNull) {
+      if (this.isNullable()) {
          enumSchema.type.push('null');
       }
 
       return enumSchema;
+   }
+
+   buildSwagger(): Record<string, any> {
+      return {
+         type: String,
+         enum: this.elements,
+         required: !this.isOptional(),
+         description: this.description,
+         example: this.example,
+      };
    }
 
    array(): ArraySchema<this> {

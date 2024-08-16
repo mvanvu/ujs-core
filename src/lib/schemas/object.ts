@@ -3,6 +3,7 @@ import { Util } from '../util';
 import { ArraySchema, ItemSchema } from './array';
 import { BaseSchema } from './base';
 import { schemaErrors } from './constant';
+import 'reflect-metadata';
 
 export type ObjectSchemaProps<T extends object> = { [K in keyof T]: ItemSchema };
 export class ObjectSchema<T extends object> extends BaseSchema {
@@ -59,32 +60,54 @@ export class ObjectSchema<T extends object> extends BaseSchema {
 
    buildSchema() {
       const required: string[] = [];
-
-      for (const key in this.properties) {
-         const schema = this.properties[key];
-
-         if (!schema.isOptional) {
-            required.push(key);
-         }
-      }
-
       const objSchema = {
-         type: this.isAllowNull ? ['null', 'object'] : 'object',
+         type: this.isNullable() ? ['null', 'object'] : 'object',
          required,
          properties: {},
          description: this.description,
-         example: this.example,
       };
+
+      if (this.properties) {
+         for (const key in this.properties) {
+            const schema = this.properties[key];
+
+            if (!schema.isOptional) {
+               required.push(key);
+            }
+         }
+
+         if (this.properties) {
+            Object.entries<ItemSchema>(this.properties).map(([k, v]) => (objSchema.properties[k] = v.buildSchema()));
+         }
+      }
 
       if (!required.length) {
          delete objSchema.required;
       }
 
+      return objSchema;
+   }
+
+   buildSwagger(): Record<string, any> {
+      const objSwagger: Record<string, any> = {
+         type: Object,
+         required: !this.isOptional(),
+         description: this.description,
+         example: this.example,
+      };
+
       if (this.properties) {
-         Object.entries<ItemSchema>(this.properties).map(([k, v]) => (objSchema.properties[k] = v.buildSchema()));
+         class SwaggerObject<T extends object> extends ObjectSchema<T> {}
+         Reflect.defineProperty(SwaggerObject, 'name', { value: `SwaggerObject${Date.now()}` });
+
+         for (const property in this.properties) {
+            this.properties[property].defineSwaggerMetadata(SwaggerObject.prototype, property);
+         }
+
+         objSwagger.type = SwaggerObject;
       }
 
-      return objSchema;
+      return objSwagger;
    }
 
    array(): ArraySchema<this> {

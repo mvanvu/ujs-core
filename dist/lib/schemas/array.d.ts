@@ -20,5 +20,6 @@ export declare class ArraySchema<T extends ItemSchema | ItemSchema[]> extends Ba
         description: string;
         example: any;
     };
+    buildSwagger(): Record<string, any>;
     clone(): ArraySchema<T>;
 }

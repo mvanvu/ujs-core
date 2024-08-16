@@ -17,6 +17,7 @@ export declare class StringSchema extends BaseSchema {
         example: any;
         format: string | RegExp;
     };
+    buildSwagger(): Record<string, any>;
     protected checkError(input: {
         value: any;
     }): void;

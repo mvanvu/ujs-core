@@ -12,8 +12,8 @@ export declare class NumberSchema extends BaseSchema {
         minimum: number;
         maximum: number;
         description: string;
-        example: any;
     };
+    buildSwagger(): Record<string, any>;
     protected checkError(input: {
         value: any;
     }): void;

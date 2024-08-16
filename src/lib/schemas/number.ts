@@ -32,9 +32,17 @@ export class NumberSchema extends BaseSchema {
       const type = this.options.integer === true ? 'integer' : 'number';
 
       return {
-         type: this.isAllowNull ? ['null', type] : type,
+         type: this.isNullable() ? ['null', type] : type,
          minimum: this.options.min,
          maximum: this.options.max,
+         description: this.description,
+      };
+   }
+
+   buildSwagger(): Record<string, any> {
+      return {
+         type: Number,
+         required: !this.isOptional(),
          description: this.description,
          example: this.example,
       };

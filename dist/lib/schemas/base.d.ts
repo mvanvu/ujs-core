@@ -7,8 +7,8 @@ export declare abstract class BaseSchema {
     protected allowValues: any[];
     protected description: string;
     protected example: any;
-    get isAllowNull(): boolean;
-    get isOptional(): boolean;
+    isNullable(): boolean;
+    isOptional(): boolean;
     setOptions(options: IsBaseOptions): this;
     getOptions(): IsBaseOptions;
     optional(optional?: boolean): this;
@@ -22,9 +22,11 @@ export declare abstract class BaseSchema {
     desc(description: string): this;
     eg(example: any): this;
     decorate(): PropertyDecorator;
+    defineSwaggerMetadata(target: Object, propertyKey: PropertyKey): this;
     protected abstract checkError(input: {
         value: any;
     }, path: string | undefined): void;
     abstract buildSchema(): Record<string, any>;
+    abstract buildSwagger(): Record<string, any>;
     abstract clone(): BaseSchema;
 }

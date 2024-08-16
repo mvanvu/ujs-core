@@ -12,7 +12,16 @@ export class BooleanSchema extends BaseSchema {
 
    buildSchema() {
       return {
-         type: this.isAllowNull ? ['null', 'boolean'] : 'boolean',
+         type: this.isNullable() ? ['null', 'boolean'] : 'boolean',
+         description: this.description,
+         example: this.example,
+      };
+   }
+
+   buildSwagger(): Record<string, any> {
+      return {
+         type: Boolean,
+         required: !this.isOptional(),
          description: this.description,
          example: this.example,
       };

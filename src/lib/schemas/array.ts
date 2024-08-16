@@ -84,7 +84,7 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
    buildSchema() {
       const { itemsProps } = this;
       const arraySchema = {
-         type: this.isAllowNull ? ['null', 'array'] : 'array',
+         type: this.isNullable() ? ['null', 'array'] : 'array',
          prefixItems: [],
          items: {},
          description: this.description,
@@ -110,6 +110,33 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
       }
 
       return arraySchema;
+   }
+
+   buildSwagger(): Record<string, any> {
+      const arraySwagger: Record<string, any> = {
+         type: Array,
+         required: !this.isOptional(),
+         description: this.description,
+         example: this.example,
+      };
+
+      if (Is.array(this.itemsProps) && this.itemsProps.length) {
+         return {
+            ...this.itemsProps[0].buildSwagger(),
+            ...arraySwagger,
+            isArray: true,
+         };
+      }
+
+      if (this.itemsProps instanceof BaseSchema) {
+         return {
+            ...this.itemsProps[0].buildSwagger(),
+            ...arraySwagger,
+            isArray: true,
+         };
+      }
+
+      return arraySwagger;
    }
 
    clone(): ArraySchema<T> {
