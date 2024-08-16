@@ -80,6 +80,14 @@ export class StringSchema extends BaseSchema {
                stringSwagger.format = 'byte';
                break;
 
+            case 'image':
+               stringSwagger.format = 'uri';
+               break;
+
+            case 'mongoId':
+               stringSwagger.pattern = '^[0-9a-f]{24}$';
+               break;
+
             case 'binary':
                stringSwagger.type = 'file';
                break;
