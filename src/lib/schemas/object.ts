@@ -13,8 +13,8 @@ export class ObjectSchema<T extends object> extends BaseSchema {
       super();
    }
 
-   get keys(): string[] {
-      return Object.keys(this.properties);
+   getPropertyKeys(): string[] {
+      return this.properties ? Object.keys(this.properties) : [];
    }
 
    whiteList(isWhiteList?: boolean): this {
@@ -36,8 +36,10 @@ export class ObjectSchema<T extends object> extends BaseSchema {
          this.appendError(path, { message: schemaErrors.NOT_AN_OBJECT });
       } else if (this.properties) {
          // Handle white list
+         const propertyKeys = this.getPropertyKeys();
+
          for (const key in value) {
-            if (!this.keys.includes(key)) {
+            if (!propertyKeys.includes(key)) {
                if (this.isWhiteList) {
                   delete value[key];
                } else {
@@ -46,8 +48,18 @@ export class ObjectSchema<T extends object> extends BaseSchema {
             }
          }
 
-         for (const key in this.properties) {
+         for (const key of propertyKeys) {
             const schema = this.properties[key];
+
+            if (value[key] === null && !schema.isNullable()) {
+               this.appendError(`${path}.${key}`, { message: schemaErrors.NOT_ALLOW_NULL });
+               continue;
+            }
+
+            if (value[key] === undefined && !schema.isOptional()) {
+               this.appendError(`${path}.${key}`, { message: schemaErrors.REQUIRED });
+               continue;
+            }
 
             if (!schema.check(value[key])) {
                this.appendError(`${path}.${key}`, schema.getErrors());
