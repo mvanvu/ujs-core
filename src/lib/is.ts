@@ -348,6 +348,12 @@ export class Is {
             case 'binary':
                return /^[01]+$/.test(value);
 
+            case 'slug':
+               return /^[a-z0-9_\-]+$/.test(value);
+
+            case 'path':
+               return /^[a-z0-9_\-/]+$/.test(value) && !/^\/|\/$|\/\/+/.test(value);
+
             default:
                return format instanceof RegExp ? format.test(value) : false;
          }

@@ -326,6 +326,18 @@ Is.stringFormat('Abc', 'lowercase'); // It returns: false
 Is.stringFormat('ABC XYZ', 'uppercase'); // It returns: true
 Is.stringFormat('Abc Xyz', 'uppercase'); // It returns: false
 
+// Slug
+Is.stringFormat('this-is-an-alias-slug-url', 'slug'); // It returns: true
+Is.stringFormat('this-is-an-alias-slug-url-123', 'slug'); // It returns: true
+Is.stringFormat('this is not an alias slug', 'slug'); // It returns: false
+
+// Path
+Is.stringFormat('path/to/url', 'path'); // It returns: true
+Is.stringFormat('path/to/url/id-123', 'path'); // It returns: true
+Is.stringFormat('/path/to/url', 'path'); // It returns: false
+Is.stringFormat('path/to/url/', 'path'); // It returns: false
+Is.stringFormat('/path/to/url/', 'path'); // It returns: false
+
 // RegExp
 Is.stringFormat('507f1f77bcf86cd799439011', /^[0-9a-fA-F]{24}$/); // It returns: true
 ```

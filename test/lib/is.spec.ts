@@ -270,6 +270,18 @@ it('Core Is', () => {
    expect(Is.stringFormat('ABC XYZ', 'uppercase')).toBeTruthy();
    expect(Is.stringFormat('Abc Xyz', 'uppercase')).toBeFalsy();
 
+   // ## Slug
+   expect(Is.stringFormat('this-is-an-alias-slug-url', 'slug')).toBeTruthy();
+   expect(Is.stringFormat('this-is-an-alias-slug-url-123', 'slug')).toBeTruthy();
+   expect(Is.stringFormat('this is not an alias slug', 'slug')).toBeFalsy();
+
+   // ## Path
+   expect(Is.stringFormat('path/to/url', 'path')).toBeTruthy();
+   expect(Is.stringFormat('path/to/url/id-123', 'path')).toBeTruthy();
+   expect(Is.stringFormat('/path/to/url', 'path')).toBeFalsy();
+   expect(Is.stringFormat('path/to/url/', 'path')).toBeFalsy();
+   expect(Is.stringFormat('/path/to/url/', 'path')).toBeFalsy();
+
    // ## RegExp
    expect(Is.stringFormat('507f1f77bcf86cd799439011', /^[0-9a-fA-F]{24}$/)).toBeTruthy();
 

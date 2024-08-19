@@ -218,6 +218,8 @@ export type IsStringOptionFormat =
    | 'lowercase'
    | 'uppercase'
    | 'binary'
+   | 'slug'
+   | 'path'
    | RegExp;
 
 export interface IsStringOptions extends IsBaseOptions {

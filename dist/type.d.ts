@@ -99,7 +99,7 @@ export interface IsBaseOptions {
     example?: any;
     validate?: boolean;
 }
-export type IsStringOptionFormat = 'email' | 'mongoId' | 'dateTime' | 'date' | 'time' | 'ipv4' | 'ipv6' | 'creditCard' | 'uri' | 'image' | 'base64' | 'md5' | 'sha1' | 'sha256' | 'uuid' | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | 'trim' | 'json' | 'alphanum' | 'lowercase' | 'uppercase' | 'binary' | RegExp;
+export type IsStringOptionFormat = 'email' | 'mongoId' | 'dateTime' | 'date' | 'time' | 'ipv4' | 'ipv6' | 'creditCard' | 'uri' | 'image' | 'base64' | 'md5' | 'sha1' | 'sha256' | 'uuid' | 'jwt' | 'number' | 'integer' | 'unsignedNumber' | 'unsignedInteger' | 'boolean' | 'trim' | 'json' | 'alphanum' | 'lowercase' | 'uppercase' | 'binary' | 'slug' | 'path' | RegExp;
 export interface IsStringOptions extends IsBaseOptions {
     format?: IsStringOptionFormat;
     minLength?: number;
