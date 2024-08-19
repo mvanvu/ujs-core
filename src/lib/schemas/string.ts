@@ -112,7 +112,7 @@ export class StringSchema extends BaseSchema {
       if (Is.string(value)) {
          if (this.options.format && !Is.stringFormat(value, this.options.format)) {
             const format = this.options.format instanceof RegExp ? 'RegExp' : this.options.format;
-            this.errors.push({ message: schemaErrors.INVALID_STRING_FORMAT, meta: { format } });
+            this.errors.push({ code: schemaErrors.INVALID_STRING_FORMAT, meta: { format } });
          }
 
          // Handle transform string value (only no-format && strongPassword options)
@@ -132,15 +132,15 @@ export class StringSchema extends BaseSchema {
          }
 
          if (this.options.strongPassword && !Is.strongPassword(value, this.options.strongPassword)) {
-            this.errors.push({ message: schemaErrors.NOT_STRONG_PASSWORD, meta: { ...this.options.strongPassword } });
+            this.errors.push({ code: schemaErrors.NOT_STRONG_PASSWORD, meta: { ...this.options.strongPassword } });
          }
 
          if (Is.number(this.options.minLength) && value.length < this.options.minLength) {
-            this.errors.push({ message: schemaErrors.STRING_MIN_LENGTH, meta: { minLength: this.options.minLength } });
+            this.errors.push({ code: schemaErrors.STRING_MIN_LENGTH, meta: { minLength: this.options.minLength } });
          }
 
          if (Is.number(this.options.maxLength) && value.length > this.options.maxLength) {
-            this.errors.push({ message: schemaErrors.STRING_MAX_LENGTH, meta: { maxLength: this.options.maxLength } });
+            this.errors.push({ code: schemaErrors.STRING_MAX_LENGTH, meta: { maxLength: this.options.maxLength } });
          }
 
          if (!this.errors.length) {
@@ -161,7 +161,7 @@ export class StringSchema extends BaseSchema {
             input.value = value;
          }
       } else {
-         this.errors.push({ message: schemaErrors.NOT_A_STRING });
+         this.errors.push({ code: schemaErrors.NOT_A_STRING });
       }
    }
 

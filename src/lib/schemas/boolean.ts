@@ -26,7 +26,7 @@ export class BooleanSchema extends BaseSchema {
 
    protected checkError(input: { value: any }): void {
       if (!Is.boolean(input.value)) {
-         this.errors.push({ message: schemaErrors.NOT_A_BOOLEAN });
+         this.errors.push({ code: schemaErrors.NOT_A_BOOLEAN });
       }
    }
 

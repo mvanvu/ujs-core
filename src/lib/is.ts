@@ -349,10 +349,10 @@ export class Is {
                return /^[01]+$/.test(value);
 
             case 'slug':
-               return /^[a-z0-9_\-]+$/.test(value);
+               return /^[a-z0-9_\-]+$/i.test(value);
 
             case 'path':
-               return /^[a-z0-9_\-/]+$/.test(value) && !/^\/|\/$|\/\/+/.test(value);
+               return /^[a-z0-9_\-/]+$/i.test(value) && !/^\/|\/$|\/\/+/.test(value);
 
             default:
                return format instanceof RegExp ? format.test(value) : false;

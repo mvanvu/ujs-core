@@ -36,18 +36,18 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
       const { value } = input;
 
       if (!Is.array(value)) {
-         this.appendError(path, { message: schemaErrors.NOT_AN_ARRAY });
+         this.appendError(path, { code: schemaErrors.NOT_AN_ARRAY });
       } else {
          if (this.options.unique && !Is.arrayUnique(value)) {
-            this.appendError(path, { message: schemaErrors.NOT_AN_UNIQUE_ARRAY });
+            this.appendError(path, { code: schemaErrors.NOT_AN_UNIQUE_ARRAY });
          }
 
          if (Is.number(this.options.minLength) && value.length < this.options.minLength) {
-            this.appendError(path, { message: schemaErrors.ARRAY_MIN_LENGTH, meta: { minLength: this.options.minLength } });
+            this.appendError(path, { code: schemaErrors.ARRAY_MIN_LENGTH, meta: { minLength: this.options.minLength } });
          }
 
          if (Is.number(this.options.maxLength) && value.length > this.options.maxLength) {
-            this.appendError(path, { message: schemaErrors.ARRAY_MAX_LENGTH, meta: { maxLength: this.options.maxLength } });
+            this.appendError(path, { code: schemaErrors.ARRAY_MAX_LENGTH, meta: { maxLength: this.options.maxLength } });
          }
 
          if (this.itemsProps) {

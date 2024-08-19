@@ -99,7 +99,7 @@ export abstract class BaseSchema {
          this.errors = {};
       }
 
-      const isLeafError = (e: any) => Is.array(e) && Is.object(e[0]) && Is.string(e[0].message);
+      const isLeafError = (e: any) => Is.array(e) && Is.object(e[0]) && Is.string(e[0].code);
       const setError = (p: string, e: any[]) => {
          p = p
             .replace(/\$|^\.|\.$/g, '')
@@ -121,7 +121,7 @@ export abstract class BaseSchema {
                flatten(p2, e);
             });
          } else if (Is.object(err)) {
-            if (Is.string(err.message)) {
+            if (Is.string(err.code)) {
                setError(p, [err]);
             } else {
                for (const k in err) {

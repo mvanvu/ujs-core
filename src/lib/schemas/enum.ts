@@ -24,7 +24,7 @@ export class EnumSchema extends BaseSchema {
 
    protected checkError(input: { value: any }): void {
       if (!this.elements.includes(input.value)) {
-         this.errors.push({ message: schemaErrors.NOT_AN_ENUM, meta: { enum: this.elements } });
+         this.errors.push({ code: schemaErrors.NOT_AN_ENUM, meta: { enum: this.elements } });
       }
    }
 

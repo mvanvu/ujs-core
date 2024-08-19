@@ -33,7 +33,7 @@ export class ObjectSchema<T extends object> extends BaseSchema {
       const { value } = input;
 
       if (!Is.object(value)) {
-         this.appendError(path, { message: schemaErrors.NOT_AN_OBJECT });
+         this.appendError(path, { code: schemaErrors.NOT_AN_OBJECT });
       } else if (this.properties) {
          // Handle white list
          const propertyKeys = this.getPropertyKeys();
@@ -43,7 +43,7 @@ export class ObjectSchema<T extends object> extends BaseSchema {
                if (this.isWhiteList) {
                   delete value[key];
                } else {
-                  this.appendError(`${path}.${key}`, { message: schemaErrors.NOT_ALLOW_PROPERTY });
+                  this.appendError(`${path}.${key}`, { code: schemaErrors.NOT_ALLOW_PROPERTY });
                }
             }
          }
@@ -52,12 +52,12 @@ export class ObjectSchema<T extends object> extends BaseSchema {
             const schema = this.properties[key];
 
             if (value[key] === null && !schema.isNullable()) {
-               this.appendError(`${path}.${key}`, { message: schemaErrors.NOT_ALLOW_NULL });
+               this.appendError(`${path}.${key}`, { code: schemaErrors.NOT_ALLOW_NULL });
                continue;
             }
 
             if (value[key] === undefined && !schema.isOptional()) {
-               this.appendError(`${path}.${key}`, { message: schemaErrors.REQUIRED });
+               this.appendError(`${path}.${key}`, { code: schemaErrors.REQUIRED });
                continue;
             }
 

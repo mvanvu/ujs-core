@@ -54,18 +54,18 @@ export class NumberSchema extends BaseSchema {
 
       if (Is.number(value)) {
          if (this.options.integer && !Number.isInteger(value)) {
-            this.errors.push({ message: schemaErrors.NOT_AN_INTEGER });
+            this.errors.push({ code: schemaErrors.NOT_AN_INTEGER });
          }
 
          if (Is.number(this.options.min) && value < this.options.min) {
-            this.errors.push({ message: schemaErrors.NUMBER_MINIMUM, meta: { min: this.options.min } });
+            this.errors.push({ code: schemaErrors.NUMBER_MINIMUM, meta: { min: this.options.min } });
          }
 
          if (Is.number(this.options.max) && value > this.options.max) {
-            this.errors.push({ message: schemaErrors.NUMBER_MAXIMUM, meta: { min: this.options.max } });
+            this.errors.push({ code: schemaErrors.NUMBER_MAXIMUM, meta: { min: this.options.max } });
          }
       } else {
-         this.errors.push({ message: this.options.integer ? schemaErrors.NOT_AN_INTEGER : schemaErrors.NOT_A_NUMBER });
+         this.errors.push({ code: this.options.integer ? schemaErrors.NOT_AN_INTEGER : schemaErrors.NOT_A_NUMBER });
       }
    }
 
