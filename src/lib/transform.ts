@@ -154,6 +154,15 @@ export class Transform {
    // Convert a string to a safe URL path
    static toPath(value: any): string {
       return Transform.toString(value)
+         .split(/\/+/g)
+         .map((p) => Transform.toSlug(p))
+         .filter((p) => !!p.trim())
+         .join('/');
+   }
+
+   // Convert a string to a safe URL path
+   static toSlug(value: any): string {
+      return Transform.toNonAccent(value)
          .trim()
          .toLowerCase()
          .replace(/[^a-z0-9-/]/gi, '-')

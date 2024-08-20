@@ -10,6 +10,7 @@ export declare class Transform {
     static toNumber(value: any): number;
     static toArrayUnique(value: any): any[];
     static toPath(value: any): string;
+    static toSlug(value: any): string;
     static toAlnum(value: any): string;
     static toNoneDiacritics(value: any): string;
     static toNonAccent(value: any): string;
