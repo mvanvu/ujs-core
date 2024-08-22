@@ -247,3 +247,17 @@ Schema.number().integer().check(1.25); // It returns: false
 Schema.number().integer().validate(false).check(1.25); // It returns: true
 Schema.number().validate(false).check('Not a number'); // It returns: true
 ```
+
+#### Default value
+
+```javascript
+// Set the default value when the check data is undefined
+const number = Schema.number().optional().default(123);
+number.check(undefined);
+number.getValue(); // It returns: 123
+
+// Ignore default value when the value is allowed values
+number.allow([null]);
+number.check(null);
+number.getValue(); // It returns: null
+```

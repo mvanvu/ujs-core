@@ -6,6 +6,7 @@ export declare class ArraySchema<T extends ItemSchema | ItemSchema[]> extends Ba
     protected itemsProps?: T;
     protected options: IsArrayOptions;
     constructor(itemsProps?: T);
+    getItems(): ItemSchema | ItemSchema[] | undefined;
     minLength(num: number): this;
     maxLength(num: number): this;
     unique(unique?: boolean): this;

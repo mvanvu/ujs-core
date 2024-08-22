@@ -14,6 +14,10 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
       super();
    }
 
+   getItems(): ItemSchema | ItemSchema[] | undefined {
+      return this.itemsProps;
+   }
+
    minLength(num: number): this {
       this.options.minLength = num;
 

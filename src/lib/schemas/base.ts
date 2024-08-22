@@ -1,12 +1,13 @@
 import { IsBaseOptions } from '../../type';
 import { Is } from '../is';
-import { UJS_CLASS_PROPERTIES, UJS_SWAGGER_PROPERTIES_ARRAY, UJS_SWAGGER_PROPERTIES_MODEL } from './constant';
+import { UJS_CLASS_PROPERTIES, UJS_SWAGGER_PROPERTIES_ARRAY, UJS_SWAGGER_PROPERTIES_MODEL, schemaErrors } from './constant';
 import 'reflect-metadata';
 
 export abstract class BaseSchema {
    protected options: IsBaseOptions = {};
    protected errors?: any = null;
    protected value?: any = undefined;
+   protected defValue?: any = undefined;
 
    isNullable(): boolean {
       return this.options.nullable === true || (this.options.nullable === undefined && this.options.optional === true);
@@ -48,6 +49,12 @@ export abstract class BaseSchema {
       return this;
    }
 
+   default<T>(value: T): this {
+      this.defValue = value;
+
+      return this;
+   }
+
    reset(): this {
       this.value = undefined;
       this.errors = [];
@@ -72,14 +79,28 @@ export abstract class BaseSchema {
    check(value: any): boolean {
       this.reset();
       this.value = value;
+      const isOptional = this.isOptional();
+      const isNullable = this.isNullable();
+      const isAllowValue = Is.array(this.options.allowValues) && this.options.allowValues.findIndex((allowValue) => Is.equals(allowValue, value)) !== -1;
 
-      if (
-         !this.isValidate() ||
-         (this.isOptional() && value === undefined) ||
-         (this.isNullable() && value === null) ||
-         (Is.array(this.options.allowValues) && this.options.allowValues.findIndex((allowValue) => Is.equals(allowValue, value)) !== -1)
-      ) {
+      if (!this.isValidate() || (isOptional && value === undefined) || (isNullable && value === null) || isAllowValue) {
+         if (value === undefined && this.defValue !== undefined && !isAllowValue) {
+            this.value = this.defValue;
+         }
+
          return true;
+      }
+
+      if (value === undefined && !isOptional) {
+         this.appendError('', { code: schemaErrors.REQUIRED });
+
+         return false;
+      }
+
+      if (value === null && !isNullable) {
+         this.appendError('', { code: schemaErrors.NOT_ALLOW_NULL });
+
+         return false;
       }
 
       const input = { value };

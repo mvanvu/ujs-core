@@ -214,4 +214,15 @@ it('Core Schema', async () => {
    expect(Schema.number().integer().check(1.25)).toBeFalsy();
    expect(Schema.number().integer().validate(false).check(1.25)).toBeTruthy();
    expect(Schema.number().validate(false).check('Not a number')).toBeTruthy();
+
+   // # Default value
+   // ## Set the default value when the check data is undefined
+   const number = Schema.number().optional().default(123);
+   number.check(undefined);
+   expect(number.getValue()).toEqual(123);
+
+   // ## Ignore default value when the value is allowed values
+   number.allow([null]);
+   number.check(null);
+   expect(number.getValue()).toEqual(null);
 });

@@ -8,6 +8,7 @@ export declare class ObjectSchema<T extends object> extends BaseSchema {
     private properties?;
     private isWhiteList;
     constructor(properties?: ObjectSchemaProps<T>);
+    getProperties(): ObjectSchemaProps<T> | undefined;
     getPropertyKeys(): string[];
     whiteList(isWhiteList?: boolean): this;
     resetErrors(): this;

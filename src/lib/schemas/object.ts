@@ -13,6 +13,10 @@ export class ObjectSchema<T extends object> extends BaseSchema {
       super();
    }
 
+   getProperties(): ObjectSchemaProps<T> | undefined {
+      return this.properties;
+   }
+
    getPropertyKeys(): string[] {
       return this.properties ? Object.keys(this.properties) : [];
    }
@@ -50,16 +54,6 @@ export class ObjectSchema<T extends object> extends BaseSchema {
 
          for (const key of propertyKeys) {
             const schema = this.properties[key];
-
-            if (value[key] === null && !schema.isNullable()) {
-               this.appendError(`${path}.${key}`, { code: schemaErrors.NOT_ALLOW_NULL });
-               continue;
-            }
-
-            if (value[key] === undefined && !schema.isOptional()) {
-               this.appendError(`${path}.${key}`, { code: schemaErrors.REQUIRED });
-               continue;
-            }
 
             if (!schema.check(value[key])) {
                this.appendError(`${path}.${key}`, schema.getErrors());
