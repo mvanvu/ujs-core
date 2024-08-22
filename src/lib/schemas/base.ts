@@ -117,8 +117,7 @@ export abstract class BaseSchema {
             setError(p, err);
          } else if (Is.array(err)) {
             err.forEach((e, i) => {
-               const p2 = `${p}[${i}]`;
-               flatten(p2, e);
+               flatten(`${p}[${i}]`, e);
             });
          } else if (Is.object(err)) {
             if (Is.string(err.code)) {
@@ -130,7 +129,7 @@ export abstract class BaseSchema {
 
                   if (isLeafError(e)) {
                      setError(p2, e);
-                  } else if (Is.object(e)) {
+                  } else {
                      flatten(p2, e);
                   }
                }

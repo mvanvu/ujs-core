@@ -68,7 +68,7 @@ export class ArraySchema<T extends ItemSchema | ItemSchema[]> extends BaseSchema
                   const element = value[i];
 
                   if (!this.itemsProps.check(element)) {
-                     this.appendError(path, this.itemsProps.getErrors());
+                     this.appendError(`${path}[${i}]`, this.itemsProps.getErrors());
                   } else if (Is.primitive(value[i])) {
                      value[i] = this.itemsProps.getValue();
                   }
