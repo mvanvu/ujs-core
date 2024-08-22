@@ -5,4 +5,5 @@ export declare class FooSchema {
 export declare class BarSchema {
     content: string;
     foo: FooSchema;
+    def?: number[];
 }

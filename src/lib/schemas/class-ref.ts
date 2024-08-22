@@ -98,16 +98,39 @@ export class ClassRefSchema<T extends object> extends ObjectSchema<T> {
       const partialSwaggerProps: string[] = [];
       const { schemaProps, swaggerProps } = ClassRefSchema.collectAllProperties(classRef);
 
+      // Partial shouldn't have default value
+      const removeDefaultValue = (schema: BaseSchema) => {
+         schema.default(undefined);
+
+         if (schema instanceof ObjectSchema) {
+            const properties = schema.getProperties();
+
+            if (properties) {
+               Object.entries(properties).forEach(([, sc]) => removeDefaultValue(sc));
+            }
+         } else if (schema instanceof ArraySchema) {
+            const items = schema.getItems();
+
+            if (items) {
+               if (Is.array(items)) {
+                  items.forEach((item) => removeDefaultValue(item));
+               } else {
+                  removeDefaultValue(items);
+               }
+            }
+         }
+      };
+
       class UjsClassRefPartialType {}
-      Object.entries(schemaProps).forEach(([k, v]) => {
-         partialSchemaProps[k] = (v as BaseSchema).optional();
+      Object.entries<BaseSchema>(schemaProps).forEach(([k, v]) => {
+         removeDefaultValue(v);
+         partialSchemaProps[k] = v;
 
          if (swaggerProps[k]) {
             partialSwaggerProps.push(`:${k}`);
             Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_MODEL, { ...swaggerProps[k], required: false }, UjsClassRefPartialType.prototype, k);
          }
       });
-
       Reflect.defineMetadata(UJS_CLASS_PROPERTIES, partialSchemaProps, UjsClassRefPartialType.prototype);
       Reflect.defineMetadata(UJS_SWAGGER_PROPERTIES_ARRAY, partialSwaggerProps, UjsClassRefPartialType.prototype);
 

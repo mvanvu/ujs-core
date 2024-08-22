@@ -95,6 +95,7 @@ export interface IsBaseOptions {
     optional?: boolean;
     nullable?: boolean;
     allowValues?: any[];
+    defaultValue?: any;
     description?: string;
     example?: any;
     validate?: boolean;

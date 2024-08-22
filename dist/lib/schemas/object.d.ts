@@ -10,7 +10,7 @@ export declare class ObjectSchema<T extends object> extends BaseSchema {
     constructor(properties?: ObjectSchemaProps<T>);
     getProperties(): ObjectSchemaProps<T> | undefined;
     getPropertyKeys(): string[];
-    whiteList(isWhiteList?: boolean): this;
+    whiteList(isWhiteList?: boolean | 'deep'): this;
     resetErrors(): this;
     protected checkError(input: {
         value: any;

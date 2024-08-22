@@ -237,6 +237,9 @@ const barClassRef = Schema.classRef(BarSchema);
 barClassRef.check({ content: 'Something', foo: { uint: 1, email: 'my@email.com' } }); // It returns: true
 barClassRef.check({ foo: { uint: 1, email: 'my.email.com' } }); // It returns: false
 barClassRef.check({ content: ' Something ', foo: { uint: 1, email: 'my.email.com' } }); // It returns: false
+
+// Check default value
+barClassRef.getValue(); // It returns: [ROOT].'def' ===  [123]
 ```
 
 #### Disable validate

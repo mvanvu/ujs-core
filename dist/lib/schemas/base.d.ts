@@ -4,7 +4,6 @@ export declare abstract class BaseSchema {
     protected options: IsBaseOptions;
     protected errors?: any;
     protected value?: any;
-    protected defValue?: any;
     isNullable(): boolean;
     isOptional(): boolean;
     isValidate(): boolean;

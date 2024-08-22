@@ -1,5 +1,6 @@
 import { IsBaseOptions } from '../../type';
 import { Is } from '../is';
+import { Util } from '../util';
 import { UJS_CLASS_PROPERTIES, UJS_SWAGGER_PROPERTIES_ARRAY, UJS_SWAGGER_PROPERTIES_MODEL, schemaErrors } from './constant';
 import 'reflect-metadata';
 
@@ -7,7 +8,6 @@ export abstract class BaseSchema {
    protected options: IsBaseOptions = {};
    protected errors?: any = null;
    protected value?: any = undefined;
-   protected defValue?: any = undefined;
 
    isNullable(): boolean {
       return this.options.nullable === true || (this.options.nullable === undefined && this.options.optional === true);
@@ -50,7 +50,7 @@ export abstract class BaseSchema {
    }
 
    default<T>(value: T): this {
-      this.defValue = value;
+      this.options.defaultValue = value;
 
       return this;
    }
@@ -84,8 +84,8 @@ export abstract class BaseSchema {
       const isAllowValue = Is.array(this.options.allowValues) && this.options.allowValues.findIndex((allowValue) => Is.equals(allowValue, value)) !== -1;
 
       if (!this.isValidate() || (isOptional && value === undefined) || (isNullable && value === null) || isAllowValue) {
-         if (value === undefined && this.defValue !== undefined && !isAllowValue) {
-            this.value = this.defValue;
+         if (value === undefined && this.options.defaultValue !== undefined && !isAllowValue) {
+            this.value = Util.clone(this.options.defaultValue);
          }
 
          return true;

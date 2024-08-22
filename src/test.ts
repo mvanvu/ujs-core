@@ -15,4 +15,7 @@ export class BarSchema {
 
    @(Schema.classRef(FooSchema).decorate())
    foo: FooSchema;
+
+   @(Schema.uint().array().optional().default([123]).decorate())
+   def?: number[];
 }

@@ -21,8 +21,33 @@ export class ObjectSchema<T extends object> extends BaseSchema {
       return this.properties ? Object.keys(this.properties) : [];
    }
 
-   whiteList(isWhiteList?: boolean): this {
-      this.isWhiteList = isWhiteList === undefined || isWhiteList === true;
+   whiteList(isWhiteList?: boolean | 'deep'): this {
+      this.isWhiteList = isWhiteList === undefined || isWhiteList === true || isWhiteList === 'deep';
+
+      if (isWhiteList === 'deep' && this.properties) {
+         const markAllWhiteList = (schema: BaseSchema) => {
+            if (schema instanceof ObjectSchema) {
+               schema.whiteList();
+               const properties = schema.getProperties();
+
+               if (properties) {
+                  Object.entries(properties).forEach(([, sc]) => markAllWhiteList(sc));
+               }
+            } else if (schema instanceof ArraySchema) {
+               const items = schema.getItems();
+
+               if (items) {
+                  if (Is.array(items)) {
+                     items.forEach((item) => markAllWhiteList(item));
+                  } else {
+                     markAllWhiteList(items);
+                  }
+               }
+            }
+         };
+
+         Object.entries<BaseSchema>(this.properties).forEach(([, schema]) => markAllWhiteList(schema));
+      }
 
       return this;
    }
