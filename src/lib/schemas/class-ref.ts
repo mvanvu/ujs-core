@@ -124,7 +124,7 @@ export class ClassRefSchema<T extends object> extends ObjectSchema<T> {
       class UjsClassRefPartialType {}
       Object.entries<BaseSchema>(schemaProps).forEach(([k, v]) => {
          removeDefaultValue(v);
-         partialSchemaProps[k] = v;
+         partialSchemaProps[k] = v.optional();
 
          if (swaggerProps[k]) {
             partialSwaggerProps.push(`:${k}`);
